@@ -1,0 +1,82 @@
+[OPTIONS]
+Compatibility=1.1
+Full-text search=Yes
+Contents file=index.hhc
+Default Window=main
+Default topic=index.html
+Index file=index.hhk
+Language=0x409 English (United States)
+Title=Nitro Engine
+
+[WINDOWS]
+main="Nitro Engine","index.hhc","index.hhk","index.html","index.html",,,,,0x23520,,0x10387e,,,,,,,,0
+
+[FILES]
+index.html
+_n_e2_d_8h.html
+_n_e_alloc_8h.html
+_n_e_a_p_i_8h.html
+_n_e_camera_8h.html
+_n_e_f_a_t_8h.html
+_n_e_formats_8h.html
+_n_e_general_8h.html
+_n_e_main_8h.html
+_n_e_model_8h.html
+_n_e_palette_8h.html
+_n_e_physics_8h.html
+_n_e_polygon_8h.html
+_n_e_text_8h.html
+_n_e_texture_8h.html
+_n_e2_d_8c.html
+_n_e_a_p_i_8c.html
+_n_e_camera_8c.html
+_n_e_f_a_t_8c.html
+_n_e_formats_8c.html
+_n_e_general_8c.html
+_n_e_model_8c.html
+_n_e_palette_8c.html
+_n_e_physics_8c.html
+_n_e_polygon_8c.html
+_n_e_text_8c.html
+_n_e_texture_8c.html
+group__d__system.html
+group__api__system.html
+group__camera__system.html
+group__fat.html
+group__formats.html
+group__general__.html
+group__touch__test.html
+group__model__system.html
+group__palette__system.html
+group__physics.html
+group__other__.html
+group__text__system.html
+group__texture__system.html
+modules.html
+annotated.html
+classes.html
+struct___n_e__input__.html
+struct_n_e___anim_data.html
+struct_n_e___a_p_i_obj.html
+struct_n_e___b_m_p___h_e_a_d_e_r.html
+struct_n_e___camera.html
+struct_n_e___i_n_f_o___b_m_p___h_e_a_d_e_r.html
+struct_n_e___material.html
+struct_n_e___model.html
+struct_n_e___physics.html
+struct_n_e___sprite.html
+struct_n_e___text_palette.html
+graph_legend.html
+files.html
+globals.html
+globals_0x6e.html
+globals_func.html
+globals_func_0x6e.html
+globals_type.html
+globals_enum.html
+globals_eval.html
+globals_defs.html
+tabs.css
+tab_b.gif
+tab_l.gif
+tab_r.gif

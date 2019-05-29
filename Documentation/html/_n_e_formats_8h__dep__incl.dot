@@ -1,0 +1,42 @@
+digraph G
+{
+  bgcolor="transparent";
+  edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  node [fontname="FreeSans",fontsize=10,shape=record];
+  Node1 [label="C:/devkitPro/NitroEngine/include/NEFormats.h",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node2 [label="C:/devkitPro/NitroEngine/include/NEMain.h",height=0.2,width=0.4,color="black",URL="$_n_e_main_8h.html",tooltip="Main file of Nitro Engine."];
+  Node2 -> Node3 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node3 [label="C:/devkitPro/NitroEngine/source/NE2D.c",height=0.2,width=0.4,color="black",URL="$_n_e2_d_8c.html"];
+  Node2 -> Node4 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node4 [label="C:/devkitPro/NitroEngine/source/NEAPI.c",height=0.2,width=0.4,color="black",URL="$_n_e_a_p_i_8c.html"];
+  Node2 -> Node5 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node5 [label="C:/devkitPro/NitroEngine/source/NECamera.c",height=0.2,width=0.4,color="black",URL="$_n_e_camera_8c.html"];
+  Node2 -> Node6 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node6 [label="C:/devkitPro/NitroEngine/source/NEFAT.c",height=0.2,width=0.4,color="black",URL="$_n_e_f_a_t_8c.html"];
+  Node2 -> Node7 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node7 [label="C:/devkitPro/NitroEngine/source/NEFormats.c",height=0.2,width=0.4,color="black",URL="$_n_e_formats_8c.html"];
+  Node2 -> Node8 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node8 [label="C:/devkitPro/NitroEngine/source/NEGeneral.c",height=0.2,width=0.4,color="black",URL="$_n_e_general_8c.html"];
+  Node2 -> Node9 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node9 [label="C:/devkitPro/NitroEngine/source/NEModel.c",height=0.2,width=0.4,color="black",URL="$_n_e_model_8c.html"];
+  Node2 -> Node10 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node10 [label="C:/devkitPro/NitroEngine/source/NEPalette.c",height=0.2,width=0.4,color="black",URL="$_n_e_palette_8c.html"];
+  Node2 -> Node11 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node11 [label="C:/devkitPro/NitroEngine/source/NEPhysics.c",height=0.2,width=0.4,color="black",URL="$_n_e_physics_8c.html"];
+  Node2 -> Node12 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node12 [label="C:/devkitPro/NitroEngine/source/NEPolygon.c",height=0.2,width=0.4,color="black",URL="$_n_e_polygon_8c.html"];
+  Node2 -> Node13 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node13 [label="C:/devkitPro/NitroEngine/source/NEText.c",height=0.2,width=0.4,color="black",URL="$_n_e_text_8c.html"];
+  Node2 -> Node14 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node14 [label="C:/devkitPro/NitroEngine/source/NETexture.c",height=0.2,width=0.4,color="black",URL="$_n_e_texture_8c.html"];
+  Node2 -> Node15 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node15 [label="C:/devkitPro/NitroEngine/include/NEAPI.h",height=0.2,width=0.4,color="black",URL="$_n_e_a_p_i_8h.html",tooltip="API functions."];
+  Node15 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node2 -> Node16 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node16 [label="C:/devkitPro/NitroEngine/include/NEGeneral.h",height=0.2,width=0.4,color="black",URL="$_n_e_general_8h.html",tooltip="Init 3D mode and process functions."];
+  Node16 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node2 -> Node17 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+  Node17 [label="C:/devkitPro/NitroEngine/include/NEPolygon.h",height=0.2,width=0.4,color="black",URL="$_n_e_polygon_8h.html",tooltip="Functions to draw polygons and more..."];
+  Node17 -> Node2 [dir=back,color="midnightblue",fontsize=10,style="solid",fontname="FreeSans"];
+}
