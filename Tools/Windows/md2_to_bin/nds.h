@@ -24,7 +24,7 @@ static inline short int floattov10(float n)
 
 #define VERTEX_10_PACK(x,y,z) (((x) & 0x3FF) | (((y) & 0x3FF) << 10) | (((z) & 0x3FF) << 20)) 
 #define NORMAL_PACK(x,y,z)   (((x) & 0x3FF) | (((y) & 0x3FF) << 10) | ((z) << 20))
-#define TEXTURE_PACK(u,v)    ((u & 0xFFFF) | ((v) << 16))
+#define TEXTURE_PACK(u,v)    (((u) & 0xFFFF) | ((v) << 16))
 
 #define COMMAND_PACK(c1,c2,c3,c4) (((c4) << 24) | ((c3) << 16) | ((c2) << 8) | (c1))
 
