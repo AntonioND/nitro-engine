@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
 
 #ifndef _DYNAMICLIST_H_
 #define _DYNAMICLIST_H_

@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
 
-#include <malloc.h>
+#include <stdlib.h>
+
 #include "dynamic_list.h"
 
 void DynamicListNew(DinamicList ** list)

@@ -1,7 +1,12 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
 
-#include <malloc.h>
-#include "framemaker.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "dynamic_list.h"
+#include "framemaker.h"
 
 DinamicList *vertices_list;
 DinamicList *normal_list;
@@ -9,11 +14,11 @@ DinamicList *texcoords_list;
 
 unsigned int FrameSize[1024];
 unsigned short *FramePointer[1024];
-int framecount = -1;		// -----.
-//                           |
-void NewFrame(void)		//        |
-{				//                          |
-	framecount++;		// <------------'  For first frame
+int framecount = -1; // ------.
+//                            |
+void NewFrame(void) //        |
+{ //                          |
+	framecount++; // <----'  For first frame
 
 	FramePointer[framecount] = (unsigned short *)malloc(DEFAULT_FRAME_SIZE);
 	if (FramePointer[framecount] == NULL) {

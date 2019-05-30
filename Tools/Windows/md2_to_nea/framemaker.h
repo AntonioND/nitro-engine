@@ -1,8 +1,11 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
 
-#ifndef _FRAMEMAKER_H_
-#define _FRAMEMAKER_H_
+#ifndef FRAMEMAKER_H__
+#define FRAMEMAKER_H__
 
-#define DEFAULT_FRAME_SIZE (512*1024)
+#define DEFAULT_FRAME_SIZE (512 * 1024)
 
 void NewFrame(void);
 void NewFrameData(unsigned short data);
@@ -27,4 +30,4 @@ void GetNormal(int index, unsigned short *x, unsigned short *y,
 	       unsigned short *z);
 void GetTexCoord(int index, unsigned short *u, unsigned short *v);
 
-#endif
+#endif // FRAMEMAKER_H__
