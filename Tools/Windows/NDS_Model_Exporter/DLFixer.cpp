@@ -20,24 +20,23 @@
 #include <string.h>
 #include <conio.h>
 
-//#define DEBUG
-
-unsigned char COMMAND_ARGUMENTS[] = { 0, 0, 0, 0, 0, 0, 0, 0,	//0h
-	0, 0, 0, 0, 0, 0, 0, 0,	//8h
+unsigned char COMMAND_ARGUMENTS[] = {
+	0, 0, 0, 0, 0, 0, 0, 0,		//0h
+	0, 0, 0, 0, 0, 0, 0, 0,		//8h
 	1, 0, 1, 1, 1, 0, 16, 12,	//10h
 	16, 12, 9, 3, 3, 0, 0, 0,	//18h
-	1, 1, 1, 2, 1, 1, 1, 1,	//20h
-	1, 1, 1, 1, 0, 0, 0, 0,	//28h
+	1, 1, 1, 2, 1, 1, 1, 1,		//20h
+	1, 1, 1, 1, 0, 0, 0, 0,		//28h
 	1, 1, 1, 1, 32, 0, 0, 0,	//30h
-	0, 0, 0, 0, 0, 0, 0, 0,	//38h
-	1, 0, 0, 0, 0, 0, 0, 0,	//40h
-	0, 0, 0, 0, 0, 0, 0, 0,	//48h
-	1, 0, 0, 0, 0, 0, 0, 0,	//50h
-	0, 0, 0, 0, 0, 0, 0, 0,	//58h
-	1, 0, 0, 0, 0, 0, 0, 0,	//60h
-	0, 0, 0, 0, 0, 0, 0, 0,	//68h
-	3, 2, 1
-};				//70h
+	0, 0, 0, 0, 0, 0, 0, 0,		//38h
+	1, 0, 0, 0, 0, 0, 0, 0,		//40h
+	0, 0, 0, 0, 0, 0, 0, 0,		//48h
+	1, 0, 0, 0, 0, 0, 0, 0,		//50h
+	0, 0, 0, 0, 0, 0, 0, 0,		//58h
+	1, 0, 0, 0, 0, 0, 0, 0,		//60h
+	0, 0, 0, 0, 0, 0, 0, 0,		//68h
+	3, 2, 1				//70h
+};
 
 unsigned char Command_Arguments[4];
 int Arguments;
@@ -45,11 +44,7 @@ unsigned char Command[4];
 unsigned int FILE_SIZE;
 
 int Color_Command;
-/*
-#define Start_Command_0			0x00003130
-#define Start_Command_1			0x00007FFF
-#define Start_Command_2			0x00000000
-*/
+
 FILE *ModelFile;
 void *Data_Buffer;
 unsigned int *Pointer;
@@ -112,24 +107,11 @@ int main(int argc, char *argv[])
 	Pointer++;
 	Out_Pointer++;
 
-	//Uncomment this and set the apropiates defines if you want to do
-	//something else at the start of all your models.
-/*
-	*Out_Pointer = Start_Command_0; Out_Pointer++; FILE_SIZE++;
-	*Out_Pointer = Start_Command_1; Out_Pointer++; FILE_SIZE++;
-	*Out_Pointer = Start_Command_2; Out_Pointer++; FILE_SIZE++;
-*/
 	while (size > 0) {
 		Divide_Commands();
 
 		bool colordetected = false;
 		bool slotdetected[4];
-
-#ifdef DEBUG
-		printf("\n%02x %02x %02x %02x\n", Command[0], Command[1],
-		       Command[2], Command[3]);
-		getch();
-#endif
 
 		//Check commands
 		for (int i = 0; i < 4; i++) {
@@ -159,10 +141,6 @@ int main(int argc, char *argv[])
 			    (Command[3] << 24) + (Command[2] << 16) +
 			    (Command[1] << 8) + (Command[0]);
 
-#ifdef DEBUG
-			printf("\n%08x  ->  %08x\n", *Pointer, newcommand);
-			getch();
-#endif
 			*Out_Pointer = newcommand;
 			Out_Pointer++;
 			FILE_SIZE++;
@@ -259,7 +237,7 @@ void Debug()
 	Pointer++;
 
 	while (size > 0) {
-		//Divide commands
+		// Divide commands
 		Command[0] = ((unsigned int)*Pointer >> 0) & 0xFF;
 		Command[1] = ((unsigned int)*Pointer >> 8) & 0xFF;
 		Command[2] = ((unsigned int)*Pointer >> 16) & 0xFF;
@@ -296,5 +274,4 @@ void Debug()
 	}
 	free(Data_Buffer);
 	printf("\n\nEnd!");
-	while (1) ;
 }
