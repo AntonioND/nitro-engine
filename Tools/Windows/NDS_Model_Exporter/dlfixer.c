@@ -38,7 +38,8 @@ unsigned int FILE_SIZE;
 void *Data_Buffer;
 unsigned int *Pointer;
 
-int Color_Command;
+// Command ID to remove from the display list
+int Target_Command;
 
 void Divide_Commands()
 {
@@ -69,7 +70,7 @@ void Debug()
 		Command[2] = ((unsigned int)*Pointer >> 16) & 0xFF;
 		Command[3] = ((unsigned int)*Pointer >> 24) & 0xFF;
 
-		printf("\nCommands:        %02x, %02x, %02x, %02x  (%08x)",
+		printf("\nCommands:        %02x, %02x, %02x, %02x  (%08x)\n",
 		       Command[0], Command[1], Command[2], Command[3],
 		       *Pointer);
 
@@ -81,7 +82,7 @@ void Debug()
 		    Command_Arguments[0] + Command_Arguments[1] +
 		    Command_Arguments[2] + Command_Arguments[3];
 
-		printf("\nArgument Number: %02d, %02d, %02d, %02d  (%d)\n",
+		printf("Argument Number: %02d, %02d, %02d, %02d  (%d)\n",
 		       Command_Arguments[0], Command_Arguments[1],
 		       Command_Arguments[2], Command_Arguments[3], Arguments);
 
@@ -89,7 +90,7 @@ void Debug()
 		size--;
 
 		for (int i = 0; i < 4; i++) {
-			if (Command[i] == Color_Command)
+			if (Command[i] == Target_Command)
 				printf("\nColor detected!\n");
 
 			Pointer += Command_Arguments[i];
@@ -97,7 +98,7 @@ void Debug()
 		}
 	}
 	free(Data_Buffer);
-	printf("\n\nEnd!");
+	printf("\n\nEnd!\n");
 }
 
 int main(int argc, char *argv[])
@@ -109,7 +110,7 @@ int main(int argc, char *argv[])
 	// Load file
 	ModelFile = fopen("model.bin", "rb+");
 	if (ModelFile == NULL) {
-		printf("model.bin not found!");
+		printf("model.bin not found!\n");
 		return (-1);
 	}
 	fseek(ModelFile, 0, SEEK_END);
@@ -122,30 +123,26 @@ int main(int argc, char *argv[])
 	Pointer = (unsigned int *)Data_Buffer;
 
 	if (argc > 1) {
-		if ((strcmp((char *)argv[1], "d") * strcmp((char *)argv[1], "D")) == 0)
-		{
+		if ((strcmp((char *)argv[1], "d") * strcmp((char *)argv[1], "D")) == 0) {
 			printf("\n\nDebug Mode\n----------\n");
-			Color_Command = 0x20;
+			Target_Command = 0x20;
 			Debug();
-		}
-		if ((strcmp((char *)argv[1], "c") * strcmp((char *)argv[1], "C")) == 0)
-		{
+		} else if ((strcmp((char *)argv[1], "c") * strcmp((char *)argv[1], "C")) == 0) {
 			printf("\n\nRemove Color\n----------\n");
-			Color_Command = 0x20;
-		} else if ((strcmp((char *)argv[1], "n") * strcmp((char *)argv[1], "N")) == 0)
-		{
+			Target_Command = 0x20;
+		} else if ((strcmp((char *)argv[1], "n") * strcmp((char *)argv[1], "N")) == 0) {
 			printf("\n\nRemove Normals\n----------\n");
-			Color_Command = 0x21;
+			Target_Command = 0x21;
 		} else {
 			printf
-			    ("\n\nUse: program.exe [c/n] (Remove color/normals).");
+			    ("\n\nUse: program.exe [c/n] (Remove color/normals).\n");
 			return -1;
 		}
 	}
 
 	Out_Pointer = Output_File = (unsigned int *)malloc(FILE_SIZE + 2);
 
-	FILE_SIZE = 0;		//Increases in this loop
+	FILE_SIZE = 0;
 	int size = (unsigned int)*Pointer;
 	Pointer++;
 	Out_Pointer++;
@@ -153,31 +150,31 @@ int main(int argc, char *argv[])
 	while (size > 0) {
 		Divide_Commands();
 
-		bool colordetected = false;
+		bool target_detected = false;
 		bool slotdetected[4];
 
 		// Check commands
 		for (int i = 0; i < 4; i++) {
-			if (Command[i] == Color_Command) {
-				colordetected = true;
+			if (Command[i] == Target_Command) {
+				target_detected = true;
 				slotdetected[i] = true;
 			} else
 				slotdetected[i] = false;
 		}
 
 		// Fix
-		if (colordetected) {
+		if (target_detected) {
 			for (int i = 0; i < 4; i++) {
-				if (Command[i] == Color_Command) {
-					if (i == 3)
-						Command[3] = 0;
-					else {
-						for (int j = i; j < 3; j++) {
-							Command[j] =
-							    Command[j + 1];
-						}
-						Command[3] = 0;
+				if (Command[i] != Target_Command)
+					continue;
+
+				if (i == 3) {
+					Command[3] = 0;
+				} else {
+					for (int j = i; j < 3; j++) {
+						Command[j] = Command[j + 1];
 					}
+					Command[3] = 0;
 				}
 			}
 			unsigned int newcommand =
@@ -192,21 +189,18 @@ int main(int argc, char *argv[])
 			// Save arguments
 			for (int i = 0; i < 4; i++) {
 				if (slotdetected[i] == false) {
-					if (Command_Arguments[i] > 0) {
-						for (int j = 0;
-						     j < Command_Arguments[i];
-						     j++) {
-							*Out_Pointer =
-							    (unsigned int)
-							    *Pointer;
-							Out_Pointer++;
-							FILE_SIZE++;
-							Pointer++;
-							size--;
-						}
+					if (Command_Arguments[i] == 0)
+						continue;
+
+					for (int j = 0; j < Command_Arguments[i]; j++) {
+						*Out_Pointer = (unsigned int)*Pointer;
+						Out_Pointer++;
+						FILE_SIZE++;
+						Pointer++;
+						size--;
 					}
 				} else {
-					//FIFO_COLOR has always one argument
+					// FIFO_COLOR has always one argument
 					Pointer++;
 					size--;
 				}
@@ -219,21 +213,18 @@ int main(int argc, char *argv[])
 			size--;
 
 			for (int i = 0; i < 4; i++) {
-				if (Command_Arguments[i] != 0) {
-					for (int j = 0;
-					     j < Command_Arguments[i]; j++) {
-						*Out_Pointer =
-						    (unsigned int)*Pointer;
-						Out_Pointer++;
-						FILE_SIZE++;
-						Pointer++;
-						size--;
-					}
+				if (Command_Arguments[i] == 0)
+					continue;
+
+				for (int j = 0; j < Command_Arguments[i]; j++) {
+					*Out_Pointer = (unsigned int)*Pointer;
+					Out_Pointer++;
+					FILE_SIZE++;
+					Pointer++;
+					size--;
 				}
 			}
-
 		}
-
 	}
 
 	*Output_File = FILE_SIZE;
@@ -241,7 +232,7 @@ int main(int argc, char *argv[])
 	// Create new file
 	ModelFile = fopen("model_out.bin", "wb+");
 	if (ModelFile == NULL) {
-		printf("model_out.bin couldn´t be created!");
+		printf("model_out.bin couldn't be created!\n");
 		free(Data_Buffer);
 		free((void *)Output_File);
 		return (-1);
@@ -252,7 +243,7 @@ int main(int argc, char *argv[])
 	free(Data_Buffer);
 	free((void *)Output_File);
 
-	printf("Done!");
+	printf("Done!\n");
 
 	return 0;
 }
