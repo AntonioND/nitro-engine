@@ -38,7 +38,7 @@
  */
 typedef struct {
 	m4x4 matrix;
-	int from[3], to[3], up[3];
+	int32 from[3], to[3], up[3];
 	bool matrix_is_updated;
 } NE_Camera;
 

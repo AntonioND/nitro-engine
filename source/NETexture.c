@@ -579,7 +579,7 @@ void NE_TextureSystemEnd(void)
 
 //--------------------------------------------------------------
 //                 INTERNAL USE
-inline int __NE_TextureGetRawX(NE_Material *tex)
+int __NE_TextureGetRawX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "__NE_TextureGetRawX: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -587,7 +587,7 @@ inline int __NE_TextureGetRawX(NE_Material *tex)
 	return (NE_Texture[tex->texindex].param & (0x7 << 20)) >> 20;
 }
 
-inline int __NE_TextureGetRawY(NE_Material *tex)
+int __NE_TextureGetRawY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "__NE_TextureGetRawY: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,

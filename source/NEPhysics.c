@@ -52,7 +52,7 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	temp->enabled = true;
 	temp->physicsgroup = 0;
 	temp->iscolliding = false;
-	temp->oncollition = NE_ColNothing;
+	temp->oncollision = NE_ColNothing;
 
 	return temp;
 }
@@ -193,7 +193,7 @@ inline void NE_PhysicsSetGroup(NE_Physics *physics, int group)
 inline void NE_PhysicsOnCollition(NE_Physics *physics, NE_OnCollition action)
 {
 	NE_AssertPointer(physics, "NE_PhysicsOnCollition: NULL pointer.");
-	physics->oncollition = action;
+	physics->oncollision = action;
 }
 
 inline bool NE_PhysicsIsColliding(NE_Physics *pointer)
@@ -273,7 +273,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 			    (abs(posz - otherposz) < (pointer->zsize + otherpointer->zsize) >> 1)) {
 				pointer->iscolliding = true;
 
-				if (pointer->oncollition == NE_ColBounce) {
+				if (pointer->oncollision == NE_ColBounce) {
 					//Used to reduce speed:
 					int temp =
 					    divf32(inttof32(pointer->keptpercent), inttof32(100));
@@ -357,7 +357,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 
 						pointer->zspeed = -mulf32(temp, pointer->zspeed);
 					}
-				} else if (pointer->oncollition == NE_ColStop) {
+				} else if (pointer->oncollision == NE_ColStop) {
 					if ((yenabled)
 					    &&
 					    ((abs(bposy - otherposy) >=

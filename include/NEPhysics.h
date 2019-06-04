@@ -62,7 +62,7 @@ typedef struct {
 	int gravity, friction;
 	int keptpercent;		// Percent of energy in an object after bouncing
 
-	int on;				// What to do when a collision is detected.
+	int oncollision;		// What to do when a collision is detected.
 	bool iscolliding;		// true if a  was detected last time.
 
 	bool enabled;

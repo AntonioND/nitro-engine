@@ -144,7 +144,7 @@ int NE_ModelLoadStaticMesh(NE_Model * model, u32 * pointer)
 	return 1;
 }
 
-inline void NE_ModelSetMaterial(NE_Model * model, NE_Material * material)
+void NE_ModelSetMaterial(NE_Model * model, NE_Material * material)
 {
 	NE_AssertPointer(model, "NE_ModelSetMaterial: NULL model pointer.");
 	NE_AssertPointer(material, "NE_ModelSetMaterial: NULL material pointer.");
@@ -217,7 +217,7 @@ void NE_ModelClone(NE_Model * dest, NE_Model * source)
 	}
 }
 
-inline void NE_ModelScaleI(NE_Model * model, int x, int y, int z)
+void NE_ModelScaleI(NE_Model * model, int x, int y, int z)
 {
 	NE_AssertPointer(model, "NE_ModelScaleI: NULL pointer.");
 	model->sx = x;
@@ -225,7 +225,7 @@ inline void NE_ModelScaleI(NE_Model * model, int x, int y, int z)
 	model->sz = z;
 }
 
-inline void NE_ModelTranslateI(NE_Model * model, int x, int y, int z)
+void NE_ModelTranslateI(NE_Model * model, int x, int y, int z)
 {
 	NE_AssertPointer(model, "NE_ModelTranslateI: NULL pointer.");
 	model->x += x;
@@ -233,7 +233,7 @@ inline void NE_ModelTranslateI(NE_Model * model, int x, int y, int z)
 	model->z += z;
 }
 
-inline void NE_ModelSetCoordI(NE_Model * model, int x, int y, int z)
+void NE_ModelSetCoordI(NE_Model * model, int x, int y, int z)
 {
 	NE_AssertPointer(model, "NE_ModelSetCoordI: NULL pointer.");
 	model->x = x;
@@ -241,7 +241,7 @@ inline void NE_ModelSetCoordI(NE_Model * model, int x, int y, int z)
 	model->z = z;
 }
 
-inline void NE_ModelRotate(NE_Model * model, int rx, int ry, int rz)
+void NE_ModelRotate(NE_Model * model, int rx, int ry, int rz)
 {
 	NE_AssertPointer(model, "NE_ModelRotate: NULL pointer.");
 	model->rx = (model->rx + rx + 512) & 0x1FF;
@@ -249,7 +249,7 @@ inline void NE_ModelRotate(NE_Model * model, int rx, int ry, int rz)
 	model->rz = (model->rz + rz + 512) & 0x1FF;
 }
 
-inline void NE_ModelSetRot(NE_Model * model, int rx, int ry, int rz)
+void NE_ModelSetRot(NE_Model * model, int rx, int ry, int rz)
 {
 	NE_AssertPointer(model, "NE_ModelSetRot: NULL pointer.");
 	model->rx = rx;
@@ -513,7 +513,7 @@ void NE_ModelAnimSetSpeed(NE_Model * model, int speed)
 	((NE_AnimData *) model->meshdata)->direction = ((speed >= 0) ? 1 : -1);
 }
 
-inline void NE_ModelAnimSetFrameSpeed(NE_Model * model, int frame, int speed)
+void NE_ModelAnimSetFrameSpeed(NE_Model * model, int frame, int speed)
 {
 	NE_AssertPointer(model, "NE_ModelAnimSetFrameSpeed: NULL pointer.");
 	NE_Assert(model->modeltype == NE_Animated,
@@ -521,14 +521,14 @@ inline void NE_ModelAnimSetFrameSpeed(NE_Model * model, int frame, int speed)
 	((NE_AnimData *) model->meshdata)->speed[frame] = speed;
 }
 
-inline int NE_ModelAnimGetFrame(NE_Model * model)
+int NE_ModelAnimGetFrame(NE_Model * model)
 {
 	NE_AssertPointer(model, "NE_ModelAnimGetFrame: NULL pointer.");
 	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimGetFrame: Not an animated model.");
 	return ((NE_AnimData *) model->meshdata)->currframe;
 }
 
-inline void NE_ModelAnimSetFrame(NE_Model * model, int frame)
+void NE_ModelAnimSetFrame(NE_Model * model, int frame)
 {
 	NE_AssertPointer(model, "NE_ModelAnimSetFrame: NULL pointer.");
 	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimSetFrame: Not an animated model.");
@@ -536,7 +536,7 @@ inline void NE_ModelAnimSetFrame(NE_Model * model, int frame)
 	((NE_AnimData *) model->meshdata)->nextframetime = 0;
 }
 
-inline void NE_ModelAnimInterpolate(NE_Model * model, bool interpolate)
+void NE_ModelAnimInterpolate(NE_Model * model, bool interpolate)
 {
 	NE_AssertPointer(model, "NE_ModelAnimInterpolate: NULL pointer.");
 	NE_Assert(model->modeltype == NE_Animated,
@@ -568,7 +568,7 @@ int NE_ModelLoadNEAFAT(NE_Model * model, char *path)
 		return 0;	// 'NEAM' - Not a nea file
 	}
 	if (*(pointer + 1) != 2) {
-		NE_DebugPrint("NE_ModelLoadNEAFAT: NEA file version is %d, should be 2.",
+		NE_DebugPrint("NE_ModelLoadNEAFAT: NEA file version is %ld, should be 2.",
 			      *(pointer + 1));
 		free(pointer);
 		return 0;	// version 2
@@ -601,7 +601,7 @@ int NE_ModelLoadNEA(NE_Model * model, u32 * pointer)
 	}
 	if (*(pointer + 1) != 2)	// version 2
 	{
-		NE_DebugPrint("NE_ModelLoadNEA: NEA file version is %d, should be 2.",
+		NE_DebugPrint("NE_ModelLoadNEA: NEA file version is %ld, should be 2.",
 			      *(pointer + 1));
 		return 0;
 	}

@@ -122,8 +122,8 @@ void NE_CameraMoveFreeI(NE_Camera * cam, int front, int right, int up)
 
 	cam->matrix_is_updated = false;
 
-	int vec_front[3], vec_right[3], vec_up[3];
-	int result[3] = { 0, 0, 0 };
+	int32 vec_front[3], vec_right[3], vec_up[3];
+	int32 result[3] = { 0, 0, 0 };
 
 	// Temporary vector used to normalize other vectors
 	int temp[3];
@@ -260,7 +260,7 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 
 //----------------------------------------------------------------
 //              INTERNAL
-static void __NE_RotateVectorAxis(int *vector, int angle, int x, int y, int z)
+static void __NE_RotateVectorAxis(int32 *vector, int angle, int x, int y, int z)
 {
 	// Vector must be an array of 3 ints with your vector in f32 format!
 	int sin = sinLerp((angle & LUT_MASK) << 6);
@@ -316,7 +316,7 @@ void NE_CameraRotateAxisI(NE_Camera * cam, int angle, int x, int y, int z)
 
 	cam->matrix_is_updated = false;
 
-	int cam_vector[3];
+	int32 cam_vector[3];
 
 	int i;
 	for (i = 0; i < 3; i++)
@@ -338,7 +338,7 @@ void NE_CameraRotateFree(NE_Camera * cam, int rx, int ry, int rz)
 
 	cam->matrix_is_updated = false;
 
-	int vec_front[3], vec_right[3], vec_up[3];
+	int32 vec_front[3], vec_right[3], vec_up[3];
 
 	int i;
 	for (i = 0; i < 3; i++)
