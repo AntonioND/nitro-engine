@@ -12,7 +12,7 @@ of the aplication. Ex.:
 
 2.Result files will be writed on the root directory of the aplication.
 3.The output names will have the following format
-	
+
 	<OriginalName>_<OriginalFormat>.bin
 
 4.Green colored textFields in Textures Tab/Panel show that the bmp2bin.exe
