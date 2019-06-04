@@ -1,43 +1,25 @@
-//    _   _ _ _               ______             _              _____   ____   _____ 
-//   | \ | (_) |  AntonioND  |  ____|           (_)            |  __ \ / __ \ / ____|
-//   |  \| |_| |_ _ __ ___   | |__   _ __   __ _ _ _ __   ___  | |__) | |  | | |     
-//   | . ` | | __| '__/ _ \  |  __| | '_ \ / _` | | '_ \ / _ \ |  ___/| |  | | |     
-//   | |\  | | |_| | | (_) | | |____| | | | (_| | | | | |  __/ | |    | |__| | |____ 
-//   |_| \_|_|\__|_|  \___/  |______|_| |_|\__, |_|_| |_|\___| |_|     \____/ \_____|
-//                                          __/ |                                    
-//                                         |___/   
-//     _   _ _____   _____   ____                  _                          _    
-//    | \ | |  __ \ / ____| |  _ \                | |                        | |   
-//    |  \| | |  | | (___   | |_) | ___ _ __   ___| |__  _ __ ___   __ _ _ __| | __
-//    | . ` | |  | |\___ \  |  _ < / _ \ '_ \ / __| '_ \| '_ ` _ \ / _` | '__| |/ /
-//    | |\  | |__| |____) | | |_) |  __/ | | | (__| | | | | | | | | (_| | |  |   < 
-//    |_| \_|_____/|_____/  |____/ \___|_| |_|\___|_| |_|_| |_| |_|\__,_|_|  |_|\_\  
-// 
-// ________             ____________      ________              _____   __              
-// ___  __ )____  __    ___  __/__(_)     ___  __ \_____ _      ___  | / /____________ _
-// __  __  |_  / / /    __  /  __  /________  /_/ /  __ `/________   |/ /_  __ \_  __ `/
-// _  /_/ /_  /_/ /     _  /   _  /_/_____/  _, _// /_/ /_/_____/  /|  / / /_/ /  /_/ / 
-// /_____/ _\__, /      /_/    /_/        /_/ |_| \__,_/        /_/ |_/  \____/_\__, /  
-//         /____/                                                              /____/   
+// Nitro Engine NDS Benchmark by Ti-Ra-Nog
+
+#include <time.h>
 
 #include <NEMain.h>
-#include <time.h>
 
 #include "model_bin.h"
 #include "cubo_bin.h"
 #include "texcubo_bin.h"
 #include "texesfera_bin.h"
+
 #define NUM_BALLS 50       // Set the initial number of balls/spheres
 #define MAX_NUM_BALLS 255  // Set the maxium number of balls/spheres (more than 255 will crash)
 #define MIN_NUM_BALLS 0    // Set the minium number of balls/spheres (less than 0 will crash) (obviously xD)
 
-u8 NUM = (int)NUM_BALLS;
+int NUM = NUM_BALLS;
 
-NE_Camera * Camera; //Pointers to objects...
-NE_Model * Esfera[MAX_NUM_BALLS], * Cubo;
-NE_Material * Material, * Material2;
+NE_Camera *Camera; // Pointers to objects...
+NE_Model *Esfera[MAX_NUM_BALLS], *Cubo;
+NE_Material *Material, *Material2;
 
-u8 a; 
+u8 a;
 float mov;
 
 typedef struct {
@@ -47,33 +29,41 @@ typedef struct {
 
 _BALL_ Ball[MAX_NUM_BALLS];
 
-
 void Draw3DScene(void)
 {
-	scanKeys();  //Get keys information
-	int keys = keysHeld(); // Keys Continously pressed
+	scanKeys(); // Get keys information
+	int keys = keysHeld(); // Keys continously pressed
 
-	mov+= 0.5; // if the b button is pressed, increase camera rotation speed
+	mov += 0.5; // if the b button is pressed, increase camera rotation speed
 	NE_CameraUse(Camera); //Use camera and draw all objects.
-	if(!(keys & KEY_B)) NE_ViewRotate(0, 0, mov); // Rotate the camara every frame if the B Button is pressed(slowly)
 
-	NE_PolyFormat(31,0,NE_LIGHT_ALL,NE_CULL_NONE,0);
-	NE_ModelDraw(Cubo); // Draw the cube
+	// Rotate the camara every frame if the B Button is pressed(slowly)
+	if (!(keys & KEY_B))
+		NE_ViewRotate(0, 0, mov);
 
-	NE_PolyFormat(31,0,NE_LIGHT_ALL,NE_CULL_BACK,0);
-	u8 a; for(a = 0; a < NUM; a++) NE_ModelDraw(Esfera[a]); // Draw every Sphere
+	// Draw the cube
+	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_NONE, 0);
+	NE_ModelDraw(Cubo);
 
-	//Get some information AFTER drawing but BEFORE returning from the function.
-	printf("\x1b[0;0HPolygon RAM: %d   \nVertex RAM: %d   ",NE_GetPolygonCount(), NE_GetVertexCount());
+	// Draw every Sphere
+	NE_PolyFormat(31, 0, NE_LIGHT_ALL,NE_CULL_BACK, 0);
+	for (int i = 0; i < NUM; i++)
+		NE_ModelDraw(Esfera[i]);
+
+	// Get some information AFTER drawing but BEFORE returning from the
+	// function.
+	printf("\x1b[0;0HPolygon RAM: %d   \nVertex RAM: %d   ",
+	       NE_GetPolygonCount(), NE_GetVertexCount());
 }
 
-int main()
+int main(void)
 {
 	irqEnable(IRQ_HBLANK);
-	irqSet(IRQ_VBLANK, NE_VBLFunc); //Used to control some things.
+	irqSet(IRQ_VBLANK, NE_VBLFunc);
 	irqSet(IRQ_HBLANK, NE_HBLFunc);
-	
-	NE_Init3D(); // Init Nitro Engine 3D rendering in one screen.
+
+	// Init Nitro Engine 3D rendering in one screen.
+	NE_Init3D();
 	NE_TextureSystemReset(0,0,NE_VRAM_AB); // libnds uses VRAM_C for the text console
 	consoleDemoInit(); //Init text.
 	
@@ -117,8 +107,7 @@ int main()
 	u8 oldsec = 0;
 	u8 seconds = 0;
 	
-	while(1) 
-	{
+	while(1) {
 		// Time Variables/Structs
 		time_t unixTime = time(NULL);
 		struct tm* timeStruct = gmtime((const time_t *)&unixTime);
