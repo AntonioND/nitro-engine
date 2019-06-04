@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, Antonio NiÃ±o DÃ­az
 
 // Display List Fixer v0.3
 //

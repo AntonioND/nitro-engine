@@ -1,28 +1,29 @@
- _   _ _ _               ______             _              _____   ____   _____ 
+ _   _ _ _               ______             _              _____   ____   _____
 | \ | (_) |             |  ____|           (_)            |  __ \ / __ \ / ____|
-|  \| |_| |_ _ __ ___   | |__   _ __   __ _ _ _ __   ___  | |__) | |  | | |     
-| . ` | | __| '__/ _ \  |  __| | '_ \ / _` | | '_ \ / _ \ |  ___/| |  | | |     
-| |\  | | |_| | | (_) | | |____| | | | (_| | | | | |  __/ | |    | |__| | |____ 
+|  \| |_| |_ _ __ ___   | |__   _ __   __ _ _ _ __   ___  | |__) | |  | | |
+| . ` | | __| '__/ _ \  |  __| | '_ \ / _` | | '_ \ / _ \ |  ___/| |  | | |
+| |\  | | |_| | | (_) | | |____| | | | (_| | | | | |  __/ | |    | |__| | |____
 |_| \_|_|\__|_|  \___/  |______|_| |_|\__, |_|_| |_|\___| |_|     \____/ \_____|
-                                       __/ |                                    
-                                      |___/                                     
-   _                ___ ____  _____    _______        _  ___                _ 
+                                       __/ |
+                                      |___/
+   _                ___ ____  _____    _______        _  ___                _
   | |        ______|  _|___ \|  __ \  |__   __|      | ||_  |______        | |
   | |  _____|______| |   __) | |  | |    | | ___  ___| |_ | |______|_____  | |
   | | |______|_____| |  |__ <| |  | |    | |/ _ \/ __| __|| |_____|______| | |
   | |       |______| |  ___) | |__| |    | |  __/\__ \ |_ | |______|       | |
   |_|              | |_|____/|_____/     |_|\___||___/\__|| |              |_|
-                   |___|                                |___|                 
-________             ____________      ________              _____   __              
+                   |___|                                |___|
+________             ____________      ________              _____   __
 ___  __ )____  __    ___  __/__(_)     ___  __ \_____ _      ___  | / /____________ _
 __  __  |_  / / /    __  /  __  /________  /_/ /  __ `/________   |/ /_  __ \_  __ `/
-_  /_/ /_  /_/ /     _  /   _  /_/_____/  _, _// /_/ /_/_____/  /|  / / /_/ /  /_/ / 
-/_____/ _\__, /      /_/    /_/        /_/ |_| \__,_/        /_/ |_/  \____/_\__, /  
-        /____/                                                              /____/   
+_  /_/ /_  /_/ /     _  /   _  /_/_____/  _, _// /_/ /_/_____/  /|  / / /_/ /  /_/ /
+/_____/ _\__, /      /_/    /_/        /_/ |_| \__,_/        /_/ |_/  \____/_\__, /
+        /____/                                                              /____/
 
-Si quieres habilitar la carga de los objetos o texturas en FAT, primero descomenta la
-linea "#define FAT_MESH_TEXT" y luego compilalo.
+Si quieres habilitar la carga de los objetos o texturas en FAT, primero
+descomenta la linea "#define FAT_MESH_TEXT" y luego compilalo.
 
-Después de tener  el archivo binario con el fat habilitado, copia los archivos que hay
-en el directorio "FAT DATA" en la raiz de tu targeta o ponlas en el mismo directorio 
-que el archivo ".nds" si quieres probarlo en un emulador (con soporte fat).
+DespuÃ©s de tener  el archivo binario con el fat habilitado, copia los archivos
+que hay en el directorio "FAT DATA" en la raiz de tu targeta o ponlas en el
+mismo directorio que el archivo ".nds" si quieres probarlo en un emulador (con
+soporte fat).
