@@ -24,6 +24,6 @@ Si quieres habilitar la carga de los objetos o texturas en FAT, primero
 descomenta la linea "#define FAT_MESH_TEXT" y luego compilalo.
 
 Después de tener  el archivo binario con el fat habilitado, copia los archivos
-que hay en el directorio "FAT DATA" en la raiz de tu targeta o ponlas en el
+que hay en el directorio "sd_card_data" en la raiz de tu tarjeta o ponlas en el
 mismo directorio que el archivo ".nds" si quieres probarlo en un emulador (con
 soporte fat).
