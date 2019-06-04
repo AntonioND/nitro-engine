@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2009, 2019, Antonio Niño Díaz
+//
+// This file is part of Nitro Engine
 
 #include "stdafx.h"
 #include <stdio.h>

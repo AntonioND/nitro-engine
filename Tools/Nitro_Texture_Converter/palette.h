@@ -1,4 +1,8 @@
-
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2009, 2019, Antonio Niño Díaz
+//
+// This file is part of Nitro Engine
 
 #define MAX_PALETTE_COLORS 256 //256 is the max. number of colors for a palette for NDS
 
