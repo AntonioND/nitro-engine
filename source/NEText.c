@@ -17,12 +17,12 @@ static _NE_TextInfo_ NE_TextInfo[NE_MAX_TEXT_FONTS];
 
 static int NE_TEXT_PRIORITY = 0;
 
-inline void NE_TextPrioritySet(int priority)
+void NE_TextPrioritySet(int priority)
 {
 	NE_TEXT_PRIORITY = priority;
 }
 
-inline void NE_TextPriorityReset(void)
+void NE_TextPriorityReset(void)
 {
 	NE_TEXT_PRIORITY = 0;
 }
@@ -58,9 +58,9 @@ void NE_TextResetSystem(void)
 	}
 }
 
-static inline void _ne_texturecuadprint(int xcrd1, int ycrd1, int xcrd2,
-					int ycrd2, int xtx1, int ytx1, int xtx2,
-					int ytx2)
+static void _ne_texturecuadprint(int xcrd1, int ycrd1, int xcrd2,
+				 int ycrd2, int xtx1, int ytx1, int xtx2,
+				 int ytx2)
 {
 	GFX_TEX_COORD = TEXTURE_PACK(inttot16(xtx1), inttot16(ytx1));
 	GFX_VERTEX16 = (ycrd1 << 16) | (xcrd1 & 0xFFFF);
@@ -76,8 +76,8 @@ static inline void _ne_texturecuadprint(int xcrd1, int ycrd1, int xcrd2,
 	GFX_VERTEX_XY = (ycrd1 << 16) | (xcrd2 & 0xFFFF);
 }
 
-static inline void _ne_charprint(_NE_TextInfo_ * textinfo, int xcrd1, int ycrd1,
-				 char character)
+static void _ne_charprint(_NE_TextInfo_ * textinfo, int xcrd1, int ycrd1,
+			  char character)
 {
 	// Texture coords
 	int xcoord = ((character & 31) * textinfo->sizex);

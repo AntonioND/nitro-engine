@@ -185,7 +185,7 @@ static inline void NE_SetRegCapture(bool enable, uint8 srcBlend,
 	REG_DISPCAPCNT = value;
 }
 
-inline void NE_SwapScreens(void)
+void NE_SwapScreens(void)
 {
 	REG_POWERCNT ^= POWER_SWAP_LCDS;
 }
@@ -296,7 +296,7 @@ void NE_InitConsole(void)
 	consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
 }
 
-inline void NE_SetConsoleColor(u32 color)
+void NE_SetConsoleColor(u32 color)
 {
 	BG_PALETTE[255] = color;
 }
@@ -382,14 +382,14 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 	dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
 }
 
-inline void NE_ClippingPlanesSetI(int znear, int zfar)
+void NE_ClippingPlanesSetI(int znear, int zfar)
 {
 	NE_Assert(znear < zfar, "NE_ClippingPlanesSet: znear should be smaller than zfar.");
 	ne_znear = znear;
 	ne_zfar = zfar;
 }
 
-inline void NE_AntialiasEnable(bool value)
+void NE_AntialiasEnable(bool value)
 {
 	if (value)
 		GFX_CONTROL |= GL_ANTIALIAS;
@@ -397,13 +397,13 @@ inline void NE_AntialiasEnable(bool value)
 		GFX_CONTROL &= ~GL_ANTIALIAS;
 }
 
-inline int NE_GetPolygonCount(void)
+int NE_GetPolygonCount(void)
 {
 	while (GFX_STATUS & (1 << 27)) ;
 	return GFX_POLYGON_RAM_USAGE;
 }
 
-inline int NE_GetVertexCount(void)
+int NE_GetVertexCount(void)
 {
 	while (GFX_STATUS & (1 << 27)) ;
 	return GFX_VERTEX_RAM_USAGE;
@@ -478,12 +478,12 @@ void NE_HBLFunc(void)
 	}
 }
 
-inline void NE_SpecialEffectNoiseConfig(int value)
+void NE_SpecialEffectNoiseConfig(int value)
 {
 	ne_noise_value = value;
 }
 
-inline void NE_SpecialEffectSineConfig(int mult, int shift)
+void NE_SpecialEffectSineConfig(int mult, int shift)
 {
 	ne_sine_mult = mult;
 	ne_sine_shift = shift;
@@ -531,12 +531,12 @@ void NE_WaitForVBL(NE_UPDATE_FLAGS flags)
 	ne_cpucount = 0;
 }
 
-inline int NE_GetCPUPercent(void)
+int NE_GetCPUPercent(void)
 {
 	return NE_CPUPercent;
 }
 
-inline bool NE_GPUIsRendering(void)
+bool NE_GPUIsRendering(void)
 {
 	if (REG_VCOUNT > 190 && REG_VCOUNT < 214)
 		return false;

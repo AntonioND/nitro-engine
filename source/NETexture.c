@@ -98,20 +98,20 @@ NE_Material *NE_MaterialCreate(void)
 	return NULL;
 }
 
-inline void NE_MaterialColorSet(NE_Material *tex, u32 color)
+void NE_MaterialColorSet(NE_Material *tex, u32 color)
 {
 	NE_AssertPointer(tex, "NE_MaterialColorSet: NULL pointer.");
 	tex->color = color;
 }
 
-inline void NE_MaterialColorDelete(NE_Material *tex)
+void NE_MaterialColorDelete(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NE_MaterialColorDelete: NULL pointer.");
 	tex->color = NE_White;
 }
 
-inline int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
-				 int sizeX, int sizeY, int param, char *path)
+int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
+			  int sizeX, int sizeY, int param, char *path)
 {
 	NE_AssertPointer(tex, "NE_MaterialTexLoadFAT: NULL material pointer.");
 	NE_AssertPointer(path, "NE_MaterialTexLoadFAT: NULL path pointer.");
@@ -352,7 +352,7 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
 	dest->texindex = source->texindex;
 }
 
-inline void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
+void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
 {
 	NE_AssertPointer(tex, "NE_MaterialTexSetPal: NULL material pointer.");
 	NE_AssertPointer(pal, "NE_MaterialTexSetPal: NULL palette pointer.");
@@ -491,7 +491,7 @@ void NE_MaterialDelete(NE_Material *tex)
 	NE_DebugPrint("NE_MaterialDelete: Material not found in array.");
 }
 
-inline int NE_TextureFreeMem(void)
+int NE_TextureFreeMem(void)
 {
 	if (!ne_texture_system_inited)
 		return 0;
@@ -502,7 +502,7 @@ inline int NE_TextureFreeMem(void)
 	return Info.Free;
 }
 
-inline int NE_TextureFreeMemPercent(void)
+int NE_TextureFreeMemPercent(void)
 {
 	if (!ne_texture_system_inited)
 		return 0;
@@ -597,7 +597,7 @@ int __NE_TextureGetRawY(NE_Material *tex)
 
 //--------------------------------------------------------------
 
-inline int NE_TextureGetRealSizeX(NE_Material *tex)
+int NE_TextureGetRealSizeX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NE_TextureGetRealSizeX: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -605,7 +605,7 @@ inline int NE_TextureGetRealSizeX(NE_Material *tex)
 	return 8 << __NE_TextureGetRawX(tex);
 }
 
-inline int NE_TextureGetRealSizeY(NE_Material *tex)
+int NE_TextureGetRealSizeY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NE_TextureGetRealSizeY: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -613,7 +613,7 @@ inline int NE_TextureGetRealSizeY(NE_Material *tex)
 	return 8 << __NE_TextureGetRawY(tex);
 }
 
-inline int NE_TextureGetSizeX(NE_Material *tex)
+int NE_TextureGetSizeX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NE_TextureGetSizeX: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -621,7 +621,7 @@ inline int NE_TextureGetSizeX(NE_Material *tex)
 	return NE_Texture[tex->texindex].sizex;
 }
 
-inline int NE_TextureGetSizeY(NE_Material *tex)
+int NE_TextureGetSizeY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NE_TextureGetSizeY: NULL pointer.");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -629,7 +629,7 @@ inline int NE_TextureGetSizeY(NE_Material *tex)
 	return NE_Texture[tex->texindex].sizey;
 }
 
-inline void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
+void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
 				      u32 ambient, u32 specular, u32 emission,
 				      bool vtxcolor, bool useshininess)
 {
@@ -642,7 +642,7 @@ inline void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
 	tex->useshininess = useshininess;
 }
 
-inline void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
+void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
 					     u32 specular, u32 emission,
 					     bool vtxcolor, bool useshininess)
 {

@@ -171,7 +171,7 @@ void NE_PaletteSystemReset(int palette_number)
 	GFX_PAL_FORMAT = 0;
 }
 
-inline int NE_PaletteFreeMem(void)
+int NE_PaletteFreeMem(void)
 {
 	if (!ne_palette_system_inited)
 		return 0;
@@ -182,7 +182,7 @@ inline int NE_PaletteFreeMem(void)
 	return Info.Free;
 }
 
-inline int NE_PaletteFreeMemPercent(void)
+int NE_PaletteFreeMemPercent(void)
 {
 	if (!ne_palette_system_inited)
 		return 0;

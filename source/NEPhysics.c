@@ -123,7 +123,7 @@ void NE_PhysicsSystemEnd(void)
 	ne_physics_system_inited = false;
 }
 
-inline void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
+void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetRadiusI: NULL pointer.");
 	NE_Assert(pointer->type == NE_BoundingSphere,
@@ -132,7 +132,7 @@ inline void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
 	pointer->radius = radius;
 }
 
-inline void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
+void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetSpeedI: NULL pointer.");
 	pointer->xspeed = x;
@@ -140,7 +140,7 @@ inline void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
 	pointer->zspeed = z;
 }
 
-inline void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
+void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetSizeI: NULL pointer.");
 	NE_Assert(pointer->type == NE_BoundingBox,
@@ -151,52 +151,52 @@ inline void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
 	pointer->zsize = z;
 }
 
-inline void NE_PhysicsSetGravityI(NE_Physics *pointer, int gravity)
+void NE_PhysicsSetGravityI(NE_Physics *pointer, int gravity)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetGravityI: NULL pointer.");
 	pointer->gravity = gravity;
 }
 
-inline void NE_PhysicsSetFrictionI(NE_Physics *pointer, int friction)
+void NE_PhysicsSetFrictionI(NE_Physics *pointer, int friction)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetFrictionI: NULL pointer.");
 	NE_Assert(friction >= 0, "NE_PhysicsSetFrictionI: Friction mustn't be lower than 0.");
 	pointer->friction = friction;
 }
 
-inline void NE_PhysicsSetBounceEnergy(NE_Physics *pointer, int percent)
+void NE_PhysicsSetBounceEnergy(NE_Physics *pointer, int percent)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsSetBounceEnergy: NULL pointer.");
 	NE_Assert(percent >= 0, "NE_PhysicsSetBounceEnergy: Percent must be higher than 0.");
 	pointer->keptpercent = percent;
 }
 
-inline void NE_PhysicsEnable(NE_Physics *pointer, bool value)
+void NE_PhysicsEnable(NE_Physics *pointer, bool value)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsEnable: NULL pointer.");
 	pointer->enabled = value;
 }
 
-inline void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer)
+void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer)
 {
 	NE_AssertPointer(physics, "NE_PhysicsSetModel: NULL physics pointer.");
 	NE_AssertPointer(modelpointer, "NE_PhysicsSetModel: NULL model pointer.");
 	physics->model = modelpointer;
 }
 
-inline void NE_PhysicsSetGroup(NE_Physics *physics, int group)
+void NE_PhysicsSetGroup(NE_Physics *physics, int group)
 {
 	NE_AssertPointer(physics, "NE_PhysicsSetGroup: NULL pointer.");
 	physics->physicsgroup = group;
 }
 
-inline void NE_PhysicsOnCollition(NE_Physics *physics, NE_OnCollition action)
+void NE_PhysicsOnCollition(NE_Physics *physics, NE_OnCollition action)
 {
 	NE_AssertPointer(physics, "NE_PhysicsOnCollition: NULL pointer.");
 	physics->oncollision = action;
 }
 
-inline bool NE_PhysicsIsColliding(NE_Physics *pointer)
+bool NE_PhysicsIsColliding(NE_Physics *pointer)
 {
 	NE_AssertPointer(pointer, "NE_PhysicsIsColliding: NULL pointer.");
 	return pointer->iscolliding;

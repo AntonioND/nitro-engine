@@ -8,12 +8,12 @@
 
 /*! \file   NEPolygon.c */
 
-inline void NE_PolyColor(u32 color)
+void NE_PolyColor(u32 color)
 {
 	GFX_COLOR = color;
 }
 
-inline void NE_LightOff(int num)
+void NE_LightOff(int num)
 {
 	NE_AssertMinMax(0, num, 3, "NE_LightOff: Unexistent light number %d.", num);
 	num = (num & 3) << 30;
@@ -21,13 +21,13 @@ inline void NE_LightOff(int num)
 	GFX_LIGHT_COLOR = num;
 }
 
-inline void NE_LightSetColor(int num, u32 color)
+void NE_LightSetColor(int num, u32 color)
 {
 	NE_AssertMinMax(0, num, 3, "NE_LightSetColor: Unexistent light number %d.", num);
 	GFX_LIGHT_COLOR = ((num & 3) << 30) | (vuint32) color;
 }
 
-inline void NE_LightSetI(int num, u32 color, int x, int y, int z)
+void NE_LightSetI(int num, u32 color, int x, int y, int z)
 {
 	NE_AssertMinMax(0, num, 3, "NE_LightSetI: Unexistent light number %d.", num);
 	num = (num & 3) << 30;
@@ -36,34 +36,34 @@ inline void NE_LightSetI(int num, u32 color, int x, int y, int z)
 	GFX_LIGHT_COLOR = num | (vuint32) color;
 }
 
-inline void NE_PolyBegin(int mode)
+void NE_PolyBegin(int mode)
 {
 	GFX_BEGIN = mode;
 }
 
-inline void NE_PolyEnd(void)
+void NE_PolyEnd(void)
 {
 	GFX_END = 0;
 }
 
-inline void NE_PolyNormalI(int x, int y, int z)
+void NE_PolyNormalI(int x, int y, int z)
 {
 	GFX_NORMAL = NORMAL_PACK(x, y, z);
 }
 
-inline void NE_PolyVertexI(int x, int y, int z)
+void NE_PolyVertexI(int x, int y, int z)
 {
 	GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
 	GFX_VERTEX16 = (uint32) (uint16) (z);
 }
 
-inline void NE_PolyTexCoord(int u, int v)
+void NE_PolyTexCoord(int u, int v)
 {
 	GFX_TEX_COORD = TEXTURE_PACK(inttot16(u), inttot16(v));
 }
 
-inline void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
-			  NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other)
+void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
+		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other)
 {
 	NE_AssertMinMax(0, alpha, 31, "NE_PolyFormat: Wrong alpha value %d.", alpha);
 	NE_AssertMinMax(0, id, 63, "NE_PolyFormat: Wrong polygon ID %d.", id);
@@ -72,7 +72,7 @@ inline void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
 			| other;
 }
 
-inline void NE_OutliningEnable(bool value)
+void NE_OutliningEnable(bool value)
 {
 	if (value)
 		GFX_CONTROL |= GL_OUTLINE;
@@ -80,7 +80,7 @@ inline void NE_OutliningEnable(bool value)
 		GFX_CONTROL &= ~GL_OUTLINE;
 }
 
-inline void NE_OutliningSetColor(u8 num, u32 color)
+void NE_OutliningSetColor(u8 num, u32 color)
 {
 	NE_AssertMinMax(0, num, 7, "NE_OutliningSetColor: Wrong outlining color index %d.", num);
 
@@ -97,7 +97,7 @@ void NE_ShadingEnable(bool value)
 	}
 }
 
-inline void NE_ToonHighlightEnable(bool value)
+void NE_ToonHighlightEnable(bool value)
 {
 	if (value)
 		GFX_CONTROL |= GL_TOON_HIGHLIGHT;
@@ -133,7 +133,7 @@ void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass, int depth)
 
 static u32 ne_clearcolor = 0;
 
-inline void NE_FogEnableBackground(bool value)
+void NE_FogEnableBackground(bool value)
 {
 	if (value)
 		ne_clearcolor |= BIT(15);
@@ -142,12 +142,12 @@ inline void NE_FogEnableBackground(bool value)
 	GFX_CLEAR_COLOR = ne_clearcolor;
 }
 
-inline void NE_FogDisable(void)
+void NE_FogDisable(void)
 {
 	GFX_CONTROL &= ~(GL_FOG | (15 << 8));
 }
 
-inline void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
+void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
 {
 	NE_AssertMinMax(0, alpha, 31, "NE_ClearColorSet: Wrong alpha value %d.", alpha);
 	NE_AssertMinMax(0, id, 63, "NE_ClearColorSet: Wrong polygon ID %d.", id);
@@ -163,7 +163,7 @@ inline void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
 
 extern bool NE_Dual;
 
-inline void NE_ClearBMPEnable(bool value)
+void NE_ClearBMPEnable(bool value)
 {
 	if (NE_Dual) {
 		// It needs two banks that are used for the display capture
@@ -184,7 +184,7 @@ inline void NE_ClearBMPEnable(bool value)
 	}
 }
 
-inline void NE_ClearBMPScroll(u8 x, u8 y)
+void NE_ClearBMPScroll(u8 x, u8 y)
 {
 	REG_CLEARBMPOFFSET = x | (((u16) y) << 8);
 }

@@ -46,52 +46,52 @@ NE_Sprite *NE_SpriteCreate(void)
 	return sprite;
 }
 
-inline void NE_SpriteSetPos(NE_Sprite * sprite, int x, int y)
+void NE_SpriteSetPos(NE_Sprite *sprite, int x, int y)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetPos: NULL pointer.");
 	sprite->x = x;
 	sprite->y = y;
 }
 
-inline void NE_SpriteSetSize(NE_Sprite * sprite, int x, int y)
+void NE_SpriteSetSize(NE_Sprite *sprite, int x, int y)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetSize: NULL pointer.");
 	sprite->sx = x;
 	sprite->sy = y;
 }
 
-inline void NE_SpriteSetRot(NE_Sprite * sprite, int angle)
+void NE_SpriteSetRot(NE_Sprite *sprite, int angle)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetRot: NULL pointer.");
 	sprite->rot_angle = angle;
 }
 
-inline void NE_SpriteSetScaleI(NE_Sprite * sprite, int scale)
+void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetScaleI: NULL pointer.");
 	sprite->scale = scale;
 }
 
-inline void NE_SpriteSetMaterial(NE_Sprite * sprite, NE_Material *mat)
+void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetMaterial: NULL sprite pointer.");
 	NE_AssertPointer(mat, "NE_SpriteSetMaterial: NULL material pointer.");
 	sprite->mat = mat;
 }
 
-inline void NE_SpriteSetPriority(NE_Sprite * sprite, int priority)
+void NE_SpriteSetPriority(NE_Sprite *sprite, int priority)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetPriority: NULL pointer.");
 	sprite->priority = priority;
 }
 
-inline void NE_SpriteVisible(NE_Sprite * sprite, bool visible)
+void NE_SpriteVisible(NE_Sprite *sprite, bool visible)
 {
 	NE_AssertPointer(sprite, "NE_SpriteVisible: NULL pointer.");
 	sprite->visible = visible;
 }
 
-inline void NE_SpriteSetParams(NE_Sprite * sprite, u8 alpha, u8 id, u32 color)
+void NE_SpriteSetParams(NE_Sprite *sprite, u8 alpha, u8 id, u32 color)
 {
 	NE_AssertPointer(sprite, "NE_SpriteSetParams: NULL pointer.");
 	NE_AssertMinMax(0, alpha, 31,
@@ -103,7 +103,7 @@ inline void NE_SpriteSetParams(NE_Sprite * sprite, u8 alpha, u8 id, u32 color)
 	sprite->color = color;
 }
 
-void NE_SpriteDelete(NE_Sprite * sprite)
+void NE_SpriteDelete(NE_Sprite *sprite)
 {
 	if (!ne_sprite_system_inited)
 		return;
@@ -277,7 +277,7 @@ void NE_2DViewInit(void)
 	NE_PolyFormat(31, 0, 0, NE_CULL_NONE, 0);
 }
 
-inline void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale)
+void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale)
 {
 	NE_ViewMoveI(x, y, 0);
 	MATRIX_SCALE = scale;
@@ -287,14 +287,14 @@ inline void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale)
 	NE_ViewMoveI(-x, -y, 0);
 }
 
-inline void NE_2DViewRotateByPosition(int x, int y, int rotz)
+void NE_2DViewRotateByPosition(int x, int y, int rotz)
 {
 	NE_ViewMoveI(x, y, 0);
 	glRotateZi(rotz << 6);
 	NE_ViewMoveI(-x, -y, 0);
 }
 
-inline void NE_2DViewScaleByPositionI(int x, int y, int scale)
+void NE_2DViewScaleByPositionI(int x, int y, int scale)
 {
 	NE_ViewMoveI(x, y, 0);
 	MATRIX_SCALE = scale;
@@ -311,14 +311,14 @@ void NE_2DDrawQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color)
 
 	GFX_COLOR = color;
 
-	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	//Up-left
+	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	// Up-left
 	GFX_VERTEX16 = z;
 
-	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	//Down-left
+	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	// Down-left
 
-	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	//Down-right
+	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	// Down-right
 
-	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	//Up-right
+	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	// Up-right
 }
 
 void NE_2DDrawQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color1,
@@ -329,17 +329,17 @@ void NE_2DDrawQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color1,
 	GFX_TEX_FORMAT = 0;
 
 	GFX_COLOR = color1;
-	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	//Up-left
+	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	// Up-left
 	GFX_VERTEX16 = z;
 
 	GFX_COLOR = color4;
-	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	//Down-left
+	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	// Down-left
 
 	GFX_COLOR = color3;
-	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	//Down-right
+	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	// Down-right
 
 	GFX_COLOR = color2;
-	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	//Up-right
+	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	// Up-right
 }
 
 void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
@@ -357,17 +357,17 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 	GFX_BEGIN = GL_QUADS;
 
 	GFX_TEX_COORD = TEXTURE_PACK(0, 0);
-	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	//Up-left
+	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	// Up-left
 	GFX_VERTEX16 = z;
 
 	GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	//Down-left
+	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	// Down-left
 
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	//Down-right
+	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	// Down-right
 
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
-	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	//Up-right
+	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	// Up-right
 }
 
 void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
@@ -387,17 +387,17 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 	GFX_BEGIN = GL_QUADS;
 
 	GFX_TEX_COORD = TEXTURE_PACK(0, 0);
-	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	//Up-left
+	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	// Up-left
 	GFX_VERTEX16 = z;
 
 	GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	//Down-left
+	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	// Down-left
 
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	//Down-right
+	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	// Down-right
 
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
-	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	//Up-right
+	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	// Up-right
 }
 
 void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
@@ -417,18 +417,18 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 
 	GFX_COLOR = color1;
 	GFX_TEX_COORD = TEXTURE_PACK(0, 0);
-	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	//Up-left
+	GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF);	// Up-left
 	GFX_VERTEX16 = z;
 
 	GFX_COLOR = color4;
 	GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	//Down-left
+	GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF);	// Down-left
 
 	GFX_COLOR = color3;
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
-	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	//Down-right
+	GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF);	// Down-right
 
 	GFX_COLOR = color2;
 	GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
-	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	//Up-right
+	GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF);	// Up-right
 }

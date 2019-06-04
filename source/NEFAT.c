@@ -59,7 +59,7 @@ u32 NE_FATFileSize(char *filename)
 //                      Screenshots
 //----------------------------------------------------------------
 
-inline void NE_write16(u16 *address, u16 value)
+void NE_write16(u16 *address, u16 value)
 {
 	u8 *first = (u8 *)address;
 	u8 *second = first + 1;
@@ -68,7 +68,7 @@ inline void NE_write16(u16 *address, u16 value)
 	*second = value >> 8;
 }
 
-inline void NE_write32(u32 *address, u32 value)
+void NE_write32(u32 *address, u32 value)
 {
 	u8 *first = (u8 *) address;
 	u8 *second = first + 1;

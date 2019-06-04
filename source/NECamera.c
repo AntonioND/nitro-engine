@@ -86,8 +86,8 @@ NE_Camera *NE_CameraCreate(void)
 	return NULL;
 }
 
-inline void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
-			  int xto, int yto, int zto, int xup, int yup, int zup)
+void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
+		   int xto, int yto, int zto, int xup, int yup, int zup)
 {
 	NE_AssertPointer(cam, "NE_CameraSetI: NULL pointer.");
 
@@ -104,7 +104,7 @@ inline void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
 	cam->matrix_is_updated = false;
 }
 
-inline void NE_CameraUse(NE_Camera * cam)
+void NE_CameraUse(NE_Camera *cam)
 {
 	NE_AssertPointer(cam, "NE_CameraUse: NULL pointer.");
 
@@ -116,7 +116,7 @@ inline void NE_CameraUse(NE_Camera * cam)
 	glLoadMatrix4x4(&cam->matrix);
 }
 
-void NE_CameraMoveFreeI(NE_Camera * cam, int front, int right, int up)
+void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 {
 	NE_AssertPointer(cam, "NE_CameraMoveFreeI: NULL pointer.");
 
@@ -174,7 +174,7 @@ void NE_CameraMoveFreeI(NE_Camera * cam, int front, int right, int up)
 	*/
 }
 
-inline void NE_CameraMoveI(NE_Camera *cam, int x, int y, int z)
+void NE_CameraMoveI(NE_Camera *cam, int x, int y, int z)
 {
 	NE_AssertPointer(cam, "NE_CameraMoveI: NULL pointer.");
 
@@ -374,7 +374,7 @@ void NE_CameraRotateFree(NE_Camera * cam, int rx, int ry, int rz)
 	}
 }
 
-inline void NE_CameraDelete(NE_Camera * cam)
+void NE_CameraDelete(NE_Camera *cam)
 {
 	NE_AssertPointer(cam, "NE_CameraDelete: NULL pointer.");
 
@@ -427,24 +427,24 @@ void NE_CameraSystemEnd(void)
 	ne_camera_system_inited = false;
 }
 
-inline void NE_ViewPush(void)
+void NE_ViewPush(void)
 {
 	MATRIX_PUSH = 0;
 }
 
-inline void NE_ViewPop(void)
+void NE_ViewPop(void)
 {
 	MATRIX_POP = 1;
 }
 
-inline void NE_ViewMoveI(int x, int y, int z)
+void NE_ViewMoveI(int x, int y, int z)
 {
 	MATRIX_TRANSLATE = x;
 	MATRIX_TRANSLATE = y;
 	MATRIX_TRANSLATE = z;
 }
 
-inline void NE_ViewRotate(int rx, int ry, int rz)
+void NE_ViewRotate(int rx, int ry, int rz)
 {
 	if (rx != 0)
 		glRotateXi(rx << 6);
@@ -454,7 +454,7 @@ inline void NE_ViewRotate(int rx, int ry, int rz)
 		glRotateZi(rz << 6);
 }
 
-inline void NE_ViewScaleI(int x, int y, int z)
+void NE_ViewScaleI(int x, int y, int z)
 {
 	MATRIX_SCALE = x;
 	MATRIX_SCALE = y;
