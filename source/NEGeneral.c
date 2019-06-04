@@ -548,13 +548,13 @@ inline bool NE_GPUIsRendering(void)
 //                               DEBUG
 void (*ne_userdebugfn)(const char *) = NULL;
 
-inline void __ne_debugoutputtoconsole(const char *text)
+void __ne_debugoutputtoconsole(const char *text)
 {
 	printf(text);
 	printf("\n");
 }
 
-inline void __NE_debugprint(const char *text)
+void __NE_debugprint(const char *text)
 {
 	if (!ne_inited)
 		return;
@@ -562,12 +562,12 @@ inline void __NE_debugprint(const char *text)
 		ne_userdebugfn(text);
 }
 
-inline void NE_DebugSetHandler(void (*fn)(const char *))
+void NE_DebugSetHandler(void (*fn)(const char *))
 {
 	ne_userdebugfn = fn;
 }
 
-inline void NE_DebugSetHandlerConsole(void)
+void NE_DebugSetHandlerConsole(void)
 {
 	NE_InitConsole();
 	ne_userdebugfn = __ne_debugoutputtoconsole;
