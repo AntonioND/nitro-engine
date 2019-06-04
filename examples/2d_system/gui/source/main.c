@@ -7,7 +7,7 @@
 void Draw3DScene(void)
 {
 	NE_2DViewInit(); 
-	NE_APIDraw();   //Easy, isn't it? ;)
+	NE_GUIDraw();   //Easy, isn't it? ;)
 }
 
 
@@ -36,45 +36,45 @@ int main()
 
 	
 	//----------------Create one button---------------------
-	NE_APIObj * Button = NE_APIButtonCreate(116,16,  //Upper-left pixel
+	NE_GUIObj * Button = NE_GUIButtonCreate(116,16,  //Upper-left pixel
 	                                        180,80); //Down-right pixel
 							
 							//Appearance when pressed (texture, color, alpha)
-	NE_APIButtonConfig(Button, ButtonImg, NE_White, 31,  
+	NE_GUIButtonConfig(Button, ButtonImg, NE_White, 31,  
 							//Appearance when not pressed
 	                          ButtonImg, NE_Blue, 25);
 
 	//----------------Create one check box---------------------
-	NE_APIObj * ChBx = NE_APICheckBoxCreate(16,16,80,80, //Coordinates
+	NE_GUIObj * ChBx = NE_GUICheckBoxCreate(16,16,80,80, //Coordinates
 	                                               true); //Start value
-	NE_APICheckBoxConfig(ChBx,  TrueImg, //Texture when value is true
+	NE_GUICheckBoxConfig(ChBx,  TrueImg, //Texture when value is true
 	                            EmptyImg, //Texture when value is false
 								NE_White, 31,   //Appearance when pressed (color, alpha)
 								NE_Yellow, 15); //Appearance when not pressed
 
 	//----------------Create three radio buttons---------------------
-	NE_APIObj * RaBtn1 = NE_APIRadioButtonCreate(16,116,56,156, //Coordinates
+	NE_GUIObj * RaBtn1 = NE_GUIRadioButtonCreate(16,116,56,156, //Coordinates
 	                                                          0, //Button group
 													     false); //Initial value
 								//Same as check boxes.
-	NE_APIRadioButtonConfig(RaBtn1, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31); 
+	NE_GUIRadioButtonConfig(RaBtn1, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31); 
 	
 	
-	NE_APIObj * RaBtn2 = NE_APIRadioButtonCreate(72,116,112,156, 0, //Coordinates and group
+	NE_GUIObj * RaBtn2 = NE_GUIRadioButtonCreate(72,116,112,156, 0, //Coordinates and group
 	                                                          true); //If true, buttons of same
 																	 //group will be set to false.
-	NE_APIRadioButtonConfig(RaBtn2, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31);
+	NE_GUIRadioButtonConfig(RaBtn2, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31);
 	
-	NE_APIObj * RaBtn3 = NE_APIRadioButtonCreate(128,116,168,156, 0,false);
-	NE_APIRadioButtonConfig(RaBtn3, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31);
+	NE_GUIObj * RaBtn3 = NE_GUIRadioButtonCreate(128,116,168,156, 0,false);
+	NE_GUIRadioButtonConfig(RaBtn3, TrueImg, EmptyImg, NE_White, 31, NE_Gray, 31);
 	
 	//----------------Create two slide bars---------------------
-	NE_APIObj * SldBar1 = NE_APISlideBarCreate(255 - 10 - 20,10, //Coordinates. This function 
+	NE_GUIObj * SldBar1 = NE_GUISlideBarCreate(255 - 10 - 20,10, //Coordinates. This function 
 	                                          255 - 10, 192 - 10, //will decide if slide bar is 
 															      //vertical  or horizontal.
 											              0, 100, //Min. and max. values.
 														      50);//Initial value.
-	NE_APISlideBarConfig(SldBar1, EmptyImg, //Buttons' texture
+	NE_GUISlideBarConfig(SldBar1, EmptyImg, //Buttons' texture
 	                              EmptyImg, //Sliding button's texture
 							          NULL, //Bar texture (NULL = No image...)
 					   NE_White, NE_Yellow, //Buttons' pressed/not pressed colors.
@@ -82,29 +82,29 @@ int main()
 							         31, 29, //Buttons' pressed/not pressed alpha.
 									    15); //Bar alpha
 
-	NE_APIObj * SldBar2 = NE_APISlideBarCreate(10,192-10-20,255 - 50,192 - 10, -30, 20, 0);
-	NE_APISlideBarConfig(SldBar2, EmptyImg, NULL, NULL, NE_Green, RGB15(25,31,0), NE_Yellow, 31,20,31);
+	NE_GUIObj * SldBar2 = NE_GUISlideBarCreate(10,192-10-20,255 - 50,192 - 10, -30, 20, 0);
+	NE_GUISlideBarConfig(SldBar2, EmptyImg, NULL, NULL, NE_Green, RGB15(25,31,0), NE_Yellow, 31,20,31);
 	
 	while(1) 
 	{
 		scanKeys(); //Needed
 		
 		//Print information
-		printf("\x1b[0;0HSlide bar 1: %d  ",NE_APISlideBarGetValue(SldBar1));
-		printf("\nSlide bar 2: %d  ",NE_APISlideBarGetValue(SldBar2));
+		printf("\x1b[0;0HSlide bar 1: %d  ",NE_GUISlideBarGetValue(SldBar1));
+		printf("\nSlide bar 2: %d  ",NE_GUISlideBarGetValue(SldBar2));
 		
-		printf("\n\nRadio button 1: %d ",NE_APIRadioButtonGetValue(RaBtn1));
-		printf("\nRadio button 2: %d ",NE_APIRadioButtonGetValue(RaBtn2));
-		printf("\nRadio button 3: %d ",NE_APIRadioButtonGetValue(RaBtn3));
+		printf("\n\nRadio button 1: %d ",NE_GUIRadioButtonGetValue(RaBtn1));
+		printf("\nRadio button 2: %d ",NE_GUIRadioButtonGetValue(RaBtn2));
+		printf("\nRadio button 3: %d ",NE_GUIRadioButtonGetValue(RaBtn3));
 		
-		printf("\n\nCheck box: %d ",NE_APICheckBoxGetValue(ChBx));
+		printf("\n\nCheck box: %d ",NE_GUICheckBoxGetValue(ChBx));
 		
-		printf("\n\nButton event: %d ",NE_APIObjectGetEvent(Button));
+		printf("\n\nButton event: %d ",NE_GUIObjectGetEvent(Button));
 		
 		NE_Process(Draw3DScene); //Draw things...
-		//Update API, input and wait for vertical blank. You have to call scanKeys() each frame
+		//Update GUI, input and wait for vertical blank. You have to call scanKeys() each frame
 		//for this to work.
-		NE_WaitForVBL(NE_UPDATE_API); 
+		NE_WaitForVBL(NE_UPDATE_GUI); 
 	}
 	
 	return 0;

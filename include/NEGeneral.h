@@ -61,7 +61,7 @@ typedef struct {
 
 /*! \fn    void NE_UpdateInput();
  *  \brief Updates input data for internal use. Use this if you are using
- *         NE_API or window system. You have to call scanKeys() each frame for
+ *         NE_GUI or window system. You have to call scanKeys() each frame for
  *         this to work.
  */
 void NE_UpdateInput(void);
@@ -222,7 +222,7 @@ void NE_SpecialEffectSineConfig(int mult, int shift);
  *  \brief Arguments for NE_WaitForVBL().
  */
 typedef enum {
-	NE_UPDATE_API = 1,		/*!< Updates NE_API. */
+	NE_UPDATE_GUI = 1,		/*!< Updates NE_GUI. */
 	NE_UPDATE_ANIMATIONS = 1 << 1,	/*!< Updates animated models. */
 	NE_UPDATE_PHYSICS = 1 << 2,	/*!< Updates the physics engine. */
 	NE_CAN_SKIP_VBL = 1 << 3	/*!< Allows Nitro Engine to skip the VBL wait if CPU load is greater than 100. */
@@ -232,7 +232,7 @@ typedef enum {
  *  \brief Updates selected systems and waits for vertical blank.
  *  \param flags Look at NE_UPDATE_FLAGS.
  *
- * For example, NE_WaitForVBL(NE_UPDATE_API | NE_UPDATE_ANIMATIONS);
+ * For example, NE_WaitForVBL(NE_UPDATE_GUI | NE_UPDATE_ANIMATIONS);
  *
  * NE_CAN_SKIP_VBL allows the function skip the VBL wait if CPU load is greater
  * than 100. You should use this if you don't need to load textures or do

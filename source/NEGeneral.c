@@ -52,7 +52,7 @@ void NE_End(void)
 		NE_UsingConsole = false;
 	}
 
-	NE_APISystemEnd();
+	NE_GUISystemEnd();
 	NE_SpriteSystemEnd();
 	NE_PhysicsSystemEnd();
 	NE_ModelSystemEnd();
@@ -122,7 +122,7 @@ static void NE_Init__(void)
 	NE_CameraSystemReset(0);
 	NE_PhysicsSystemReset(0);
 	NE_SpriteSystemReset(0);
-	NE_APISystemReset(0);
+	NE_GUISystemReset(0);
 	NE_ModelSystemReset(0);
 	NE_TextPriorityReset();
 
@@ -510,8 +510,8 @@ int NE_CPUPercent;
 
 void NE_WaitForVBL(NE_UPDATE_FLAGS flags)
 {
-	if (flags & NE_UPDATE_API)
-		NE_APIUpdate();
+	if (flags & NE_UPDATE_GUI)
+		NE_GUIUpdate();
 	if (flags & NE_UPDATE_ANIMATIONS)
 		NE_ModelAnimateAll();
 	if (flags & NE_UPDATE_PHYSICS)

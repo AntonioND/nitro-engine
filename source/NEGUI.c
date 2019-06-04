@@ -6,13 +6,13 @@
 
 #include "NEMain.h"
 
-/*! \file   NEAPI.c */
+/*! \file   NEGUI.c */
 
 extern _NE_input_ NE_Input;
 
-static NE_APIObj **NE_apipointers;
-static int NE_API_OBJECTS;
-static bool ne_api_system_inited = false;
+static NE_GUIObj **NE_guipointers;
+static int NE_GUI_OBJECTS;
+static bool ne_gui_system_inited = false;
 
 typedef struct {
 	int x1, y1, x2, y2;
@@ -58,33 +58,33 @@ typedef struct {
 static void NE_ResetRadioButtonGroup(int group)
 {
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] == NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] == NULL)
 			continue;
 
-		if (NE_apipointers[i]->type != NE_RadioButton)
+		if (NE_guipointers[i]->type != NE_RadioButton)
 			continue;
 
-		if (((_NE_RadioButton_ *) (NE_apipointers[i]->pointer))->group == group) {
-			((_NE_RadioButton_ *) (NE_apipointers[i]->pointer))->checked = false;
+		if (((_NE_RadioButton_ *) (NE_guipointers[i]->pointer))->group == group) {
+			((_NE_RadioButton_ *) (NE_guipointers[i]->pointer))->checked = false;
 		}
 	}
 }
 
-void NE_APIUpdate(void)
+void NE_GUIUpdate(void)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] == NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] == NULL)
 			continue;
 
 		// -------------------    BUTTON    -------------------
 
-		if (NE_apipointers[i]->type == NE_Button) {
-			_NE_Button_ *button = NE_apipointers[i]->pointer;
+		if (NE_guipointers[i]->type == NE_Button) {
+			_NE_Button_ *button = NE_guipointers[i]->pointer;
 
 			if (button->x1 < NE_Input.touch.px && button->x2 > NE_Input.touch.px
 			 && button->y1 < NE_Input.touch.py && button->y2 > NE_Input.touch.py) {
@@ -102,8 +102,8 @@ void NE_APIUpdate(void)
 		}
 		// -------------------    CHECK BOX    -------------------
 
-		else if (NE_apipointers[i]->type == NE_CheckBox) {
-			_NE_CheckBox_ *chbox = NE_apipointers[i]->pointer;
+		else if (NE_guipointers[i]->type == NE_CheckBox) {
+			_NE_CheckBox_ *chbox = NE_guipointers[i]->pointer;
 
 			if (chbox->x1 < NE_Input.touch.px && chbox->x2 > NE_Input.touch.px
 			 && chbox->y1 < NE_Input.touch.py && chbox->y2 > NE_Input.touch.py) {
@@ -123,8 +123,8 @@ void NE_APIUpdate(void)
 		}
 		// -------------------    RADIO BUTTON    -------------------
 
-		else if (NE_apipointers[i]->type == NE_RadioButton) {
-			_NE_RadioButton_ *rabutton = NE_apipointers[i]->pointer;
+		else if (NE_guipointers[i]->type == NE_RadioButton) {
+			_NE_RadioButton_ *rabutton = NE_guipointers[i]->pointer;
 
 			if (rabutton->x1 < NE_Input.touch.px
 				&& rabutton->x2 > NE_Input.touch.px
@@ -147,8 +147,8 @@ void NE_APIUpdate(void)
 		}
 		// -------------------    SLIDE BAR    -------------------
 
-		else if (NE_apipointers[i]->type == NE_SlideBar) {
-			_NE_SlideBar_ *sldbar = NE_apipointers[i]->pointer;
+		else if (NE_guipointers[i]->type == NE_SlideBar) {
+			_NE_SlideBar_ *sldbar = NE_guipointers[i]->pointer;
 
 			// Simplify code...
 			int x1 = sldbar->x1, x2 = sldbar->x2;
@@ -240,31 +240,31 @@ void NE_APIUpdate(void)
 	}
 }
 
-void NE_APIDraw(void)
+void NE_GUIDraw(void)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] == NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] == NULL)
 			continue;
 
-		int b = i + NE_API_MIN_PRIORITY;
-		if (NE_apipointers[i]->type == NE_Button) {
-			_NE_Button_ *button = NE_apipointers[i]->pointer;
+		int b = i + NE_GUI_MIN_PRIORITY;
+		if (NE_guipointers[i]->type == NE_Button) {
+			_NE_Button_ *button = NE_guipointers[i]->pointer;
 			NE_Material *tex = NULL;
 			u32 color = 0;
 
 			if (button->event > 0) { //pressed
 				GFX_POLY_FORMAT = POLY_ALPHA(button->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				tex = button->tex_2;
 				color = button->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(button->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				tex = button->tex_1;
 				color = button->color1;
@@ -280,18 +280,18 @@ void NE_APIDraw(void)
 							   button->y2, b, tex,
 							   color);
 			}
-		} else if (NE_apipointers[i]->type == NE_CheckBox) {
-			_NE_CheckBox_ *chbox = NE_apipointers[i]->pointer;
+		} else if (NE_guipointers[i]->type == NE_CheckBox) {
+			_NE_CheckBox_ *chbox = NE_guipointers[i]->pointer;
 			u32 color = 0;
 
 			if (chbox->event > 0) {
 				GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = chbox->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = chbox->color1;
 			}
@@ -307,18 +307,18 @@ void NE_APIDraw(void)
 							   chbox->x2, chbox->y2,
 							   b, tex, color);
 			}
-		} else if (NE_apipointers[i]->type == NE_RadioButton) {
-			_NE_RadioButton_ *rabutton = NE_apipointers[i]->pointer;
+		} else if (NE_guipointers[i]->type == NE_RadioButton) {
+			_NE_RadioButton_ *rabutton = NE_guipointers[i]->pointer;
 			u32 color = 0;
 
 			if (rabutton->event > 0) {
 				GFX_POLY_FORMAT = POLY_ALPHA(rabutton->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = rabutton->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(rabutton->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = rabutton->color1;
 			}
@@ -337,8 +337,8 @@ void NE_APIDraw(void)
 							   rabutton->y2, b,
 							   tex, color);
 			}
-		} else if (NE_apipointers[i]->type == NE_SlideBar) {
-			_NE_SlideBar_ *sldbar = NE_apipointers[i]->pointer;
+		} else if (NE_guipointers[i]->type == NE_SlideBar) {
+			_NE_SlideBar_ *sldbar = NE_guipointers[i]->pointer;
 
 			// -------   used to simplify code
 			int x1 = sldbar->x1, x2 = sldbar->x2;
@@ -358,12 +358,12 @@ void NE_APIDraw(void)
 			// ----------------      PLUS BUTTON  ---------------
 			if (sldbar->event_plus > 0) {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color1;
 			}
@@ -391,12 +391,12 @@ void NE_APIDraw(void)
 			// ----------------      MINUS BUTTON  ---------------
 			if (sldbar->event_minus > 0) {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color1;
 			}
@@ -425,12 +425,12 @@ void NE_APIDraw(void)
 			// ----------------      BAR BUTTON  ---------------
 			if (sldbar->event_bar > 0) {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color2;
 			} else {
 				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_API_POLY_ID)
+						| POLY_ID(NE_GUI_POLY_ID)
 						| NE_CULL_NONE;
 				color = sldbar->color1;
 			}
@@ -461,7 +461,7 @@ void NE_APIDraw(void)
 			color = sldbar->barcolor;
 			// ----------------      SLIDE BAR     ---------------
 			GFX_POLY_FORMAT = POLY_ALPHA(sldbar->baralpha)
-					| POLY_ID(NE_API_POLY_ID_ALT)
+					| POLY_ID(NE_GUI_POLY_ID_ALT)
 					| NE_CULL_NONE;
 
 			// NOTE: b+1 -> Bar button must be in front of bar
@@ -488,25 +488,25 @@ void NE_APIDraw(void)
 	}
 }
 
-NE_APIObj *NE_APIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
+NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return NULL;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] != NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] != NULL)
 			continue;
 
 		_NE_Button_ *ptr = (_NE_Button_ *) malloc(sizeof(_NE_Button_));
-		NE_AssertPointer(ptr, "NE_APIButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "NE_GUIButtonCreate: Couldn't allocate object.");
 
-		NE_apipointers[i] = (void *)malloc(sizeof(NE_APIObj));
-		NE_AssertPointer(NE_apipointers[i],
-				 "NE_APIButtonCreate: Couldn't allocate object.");
+		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_AssertPointer(NE_guipointers[i],
+				 "NE_GUIButtonCreate: Couldn't allocate object.");
 
-		NE_apipointers[i]->pointer = (void *)ptr;
-		NE_apipointers[i]->type = NE_Button;
+		NE_guipointers[i]->pointer = (void *)ptr;
+		NE_guipointers[i]->type = NE_Button;
 
 		ptr->x1 = x1;
 		ptr->y1 = y1;
@@ -517,33 +517,33 @@ NE_APIObj *NE_APIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 		ptr->color1 = ptr->color2 = NE_White;
 		ptr->alpha1 = ptr->alpha2 = 31;
 
-		return NE_apipointers[i];
+		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_APIButtonCreate: No free slots...");
+	NE_DebugPrint("NE_GUIButtonCreate: No free slots...");
 
 	return NULL;
 }
 
-NE_APIObj *NE_APICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalue)
+NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalue)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return NULL;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] != NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] != NULL)
 			continue;
 
 		_NE_CheckBox_ *ptr = (_NE_CheckBox_ *) malloc(sizeof(_NE_CheckBox_));
-		NE_AssertPointer(ptr, "NE_APICheckBoxCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "NE_GUICheckBoxCreate: Couldn't allocate object.");
 
-		NE_apipointers[i] = (void *)malloc(sizeof(NE_APIObj));
-		NE_AssertPointer(NE_apipointers[i],
-				 "NE_APICheckBoxCreate: Couldn't allocate object.");
+		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_AssertPointer(NE_guipointers[i],
+				 "NE_GUICheckBoxCreate: Couldn't allocate object.");
 
-		NE_apipointers[i]->pointer = (void *)ptr;
-		NE_apipointers[i]->type = NE_CheckBox;
+		NE_guipointers[i]->pointer = (void *)ptr;
+		NE_guipointers[i]->type = NE_CheckBox;
 
 		ptr->x1 = x1;
 		ptr->y1 = y1;
@@ -555,34 +555,34 @@ NE_APIObj *NE_APICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
 		ptr->alpha1 = ptr->alpha2 = 31;
 		ptr->checked = initialvalue;
 
-		return NE_apipointers[i];
+		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_APICheckBoxCreate: No free slots...");
+	NE_DebugPrint("NE_GUICheckBoxCreate: No free slots...");
 
 	return NULL;
 }
 
-NE_APIObj *NE_APIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
+NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 				   bool initialvalue)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return NULL;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] != NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] != NULL)
 			continue;
 
 		_NE_RadioButton_ *ptr = (_NE_RadioButton_ *) malloc(sizeof(_NE_RadioButton_));
-		NE_AssertPointer(ptr, "NE_APIRadioButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "NE_GUIRadioButtonCreate: Couldn't allocate object.");
 
-		NE_apipointers[i] = (void *)malloc(sizeof(NE_APIObj));
-		NE_AssertPointer(NE_apipointers[i],
-				 "NE_APIRadioButtonCreate: Couldn't allocate object.");
+		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_AssertPointer(NE_guipointers[i],
+				 "NE_GUIRadioButtonCreate: Couldn't allocate object.");
 
-		NE_apipointers[i]->pointer = (void *)ptr;
-		NE_apipointers[i]->type = NE_RadioButton;
+		NE_guipointers[i]->pointer = (void *)ptr;
+		NE_guipointers[i]->type = NE_RadioButton;
 
 		ptr->x1 = x1;
 		ptr->y1 = y1;
@@ -598,34 +598,34 @@ NE_APIObj *NE_APIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 			NE_ResetRadioButtonGroup(group);
 
 		ptr->checked = initialvalue;
-		return NE_apipointers[i];
+		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_APIRadioButtonCreate: No free slots...");
+	NE_DebugPrint("NE_GUIRadioButtonCreate: No free slots...");
 
 	return NULL;
 }
 
-NE_APIObj *NE_APISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
+NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 				int max, int initialvalue)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return NULL;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] != NULL)
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] != NULL)
 			continue;
 
 		_NE_SlideBar_ *ptr = (_NE_SlideBar_ *) malloc(sizeof(_NE_SlideBar_));
-		NE_AssertPointer(ptr, "NE_APISlideBarCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "NE_GUISlideBarCreate: Couldn't allocate object.");
 
-		NE_apipointers[i] = (void *)malloc(sizeof(NE_APIObj));
-		NE_AssertPointer(NE_apipointers[i],
-				 "NE_APISlideBarCreate: Couldn't allocate object.");
+		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_AssertPointer(NE_guipointers[i],
+				 "NE_GUISlideBarCreate: Couldn't allocate object.");
 
-		NE_apipointers[i]->pointer = (void *)ptr;
-		NE_apipointers[i]->type = NE_SlideBar;
+		NE_guipointers[i]->pointer = (void *)ptr;
+		NE_guipointers[i]->type = NE_SlideBar;
 
 		ptr->x1 = x1;
 		ptr->y1 = y1;
@@ -656,20 +656,20 @@ NE_APIObj *NE_APISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 				ptr->y1 + (ptr->x2 - ptr->x1) :
 				ptr->x1 + (ptr->y2 - ptr->y1);
 
-		return NE_apipointers[i];
+		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_APISlideBarCreate: No free slots...");
+	NE_DebugPrint("NE_GUISlideBarCreate: No free slots...");
 
 	return NULL;
 }
 
-void NE_APIButtonConfig(NE_APIObj *btn, NE_Material *material, u32 color,
+void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material, u32 color,
 			u32 alpha, NE_Material *pressedmaterial,
 			u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(btn, "NE_APIButtonConfig: NULL pointer.");
-	NE_Assert(btn->type == NE_Button, "NE_APIButtonConfig: Not a button.");
+	NE_AssertPointer(btn, "NE_GUIButtonConfig: NULL pointer.");
+	NE_Assert(btn->type == NE_Button, "NE_GUIButtonConfig: Not a button.");
 
 	_NE_Button_ *button = btn->pointer;
 
@@ -681,12 +681,12 @@ void NE_APIButtonConfig(NE_APIObj *btn, NE_Material *material, u32 color,
 	button->alpha2 = pressedalpha;
 }
 
-void NE_APICheckBoxConfig(NE_APIObj *chbx, NE_Material *materialtrue,
+void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
 			  NE_Material *materialfalse, u32 color, u32 alpha,
 			  u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(chbx, "NE_APICheckBoxConfig: NULL pointer.");
-	NE_Assert(chbx->type == NE_CheckBox, "NE_APICheckBoxConfig: Not a check box.");
+	NE_AssertPointer(chbx, "NE_GUICheckBoxConfig: NULL pointer.");
+	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxConfig: Not a check box.");
 
 	_NE_CheckBox_ *checkbox = chbx->pointer;
 
@@ -698,12 +698,12 @@ void NE_APICheckBoxConfig(NE_APIObj *chbx, NE_Material *materialtrue,
 	checkbox->alpha2 = pressedalpha;
 }
 
-void NE_APIRadioButtonConfig(NE_APIObj *rdbtn, NE_Material *materialtrue,
+void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn, NE_Material *materialtrue,
 			     NE_Material *materialfalse, u32 color, u32 alpha,
 			     u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(rdbtn, "NE_APIRadioButtonConfig: NULL pointer.");
-	NE_Assert(rdbtn->type == NE_RadioButton, "NE_APIRadioButtonConfig: Not a radio button.");
+	NE_AssertPointer(rdbtn, "NE_GUIRadioButtonConfig: NULL pointer.");
+	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonConfig: Not a radio button.");
 
 	_NE_RadioButton_ *radiobutton = rdbtn->pointer;
 
@@ -715,13 +715,13 @@ void NE_APIRadioButtonConfig(NE_APIObj *rdbtn, NE_Material *materialtrue,
 	radiobutton->alpha2 = pressedalpha;
 }
 
-void NE_APISlideBarConfig(NE_APIObj *sldbar, NE_Material *matbtn,
+void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 			  NE_Material *matbarbtn, NE_Material *matbar,
 			  u32 normalcolor, u32 pressedcolor, u32 barcolor,
 			  u32 alpha, u32 pressedalpha, u32 baralpha)
 {
-	NE_AssertPointer(sldbar, "NE_APISlideBarConfig: NULL pointer.");
-	NE_Assert(sldbar->type == NE_SlideBar, "NE_APISlideBarConfig: Not a slide bar.");
+	NE_AssertPointer(sldbar, "NE_GUISlideBarConfig: NULL pointer.");
+	NE_Assert(sldbar->type == NE_SlideBar, "NE_GUISlideBarConfig: Not a slide bar.");
 
 	_NE_SlideBar_ *slidebar = sldbar->pointer;
 
@@ -736,10 +736,10 @@ void NE_APISlideBarConfig(NE_APIObj *sldbar, NE_Material *matbtn,
 	slidebar->baralpha = baralpha;
 }
 
-void NE_APISlideBarSetMinMax(NE_APIObj *sldbr, int min, int max)
+void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 {
-	NE_AssertPointer(sldbr, "NE_APISlideBarSetMinMax: NULL pointer.");
-	NE_Assert(sldbr->type == NE_SlideBar, "NE_APISlideBarSetMinMax: Not a slide bar.");
+	NE_AssertPointer(sldbr, "NE_GUISlideBarSetMinMax: NULL pointer.");
+	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarSetMinMax: Not a slide bar.");
 
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
 
@@ -757,9 +757,9 @@ void NE_APISlideBarSetMinMax(NE_APIObj *sldbr, int min, int max)
 	    slidebar->x1 + (slidebar->y2 - slidebar->y1);
 }
 
-NE_APIState NE_APIObjectGetEvent(NE_APIObj *obj)
+NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 {
-	NE_AssertPointer(obj, "NE_APIObjectGetEvent: NULL pointer.");
+	NE_AssertPointer(obj, "NE_GUIObjectGetEvent: NULL pointer.");
 
 	switch (obj->type) {
 	case NE_Button:
@@ -774,7 +774,7 @@ NE_APIState NE_APIObjectGetEvent(NE_APIObj *obj)
 	case NE_SlideBar:
 		break;		//Calculated after switch
 	default:
-		NE_DebugPrint("NE_APIObjectGetEvent: Unknown object type.");
+		NE_DebugPrint("NE_GUIObjectGetEvent: Unknown object type.");
 		return -1;
 	}
 
@@ -783,88 +783,88 @@ NE_APIState NE_APIObjectGetEvent(NE_APIObj *obj)
 	return ptr->event_plus | ptr->event_minus | ptr->event_bar;
 }
 
-bool NE_APICheckBoxGetValue(NE_APIObj *chbx)
+bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx)
 {
-	NE_AssertPointer(chbx, "NE_APICheckBoxGetValue: NULL pointer.");
-	NE_Assert(chbx->type == NE_CheckBox, "NE_APICheckBoxGetValue: Not a check box.");
+	NE_AssertPointer(chbx, "NE_GUICheckBoxGetValue: NULL pointer.");
+	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxGetValue: Not a check box.");
 	return ((_NE_CheckBox_ *) (chbx->pointer))->checked;
 }
 
-bool NE_APIRadioButtonGetValue(NE_APIObj *rdbtn)
+bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn)
 {
-	NE_AssertPointer(rdbtn, "NE_APIRadioButtonGetValue: NULL pointer.");
-	NE_Assert(rdbtn->type == NE_RadioButton, "NE_APIRadioButtonGetValue: Not a radio button.");
+	NE_AssertPointer(rdbtn, "NE_GUIRadioButtonGetValue: NULL pointer.");
+	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonGetValue: Not a radio button.");
 	return ((_NE_RadioButton_ *) (rdbtn->pointer))->checked;
 }
 
-int NE_APISlideBarGetValue(NE_APIObj *sldbr)
+int NE_GUISlideBarGetValue(NE_GUIObj *sldbr)
 {
-	NE_AssertPointer(sldbr, "NE_APISlideBarGetValue: NULL pointer.");
-	NE_Assert(sldbr->type == NE_SlideBar, "NE_APISlideBarGetValue: Not a slide bar.");
+	NE_AssertPointer(sldbr, "NE_GUISlideBarGetValue: NULL pointer.");
+	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarGetValue: Not a slide bar.");
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
 	return slidebar->value + slidebar->desp;
 }
 
-void NE_APIDeleteObject(NE_APIObj *obj)
+void NE_GUIDeleteObject(NE_GUIObj *obj)
 {
-	NE_AssertPointer(obj, "NE_APIDeleteObject: NULL pointer.");
+	NE_AssertPointer(obj, "NE_GUIDeleteObject: NULL pointer.");
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i] == obj) {
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i] == obj) {
 			free(obj->pointer);
 			free(obj);
-			NE_apipointers[i] = NULL;
+			NE_guipointers[i] = NULL;
 			return;
 		}
 	}
 
-	NE_DebugPrint("NE_APIDeleteObject: Pointer not found in array.");
+	NE_DebugPrint("NE_GUIDeleteObject: Pointer not found in array.");
 }
 
-void NE_APIDeleteAll(void)
+void NE_GUIDeleteAll(void)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return;
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++) {
-		if (NE_apipointers[i]) {
-			free(NE_apipointers[i]->pointer);
-			free(NE_apipointers[i]);
-			NE_apipointers[i] = NULL;
+	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+		if (NE_guipointers[i]) {
+			free(NE_guipointers[i]->pointer);
+			free(NE_guipointers[i]);
+			NE_guipointers[i] = NULL;
 		}
 	}
 }
 
-void NE_APISystemReset(int number_of_objects)
+void NE_GUISystemReset(int number_of_objects)
 {
-	if (ne_api_system_inited)
-		NE_APISystemEnd();
+	if (ne_gui_system_inited)
+		NE_GUISystemEnd();
 
 	if (number_of_objects < 1)
-		NE_API_OBJECTS = NE_API_DEFAULT_OBJECTS;
+		NE_GUI_OBJECTS = NE_GUI_DEFAULT_OBJECTS;
 	else
-		NE_API_OBJECTS = number_of_objects;
+		NE_GUI_OBJECTS = number_of_objects;
 
-	NE_apipointers = malloc(NE_API_OBJECTS * sizeof(NE_apipointers));
-	NE_AssertPointer(NE_apipointers, "NE_APISystemReset: Not enough memory to allocate array.");
+	NE_guipointers = malloc(NE_GUI_OBJECTS * sizeof(NE_guipointers));
+	NE_AssertPointer(NE_guipointers, "NE_GUISystemReset: Not enough memory to allocate array.");
 
 	int i;
-	for (i = 0; i < NE_API_OBJECTS; i++)
-		NE_apipointers[i] = NULL;
+	for (i = 0; i < NE_GUI_OBJECTS; i++)
+		NE_guipointers[i] = NULL;
 
-	ne_api_system_inited = true;
+	ne_gui_system_inited = true;
 }
 
-void NE_APISystemEnd(void)
+void NE_GUISystemEnd(void)
 {
-	if (!ne_api_system_inited)
+	if (!ne_gui_system_inited)
 		return;
 
-	NE_APIDeleteAll();
+	NE_GUIDeleteAll();
 
-	free(NE_apipointers);
+	free(NE_guipointers);
 
-	ne_api_system_inited = false;
+	ne_gui_system_inited = false;
 }

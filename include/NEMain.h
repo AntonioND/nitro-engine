@@ -40,7 +40,7 @@ extern "C" {
 #include "NEModel.h"
 #include "NE2D.h"
 #include "NEPhysics.h"
-#include "NEAPI.h"
+#include "NEGUI.h"
 #include "NEText.h"
 
 //------------------------------------------------------------------------------
