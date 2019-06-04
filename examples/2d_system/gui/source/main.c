@@ -6,9 +6,9 @@
 
 #include <NEMain.h>
 
-#include "Button_bin.h"
-#include "Empty_bin.h"
-#include "True_bin.h"
+#include "button_bin.h"
+#include "empty_bin.h"
+#include "true_bin.h"
 
 void Draw3DScene(void)
 {
@@ -41,14 +41,14 @@ int main(void)
 	ButtonImg = NE_MaterialCreate();
 	TrueImg = NE_MaterialCreate();
 	EmptyImg = NE_MaterialCreate();
-	NE_MaterialTexLoadBMPtoRGBA(ButtonImg,(void*)Button_bin, true);
-	NE_MaterialTexLoadBMPtoRGBA(TrueImg,(void*)True_bin, true);
-	NE_MaterialTexLoadBMPtoRGBA(EmptyImg,(void*)Empty_bin, true);
+	NE_MaterialTexLoadBMPtoRGBA(ButtonImg, (void *)button_bin, true);
+	NE_MaterialTexLoadBMPtoRGBA(TrueImg, (void *)true_bin, true);
+	NE_MaterialTexLoadBMPtoRGBA(EmptyImg, (void *)empty_bin, true);
 
 	// Create one button
 	// -----------------
-	NE_GUIObj *Button = NE_GUIButtonCreate(116,16,  // Upper-left pixel
-					       180,80); // Down-right pixel
+	NE_GUIObj *Button = NE_GUIButtonCreate(116, 16,  // Upper-left pixel
+					       180, 80); // Down-right pixel
 	NE_GUIButtonConfig(Button,
 			   // Appearance when pressed (texture, color, alpha)
 			   ButtonImg, NE_White, 31,
@@ -57,7 +57,7 @@ int main(void)
 
 	// Create one check box
 	// --------------------
-	NE_GUIObj *ChBx = NE_GUICheckBoxCreate(16,16,80,80, // Coordinates
+	NE_GUIObj *ChBx = NE_GUICheckBoxCreate(16, 16, 80, 80, // Coordinates
 					       true); // Initial value
 	NE_GUICheckBoxConfig(ChBx,
 			     TrueImg,  // Texture when value is true

@@ -57,11 +57,11 @@ int main()
 	NE_SwapScreens();
 
 	Text = NE_MaterialCreate(); // Load RGB font
-	NE_MaterialTexLoadBMPtoRGBA(Text, (void*)text_bmp_bin, true);
+	NE_MaterialTexLoadBMPtoRGBA(Text, (void *)text_bmp_bin, true);
 
 	Text2 = NE_MaterialCreate();
 	PalText2 = NE_PaletteCreate(); // Load paletted font
-	NE_MaterialTexLoadBMPtoRGB256(Text2, PalText2,(void*)text2_bmp_bin,
+	NE_MaterialTexLoadBMPtoRGB256(Text2, PalText2, (void *)text2_bmp_bin,
 				      true);
 
 	NE_TextInit(0, // Font slot

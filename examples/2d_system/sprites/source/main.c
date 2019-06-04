@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "BMP24BIT_bin.h"
+#include "bmp24bit_bin.h"
 
 NE_Material *Material;
 NE_Sprite *Sprite[3];
@@ -28,9 +28,9 @@ int main()
 
 	Material = NE_MaterialCreate();
 
-	NE_MaterialTexLoadBMPtoRGBA(Material, (void*)BMP24BIT_bin, 1);
+	NE_MaterialTexLoadBMPtoRGBA(Material, (void *)bmp24bit_bin, 1);
 
-	NE_ClearColorSet(NE_Gray,31,63);
+	NE_ClearColorSet(NE_Gray, 31, 63);
 
 	Sprite[0] = NE_SpriteCreate();
 	Sprite[1] = NE_SpriteCreate();

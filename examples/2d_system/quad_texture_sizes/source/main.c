@@ -6,9 +6,9 @@
 
 #include <NEMain.h>
 
-#include "BMP24BIT_big_bin.h"
-#include "BMP24BIT_medium_bin.h"
-#include "BMP24BIT_small_bin.h"
+#include "bmp24bit_big_bin.h"
+#include "bmp24bit_medium_bin.h"
+#include "bmp24bit_small_bin.h"
 
 // This example shows that Nitro Engine fixes the strange texture mapping of the
 // DS of any size of texture. The magic part is in NE_2DDrawXXXXXX() source. The
@@ -49,11 +49,11 @@ int main(void)
 	Material_big = NE_MaterialCreate();
 
 	NE_MaterialTexLoadBMPtoRGBA(Material_small,
-				    (void*)BMP24BIT_small_bin, 0); // 8x8
+				    (void *)bmp24bit_small_bin, 0); // 8x8
 	NE_MaterialTexLoadBMPtoRGBA(Material_medium,
-				    (void*)BMP24BIT_medium_bin, 0); // 16x16
+				    (void *)bmp24bit_medium_bin, 0); // 16x16
 	NE_MaterialTexLoadBMPtoRGBA(Material_big,
-				    (void*)BMP24BIT_big_bin, 0); // 64x64
+				    (void *)bmp24bit_big_bin, 0); // 64x64
 
 	NE_ClearColorSet(NE_DarkGray, 31, 63);
 
