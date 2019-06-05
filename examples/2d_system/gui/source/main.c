@@ -23,7 +23,6 @@ int main(void)
 	irqSet(IRQ_HBLANK, NE_HBLFunc);
 
 	NE_Init3D();
-
 	// Move 3D screen to lower screen
 	NE_SwapScreens();
 	// libnds uses VRAM_C for the text console, reserve A and B only

@@ -1,43 +1,53 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+//
+// This file is part of Nitro Engine
 
 #include <NEMain.h>
 
-//------------------------------------------------------------------------------------
-// DON'T FORGET TO COMPILE NITRO ENGINE WITH NE_DEBUG DEFINED OR THIS WON'T WORK!!!!!
-//------------------------------------------------------------------------------------
+// Don't forget to compile Nitro Engine with NE_DEBUG defined or this won't work
 
 void Draw3DScene(void)
 {
-	NE_LightOff(100);  // Let's generate some error messages... :P
-	NE_CameraSetI(NULL,1,1,1,1,1,1,1,1,1);
-	NE_PolyFormat(100,120,0,0,0);
+	// Let's generate some error messages...
+	NE_LightOff(100);
+	NE_CameraSetI(NULL,
+		      1, 1, 1,
+		      1, 1, 1,
+		      1, 1, 1);
+	NE_PolyFormat(100, 120, 0, 0, 0);
 }
 
 void error_handler(const char * text)
 {
-	printf(text); // Simple handler, you could write this to a file, for example.
+	// Simple handler. You could write this to a file instead, for example.
+	printf(text);
 }
 
-int main()
+int main(void)
 {
 	irqEnable(IRQ_HBLANK);
-	irqSet(IRQ_VBLANK, NE_VBLFunc); //Used to control some things.
+	irqSet(IRQ_VBLANK, NE_VBLFunc);
 	irqSet(IRQ_HBLANK, NE_HBLFunc);
-	
+
 	NE_Init3D();
-	NE_TextureSystemReset(0,0,NE_VRAM_AB); // libnds uses VRAM_C for the text console
-	consoleDemoInit(); 
-	
-	NE_DebugSetHandler(error_handler); //Sets a custom error handler
-	
-	//NE_DebugSetHandlerConsole(); -> This would call NE_InitConsole and output all debug
-	//                                messages to the console.
-	
-	while(1)
-	{
-		
-		NE_Process(Draw3DScene); //Draw scene
+	// libnds uses VRAM_C for the text console, reserve A and B only
+	NE_TextureSystemReset(0, 0, NE_VRAM_AB);
+	// Init console in non-3D screen
+	consoleDemoInit();
+
+	// Set a custom error handler
+	NE_DebugSetHandler(error_handler);
+
+	// In order to use the default handler again it is needed to call
+	// NE_DebugSetHandlerConsole(). After that, all messages will be printed
+	// to the default console
+
+	while (1) {
+		NE_Process(Draw3DScene);
 		NE_WaitForVBL(0);
 	}
-	
+
 	return 0;
 }
