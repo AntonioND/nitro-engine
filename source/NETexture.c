@@ -58,7 +58,7 @@ static inline void NE_MaterialTexParam(NE_Material *tex, int sizeX, int sizeY,
 				       uint32 *addr, GL_TEXTURE_TYPE_ENUM mode,
 				       u32 param)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexParam: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_MaterialTexParam: No texture asigned to material.");
 	NE_Texture[tex->texindex].param =
@@ -79,7 +79,7 @@ NE_Material *NE_MaterialCreate(void)
 			continue;
 
 		NE_Material *mat = (NE_Material *) malloc(sizeof(NE_Material));
-		NE_AssertPointer(mat, "NE_MaterialCreate: Couldn't allocate material.");
+		NE_AssertPointer(mat, "Not enough memory");
 		NE_UserMaterials[i] = mat;
 		mat->texindex = NE_NO_TEXTURE;
 		mat->color = NE_White;
@@ -100,25 +100,25 @@ NE_Material *NE_MaterialCreate(void)
 
 void NE_MaterialColorSet(NE_Material *tex, u32 color)
 {
-	NE_AssertPointer(tex, "NE_MaterialColorSet: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	tex->color = color;
 }
 
 void NE_MaterialColorDelete(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_MaterialColorDelete: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	tex->color = NE_White;
 }
 
 int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
 			  int sizeX, int sizeY, int param, char *path)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexLoadFAT: NULL material pointer.");
-	NE_AssertPointer(path, "NE_MaterialTexLoadFAT: NULL path pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(path, "NULL path pointer");
 	NE_Assert(sizeX > 0 && sizeY > 0, "NE_MaterialTexLoadFAT: Size must be positive.");
 
 	char *ptr = NE_FATLoadData(path);
-	NE_AssertPointer(ptr, "NE_MaterialTexLoadFAT: Couldn't load data from FAT.");
+	NE_AssertPointer(ptr, "Couldn't load file from FAT");
 
 	u8 i = NE_MaterialTexLoad(tex, type, sizeX, sizeY, param, (u8 *) ptr);
 	free(ptr);
@@ -137,8 +137,8 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
 				   GL_TEXTURE_TYPE_ENUM type, int height,
 				   int width, int newwidth)
 {
-	NE_AssertPointer(source, "__NE_TextureResizeWidth: NULL source pointer.");
-	NE_AssertPointer(dest, "__NE_TextureResizeWidth: NULL dest pointer.");
+	NE_AssertPointer(source, "NULL source pointer");
+	NE_AssertPointer(dest, "NULL dest pointer");
 
 	int x, y;
 
@@ -234,7 +234,7 @@ static const int __NE_TextureSizeShift[] = {
 int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 		       int sizeY, int param, void *texture)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexLoad: NULL material pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
 
 	if (tex->texindex != NE_NO_TEXTURE) {	// texture exists
 		NE_MaterialDelete(tex);
@@ -270,14 +270,15 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 	if (__NE_GetValidSize(sizeX) != sizeX) {
 		invalidwidth = true;
 		// Width MUST be power of 2. This one has an invalid size...
-		// Let's expand the texture...
+		// Let's expand the texture, load it to VRAM, and delete the
+		// temporary buffer...
 
 		size = (__NE_GetValidSize(sizeX) * sizeY << 1) >>
 				__NE_TextureSizeShift[type];
 
 		void *newbuffer = malloc(size);
 		NE_AssertPointer(newbuffer,
-				 "NE_MaterialTexLoad: Couldn't allocate buffer for resizing the texture.");
+				 "Not enough memory for temporary buffer");
 
 		if (__NE_TextureResizeWidth(texture, newbuffer, type, sizeY,
 					    sizeX,
@@ -344,8 +345,8 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 
 void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
 {
-	NE_AssertPointer(source, "NE_MaterialTexClone: NULL source pointer.");
-	NE_AssertPointer(dest, "NE_MaterialTexClone: NULL dest pointer.");
+	NE_AssertPointer(source, "NULL source pointer");
+	NE_AssertPointer(dest, "NULL dest pointer");
 	NE_Assert(source->texindex != NE_NO_TEXTURE,
 		  "NE_MaterialTexClone: No texture asigned to source material.");
 	NE_Texture[source->texindex].uses++;
@@ -354,8 +355,8 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
 
 void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexSetPal: NULL material pointer.");
-	NE_AssertPointer(pal, "NE_MaterialTexSetPal: NULL palette pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(pal, "NULL palette pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_MaterialTexSetPal: No texture asigned to material.");
 	NE_Texture[tex->texindex].palette = pal;
@@ -449,11 +450,9 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 	}
 
 	NE_Texture = malloc(NE_MAX_TEXTURES * sizeof(_NE_TEX_STRUCT_));
-	NE_AssertPointer(NE_Texture,
-			 "NE_TextureSystemReset: Not enough memory to allocate texture array.");
+	NE_AssertPointer(NE_Texture, "Not enough memory");
 	NE_UserMaterials = malloc(NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
-	NE_AssertPointer(NE_UserMaterials,
-			 "NE_TextureSystemReset: Not enough memory to allocate control array.");
+	NE_AssertPointer(NE_UserMaterials, "Not enough memory");
 
 	memset(NE_Texture, 0, NE_MAX_TEXTURES * sizeof(_NE_TEX_STRUCT_));
 	memset(NE_UserMaterials, 0, NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
@@ -467,7 +466,7 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 
 void NE_MaterialDelete(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_MaterialDelete: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 
 	if (tex->texindex != NE_NO_TEXTURE) { // If there is an asigned texture
 		int slot = tex->texindex;
@@ -537,7 +536,7 @@ void NE_TextureDefragMem(void)
 			void *pointer = NE_Alloc(NE_TexAllocList, size, 8);
 
 			NE_AssertPointer(pointer,
-					 "NE_TextureDefragMem: Couldn't reallocate texture.");
+					 "Couldn't reallocate texture");
 
 			if (pointer != NE_Texture[i].adress) {
 				dmaCopy((void*) NE_Texture[i].adress, pointer,
@@ -581,7 +580,7 @@ void NE_TextureSystemEnd(void)
 //                 INTERNAL USE
 int __NE_TextureGetRawX(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "__NE_TextureGetRawX: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "__NE_TextureGetRawX: No texture asigned to material.");
 	return (NE_Texture[tex->texindex].param & (0x7 << 20)) >> 20;
@@ -589,7 +588,7 @@ int __NE_TextureGetRawX(NE_Material *tex)
 
 int __NE_TextureGetRawY(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "__NE_TextureGetRawY: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "__NE_TextureGetRawY: No texture asigned to material.");
 	return (NE_Texture[tex->texindex].param & (0x7 << 23)) >> 23;
@@ -599,7 +598,7 @@ int __NE_TextureGetRawY(NE_Material *tex)
 
 int NE_TextureGetRealSizeX(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_TextureGetRealSizeX: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_TextureGetRealSizeX: No texture asigned to material.");
 	return 8 << __NE_TextureGetRawX(tex);
@@ -607,7 +606,7 @@ int NE_TextureGetRealSizeX(NE_Material *tex)
 
 int NE_TextureGetRealSizeY(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_TextureGetRealSizeY: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_TextureGetRealSizeY: No texture asigned to material.");
 	return 8 << __NE_TextureGetRawY(tex);
@@ -615,7 +614,7 @@ int NE_TextureGetRealSizeY(NE_Material *tex)
 
 int NE_TextureGetSizeX(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_TextureGetSizeX: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_TextureGetSizeX: No texture asigned to material.");
 	return NE_Texture[tex->texindex].sizex;
@@ -623,7 +622,7 @@ int NE_TextureGetSizeX(NE_Material *tex)
 
 int NE_TextureGetSizeY(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_TextureGetSizeY: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_TextureGetSizeY: No texture asigned to material.");
 	return NE_Texture[tex->texindex].sizey;
@@ -633,7 +632,7 @@ void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
 				      u32 ambient, u32 specular, u32 emission,
 				      bool vtxcolor, bool useshininess)
 {
-	NE_AssertPointer(tex, "NE_MaterialSetPropierties: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	tex->diffuse = diffuse;
 	tex->ambient = ambient;
 	tex->specular = specular;
@@ -668,7 +667,7 @@ static u32 ne_vram_saved;
 
 void *NE_TextureDrawingStart(NE_Material *tex)
 {
-	NE_AssertPointer(tex, "NE_TextureDrawingStart: NULL pointer.");
+	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
 		  "NE_TextureDrawingStart: No texture asigned to material.");
 
@@ -690,7 +689,7 @@ void *NE_TextureDrawingStart(NE_Material *tex)
 void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
 {
 	NE_AssertPointer(drawingtexture_adress,
-			 "NE_TexturePutPixelRGBA: No texture enabled for drawing.");
+			 "No texture active for drawing");
 	NE_Assert(drawingtexture_type == GL_RGBA,
 		  "NE_TexturePutPixelRGBA: Enabled texture isn't GL_RGBA.");
 
@@ -703,7 +702,7 @@ void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
 void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
 {
 	NE_AssertPointer(drawingtexture_adress,
-			 "NE_TexturePutPixelRGB256: No texture enabled for drawing.");
+			 "No texture active for drawing.");
 	NE_Assert(drawingtexture_type == GL_RGB256,
 		  "NE_TexturePutPixelRGB256: Enabled texture isn't GL_RGB256.");
 

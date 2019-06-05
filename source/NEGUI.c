@@ -499,11 +499,10 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 			continue;
 
 		_NE_Button_ *ptr = (_NE_Button_ *) malloc(sizeof(_NE_Button_));
-		NE_AssertPointer(ptr, "NE_GUIButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
-		NE_AssertPointer(NE_guipointers[i],
-				 "NE_GUIButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
 		NE_guipointers[i]->type = NE_Button;
@@ -536,11 +535,10 @@ NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
 			continue;
 
 		_NE_CheckBox_ *ptr = (_NE_CheckBox_ *) malloc(sizeof(_NE_CheckBox_));
-		NE_AssertPointer(ptr, "NE_GUICheckBoxCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
-		NE_AssertPointer(NE_guipointers[i],
-				 "NE_GUICheckBoxCreate: Couldn't allocate object.");
+		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
 		NE_guipointers[i]->type = NE_CheckBox;
@@ -575,11 +573,10 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 			continue;
 
 		_NE_RadioButton_ *ptr = (_NE_RadioButton_ *) malloc(sizeof(_NE_RadioButton_));
-		NE_AssertPointer(ptr, "NE_GUIRadioButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
-		NE_AssertPointer(NE_guipointers[i],
-				 "NE_GUIRadioButtonCreate: Couldn't allocate object.");
+		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
 		NE_guipointers[i]->type = NE_RadioButton;
@@ -618,11 +615,10 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 			continue;
 
 		_NE_SlideBar_ *ptr = (_NE_SlideBar_ *) malloc(sizeof(_NE_SlideBar_));
-		NE_AssertPointer(ptr, "NE_GUISlideBarCreate: Couldn't allocate object.");
+		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
-		NE_AssertPointer(NE_guipointers[i],
-				 "NE_GUISlideBarCreate: Couldn't allocate object.");
+		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
 		NE_guipointers[i]->type = NE_SlideBar;
@@ -668,7 +664,7 @@ void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material, u32 color,
 			u32 alpha, NE_Material *pressedmaterial,
 			u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(btn, "NE_GUIButtonConfig: NULL pointer.");
+	NE_AssertPointer(btn, "NULL pointer");
 	NE_Assert(btn->type == NE_Button, "NE_GUIButtonConfig: Not a button.");
 
 	_NE_Button_ *button = btn->pointer;
@@ -685,7 +681,7 @@ void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
 			  NE_Material *materialfalse, u32 color, u32 alpha,
 			  u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(chbx, "NE_GUICheckBoxConfig: NULL pointer.");
+	NE_AssertPointer(chbx, "NULL pointer");
 	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxConfig: Not a check box.");
 
 	_NE_CheckBox_ *checkbox = chbx->pointer;
@@ -702,7 +698,7 @@ void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn, NE_Material *materialtrue,
 			     NE_Material *materialfalse, u32 color, u32 alpha,
 			     u32 pressedcolor, u32 pressedalpha)
 {
-	NE_AssertPointer(rdbtn, "NE_GUIRadioButtonConfig: NULL pointer.");
+	NE_AssertPointer(rdbtn, "NULL pointer");
 	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonConfig: Not a radio button.");
 
 	_NE_RadioButton_ *radiobutton = rdbtn->pointer;
@@ -720,7 +716,7 @@ void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 			  u32 normalcolor, u32 pressedcolor, u32 barcolor,
 			  u32 alpha, u32 pressedalpha, u32 baralpha)
 {
-	NE_AssertPointer(sldbar, "NE_GUISlideBarConfig: NULL pointer.");
+	NE_AssertPointer(sldbar, "NULL pointer");
 	NE_Assert(sldbar->type == NE_SlideBar, "NE_GUISlideBarConfig: Not a slide bar.");
 
 	_NE_SlideBar_ *slidebar = sldbar->pointer;
@@ -738,7 +734,7 @@ void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 
 void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 {
-	NE_AssertPointer(sldbr, "NE_GUISlideBarSetMinMax: NULL pointer.");
+	NE_AssertPointer(sldbr, "NULL pointer");
 	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarSetMinMax: Not a slide bar.");
 
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
@@ -759,7 +755,7 @@ void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 
 NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 {
-	NE_AssertPointer(obj, "NE_GUIObjectGetEvent: NULL pointer.");
+	NE_AssertPointer(obj, "NULL pointer");
 
 	switch (obj->type) {
 	case NE_Button:
@@ -785,21 +781,21 @@ NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 
 bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx)
 {
-	NE_AssertPointer(chbx, "NE_GUICheckBoxGetValue: NULL pointer.");
+	NE_AssertPointer(chbx, "NULL pointer");
 	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxGetValue: Not a check box.");
 	return ((_NE_CheckBox_ *) (chbx->pointer))->checked;
 }
 
 bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn)
 {
-	NE_AssertPointer(rdbtn, "NE_GUIRadioButtonGetValue: NULL pointer.");
+	NE_AssertPointer(rdbtn, "NULL pointer");
 	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonGetValue: Not a radio button.");
 	return ((_NE_RadioButton_ *) (rdbtn->pointer))->checked;
 }
 
 int NE_GUISlideBarGetValue(NE_GUIObj *sldbr)
 {
-	NE_AssertPointer(sldbr, "NE_GUISlideBarGetValue: NULL pointer.");
+	NE_AssertPointer(sldbr, "NULL pointer");
 	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarGetValue: Not a slide bar.");
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
 	return slidebar->value + slidebar->desp;
@@ -807,7 +803,7 @@ int NE_GUISlideBarGetValue(NE_GUIObj *sldbr)
 
 void NE_GUIDeleteObject(NE_GUIObj *obj)
 {
-	NE_AssertPointer(obj, "NE_GUIDeleteObject: NULL pointer.");
+	NE_AssertPointer(obj, "NULL pointer");
 
 	int i;
 	for (i = 0; i < NE_GUI_OBJECTS; i++) {
@@ -848,7 +844,7 @@ void NE_GUISystemReset(int number_of_objects)
 		NE_GUI_OBJECTS = number_of_objects;
 
 	NE_guipointers = malloc(NE_GUI_OBJECTS * sizeof(NE_guipointers));
-	NE_AssertPointer(NE_guipointers, "NE_GUISystemReset: Not enough memory to allocate array.");
+	NE_AssertPointer(NE_guipointers, "Not enough memory");
 
 	int i;
 	for (i = 0; i < NE_GUI_OBJECTS; i++)

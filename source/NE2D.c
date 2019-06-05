@@ -20,7 +20,7 @@ NE_Sprite *NE_SpriteCreate(void)
 		return NULL;
 
 	NE_Sprite *sprite = (NE_Sprite *) malloc(sizeof(NE_Sprite));
-	NE_AssertPointer(sprite, "NE_SpriteCreate: Couldn't allocate sprite.");
+	NE_AssertPointer(sprite, "Not enough memory");
 
 	int i = 0;
 	while (1) {
@@ -48,52 +48,52 @@ NE_Sprite *NE_SpriteCreate(void)
 
 void NE_SpriteSetPos(NE_Sprite *sprite, int x, int y)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetPos: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->x = x;
 	sprite->y = y;
 }
 
 void NE_SpriteSetSize(NE_Sprite *sprite, int x, int y)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetSize: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->sx = x;
 	sprite->sy = y;
 }
 
 void NE_SpriteSetRot(NE_Sprite *sprite, int angle)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetRot: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->rot_angle = angle;
 }
 
 void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetScaleI: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->scale = scale;
 }
 
 void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetMaterial: NULL sprite pointer.");
-	NE_AssertPointer(mat, "NE_SpriteSetMaterial: NULL material pointer.");
+	NE_AssertPointer(sprite, "NULL sprite pointer");
+	NE_AssertPointer(mat, "NULL material pointer");
 	sprite->mat = mat;
 }
 
 void NE_SpriteSetPriority(NE_Sprite *sprite, int priority)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetPriority: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->priority = priority;
 }
 
 void NE_SpriteVisible(NE_Sprite *sprite, bool visible)
 {
-	NE_AssertPointer(sprite, "NE_SpriteVisible: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	sprite->visible = visible;
 }
 
 void NE_SpriteSetParams(NE_Sprite *sprite, u8 alpha, u8 id, u32 color)
 {
-	NE_AssertPointer(sprite, "NE_SpriteSetParams: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 	NE_AssertMinMax(0, alpha, 31,
 			"NE_SpriteSetParams: Wrong alpha value %d.", alpha);
 	NE_AssertMinMax(0, id, 63,
@@ -108,7 +108,7 @@ void NE_SpriteDelete(NE_Sprite *sprite)
 	if (!ne_sprite_system_inited)
 		return;
 
-	NE_AssertPointer(sprite, "NE_SpriteDelete: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 
 	int i = 0;
 	while (1) {
@@ -149,8 +149,7 @@ void NE_SpriteSystemReset(int number_of_sprites)
 		NE_MAX_SPRITES = number_of_sprites;
 
 	NE_spritepointers = malloc(NE_MAX_SPRITES * sizeof(NE_spritepointers));
-	NE_AssertPointer(NE_spritepointers,
-			 "NE_SpriteSystemReset: Not enough memory to allocate array.");
+	NE_AssertPointer(NE_spritepointers, "Not enough memory");
 
 	int i;
 	for (i = 0; i < NE_MAX_SPRITES; i++)
@@ -173,7 +172,7 @@ void NE_SpriteSystemEnd(void)
 
 void NE_SpriteDraw(NE_Sprite *sprite)
 {
-	NE_AssertPointer(sprite, "NE_SpriteDraw: NULL pointer.");
+	NE_AssertPointer(sprite, "NULL pointer");
 
 	if (!sprite->visible)
 		return;
@@ -345,7 +344,7 @@ void NE_2DDrawQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color1,
 void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 			   NE_Material *mat)
 {
-	NE_AssertPointer(mat, "NE_2DDrawTexturedQuad: NULL pointer.");
+	NE_AssertPointer(mat, "NULL pointer");
 	NE_Assert(mat->texindex != NE_NO_TEXTURE,
 		  "NE_2DDrawTexturedQuad: No texture.");
 
@@ -373,7 +372,7 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 				NE_Material *mat, u32 color)
 {
-	NE_AssertPointer(mat, "NE_2DDrawTexturedQuadColor: NULL pointer.");
+	NE_AssertPointer(mat, "NULL pointer");
 	NE_Assert(mat->texindex != NE_NO_TEXTURE,
 		  "NE_2DDrawTexturedQuadColor: No texture.");
 
@@ -404,7 +403,7 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 				   NE_Material *mat, u32 color1, u32 color2,
 				   u32 color3, u32 color4)
 {
-	NE_AssertPointer(mat, "NE_2DDrawTexturedQuadGradient: NULL pointer.");
+	NE_AssertPointer(mat, "NULL pointer");
 	NE_Assert(mat->texindex != NE_NO_TEXTURE,
 		  "NE_2DDrawTexturedQuadGradient: No texture.");
 

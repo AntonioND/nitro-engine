@@ -318,7 +318,7 @@ void NE_Process(NE_Voidfunc drawscene)
 	MATRIX_CONTROL = GL_MODELVIEW;
 	MATRIX_IDENTITY = 0;
 
-	NE_AssertPointer(drawscene, "NE_Process: NULL function pointer.");
+	NE_AssertPointer(drawscene, "NULL function pointer");
 	drawscene();
 
 	GFX_FLUSH = (1 << 0) /* | (1<<1) */ ; //GL_TRANS_MANUALSORT | GL_WBUFFERING
@@ -368,8 +368,8 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 	MATRIX_CONTROL = GL_MODELVIEW;
 	MATRIX_IDENTITY = 0;
 
-	NE_AssertPointer(topscreen, "NE_Process: NULL function pointer (top screen).");
-	NE_AssertPointer(downscreen, "NE_Process: NULL function pointer (lower screen).");
+	NE_AssertPointer(topscreen, "NULL function pointer (top screen)");
+	NE_AssertPointer(downscreen, "NULL function pointer (lower screen)");
 
 	if (NE_Screen == 1) {
 		topscreen();

@@ -11,11 +11,11 @@
 
 void NE_AllocInit(NEChunk **first_chunk, void *start, void *end)
 {
-	NE_AssertPointer(first_chunk, "NE_AllocInit: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 	NE_Assert(end > start, "NE_AllocInit: End must be after the start.");
 
 	*first_chunk = malloc(sizeof(NEChunk));
-	NE_AssertPointer(*first_chunk, "NE_AllocInit: Couldn't allocte chunk.");
+	NE_AssertPointer(*first_chunk, "Couldn't allocate chunk");
 
 	(*first_chunk)->previous = NULL;
 	(*first_chunk)->status = NE_STATE_FREE;
@@ -26,7 +26,7 @@ void NE_AllocInit(NEChunk **first_chunk, void *start, void *end)
 
 void NE_AllocEnd(NEChunk *first_chunk)
 {
-	NE_AssertPointer(first_chunk, "NE_AllocEnd: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 
 	NEChunk *chunk_search, *chunk_current = first_chunk;
 
@@ -43,7 +43,7 @@ void NE_AllocEnd(NEChunk *first_chunk)
 
 void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 {
-	NE_AssertPointer(first_chunk, "NE_Alloc: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 	NE_Assert(size > 0, "NE_Alloc: Size must be positive.");
 
 	NEChunk *chunk_search = first_chunk;
@@ -75,7 +75,7 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 					NEChunk *next_chunk = free_chunk->next;
 					NEChunk *new_chunk = malloc(sizeof(NEChunk));
 					NE_AssertPointer(new_chunk,
-							 "NE_Alloc: Couldn't allocte chunk. (1)");
+							 "Couldn't allocate chunk. (1)");
 
 					// Set as used
 					free_chunk->status = NE_STATE_USED;
@@ -130,9 +130,9 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 						NEChunk *new_chunk = malloc(sizeof(NEChunk));
 						NEChunk *new2_chunk = malloc(sizeof(NEChunk));
 						NE_AssertPointer(new_chunk,
-								 "NE_Alloc: Couldn't allocte chunk. (2)");
+								 "Couldn't allocate chunk. (2)");
 						NE_AssertPointer(new2_chunk,
-								 "NE_Alloc: Couldn't allocte chunk. (3)");
+								 "Couldn't allocate chunk. (3)");
 
 						// Set as used
 						new_chunk->status = NE_STATE_USED;
@@ -181,7 +181,7 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 						// Get chunks next to this, and create 2 new ones.
 						NEChunk *next_chunk = free_chunk->next;
 						NEChunk *new_chunk = malloc(sizeof(NEChunk));
-						NE_AssertPointer(new_chunk, "NE_Alloc: Couldn't allocte chunk. (4)");
+						NE_AssertPointer(new_chunk, "NE_Alloc: Couldn't allocate chunk. (4)");
 
 						// Set as used
 						new_chunk->status = NE_STATE_USED;
@@ -232,7 +232,7 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 
 void NE_Free(NEChunk *first_chunk, void *pointer)
 {
-	NE_AssertPointer(first_chunk, "NE_Free: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 
 	NEChunk *chunk_search = first_chunk;
 
@@ -366,7 +366,7 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 
 void NE_Lock(NEChunk *first_chunk, void *pointer)
 {
-	NE_AssertPointer(first_chunk, "NE_Lock: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 
 	NEChunk *chunk_search = first_chunk;
 
@@ -387,7 +387,7 @@ void NE_Lock(NEChunk *first_chunk, void *pointer)
 
 void NE_Unlock(NEChunk *first_chunk, void *pointer)
 {
-	NE_AssertPointer(first_chunk, "NE_Unlock: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 
 	NEChunk *chunk_search = first_chunk;
 
@@ -411,7 +411,7 @@ void NE_Unlock(NEChunk *first_chunk, void *pointer)
 /*
 int NE_GetSize(NEChunk *first_chunk, void *pointer)
 {
-	NE_AssertPointer(first_chunk,"NE_GetSize: NULL pointer.");
+	NE_AssertPointer(first_chunk, "NULL pointer");
 
 	NEChunk *chunk_search = first_chunk;
 
@@ -431,8 +431,8 @@ int NE_GetSize(NEChunk *first_chunk, void *pointer)
 
 void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 {
-	NE_AssertPointer(first_chunk, "NE_MemGetInformation: NULL list pointer.");
-	NE_AssertPointer(info, "NE_MemGetInformation: NULL information struct pointer.");
+	NE_AssertPointer(first_chunk, "NULL list pointer");
+	NE_AssertPointer(info, "NULL info pointer");
 
 	info->Free = info->Used = info->Total = info->Locked = 0;
 

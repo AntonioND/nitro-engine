@@ -34,8 +34,7 @@ NE_Palette *NE_PaletteCreate(void)
 			continue;
 
 		NE_Palette *ptr = malloc(sizeof(NE_Palette));
-		NE_AssertPointer(ptr,
-				 "NE_PaletteCreate: Couldn't allocate palette information.");
+		NE_AssertPointer(ptr, "Not enough memory");
 		ptr->index = NE_NO_PALETTE;
 		NE_UserPalette[i] = ptr;
 		return ptr;
@@ -51,8 +50,8 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format)
 	if (!ne_palette_system_inited)
 		return 0;
 
-	NE_AssertPointer(pal, "NE_PaletteLoadFAT: NULL palette pointer.");
-	NE_AssertPointer(path, "NE_PaletteLoadFAT: NULL path pointer.");
+	NE_AssertPointer(pal, "NULL palette pointer");
+	NE_AssertPointer(path, "NULL path pointer");
 
 	u32 size = NE_FATFileSize(path);
 	if (size < 1) {
@@ -61,7 +60,7 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format)
 	}
 
 	char *ptr = NE_FATLoadData(path);
-	NE_AssertPointer(ptr, "NE_PaletteLoadFAT: Couldn't load data from FAT.");
+	NE_AssertPointer(ptr, "Couldn't load file from FAT");
 	int i = NE_PaletteLoad(pal, (u16 *) ptr, size >> 1, format);
 	free(ptr);
 
@@ -73,7 +72,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 	if (!ne_palette_system_inited)
 		return 0;
 
-	NE_AssertPointer(pal, "NE_PaletteLoad: NULL pointer.");
+	NE_AssertPointer(pal, "NULL pointer");
 
 	if (pal->index != NE_NO_PALETTE) {
 		NE_DebugPrint("NE_PaletteLoad: Another palette loaded.");
@@ -116,7 +115,7 @@ void NE_PaletteDelete(NE_Palette *pal)
 	if (!ne_palette_system_inited)
 		return;
 
-	NE_AssertPointer(pal, "NE_PaletteDelete: NULL pointer.");
+	NE_AssertPointer(pal, "NULL pointer");
 
 	//If there is an asigned palette...
 	if (pal->index != NE_NO_PALETTE) {
@@ -138,7 +137,7 @@ void NE_PaletteDelete(NE_Palette *pal)
 
 void NE_PaletteUse(NE_Palette *pal)
 {
-	NE_AssertPointer(pal, "NE_PaletteUse: NULL pointer.");
+	NE_AssertPointer(pal, "NULL pointer");
 	NE_Assert(pal->index != NE_NO_PALETTE, "NE_PaletteUse: No asigned palette.");
 	GFX_PAL_FORMAT = (int)NE_PalInfo[pal->index].pointer
 			 >> (4 - (NE_PalInfo[pal->index].format == GL_RGB4));
@@ -155,11 +154,9 @@ void NE_PaletteSystemReset(int palette_number)
 		NE_MAX_PALETTES = palette_number;
 
 	NE_PalInfo = malloc(NE_MAX_PALETTES * sizeof(_NE_PalInfo_));
-	NE_AssertPointer(NE_PalInfo,
-			 "NE_PaletteSystemReset: Not enough memory to allocate palette array.");
+	NE_AssertPointer(NE_PalInfo, "Not enough memory");
 	NE_UserPalette = malloc(NE_MAX_PALETTES * sizeof(NE_UserPalette));
-	NE_AssertPointer(NE_UserPalette,
-			 "NE_PaletteSystemReset: Not enough memory to allocate control array.");
+	NE_AssertPointer(NE_UserPalette, "Not enough memory");
 
 	NE_AllocInit(&NE_PalAllocList, (void *)VRAM_E, (void *)VRAM_F);
 
@@ -216,7 +213,7 @@ void NE_PaletteDefragMem(void)
 			void *pointer = NE_Alloc(NE_PalAllocList, size,
 						 1 << (4 - (NE_PalInfo[i].format == GL_RGB4)));
 
-			NE_AssertPointer(pointer, "NE_PaletteDefragMem: Couldn't reallocate palette.");
+			NE_AssertPointer(pointer, "Couldn't reallocate palette");
 
 			if ((int)pointer != (int)NE_PalInfo[i].pointer) {
 				dmaCopy((void*)NE_PalInfo[i].pointer, pointer, size);
@@ -256,7 +253,7 @@ static int palette_format;
 
 void *NE_PaletteModificationStart(NE_Palette *pal)
 {
-	NE_AssertPointer(pal, "NE_PaletteModificationStart: NULL pointer.");
+	NE_AssertPointer(pal, "NULL pointer");
 	NE_Assert(pal->index != NE_NO_PALETTE, "NE_PaletteModificationStart: No asigned palette.");
 
 	NE_Assert(palette_adress == NULL,
@@ -272,8 +269,7 @@ void *NE_PaletteModificationStart(NE_Palette *pal)
 
 void NE_PaletteRGB256SetColor(u8 colorindex, u16 color)
 {
-	NE_AssertPointer(palette_adress,
-			 "NE_PaletteRGB256SetColor: No palette enabled for modifying.");
+	NE_AssertPointer(palette_adress, "No palette active for modifying");
 	NE_Assert(palette_format == GL_RGB256,
 		  "NE_PaletteRGB256SetColor: Enabled palette isn't GL_RGB256.");
 

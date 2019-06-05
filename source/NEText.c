@@ -31,7 +31,7 @@ void NE_TextInit(int slot, NE_Material *mat, int sizex, int sizey)
 {
 	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
 			"NE_TextInit: Text slot %d unavailable.", slot);
-	NE_AssertPointer(mat, "NE_TextInit: NULL pointer.");
+	NE_AssertPointer(mat, "NULL pointer");
 
 	NE_TextInfo[slot].sizex = sizex;
 	NE_TextInfo[slot].sizey = sizey;

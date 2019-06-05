@@ -29,7 +29,7 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	}
 
 	NE_Physics *temp = (NE_Physics *) malloc(sizeof(NE_Physics));
-	NE_AssertPointer(temp, "NE_PhysicsCreate: Couldn't allocate physics object.");
+	NE_AssertPointer(temp, "Not enough memory");
 
 	int i = 0;
 	while (1) {
@@ -57,12 +57,12 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	return temp;
 }
 
-void NE_PhysicsDelete(NE_Physics * pointer)
+void NE_PhysicsDelete(NE_Physics *pointer)
 {
 	if (!ne_physics_system_inited)
 		return;
 
-	NE_AssertPointer(pointer, "NE_PhysicsDelete: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 
 	int i = 0;
 	while (1) {
@@ -101,8 +101,7 @@ void NE_PhysicsSystemReset(int number_of_objects)
 		NE_MAX_PHYSICS = number_of_objects;
 
 	NE_PhysicsPointers = malloc(NE_MAX_PHYSICS * sizeof(NE_PhysicsPointers));
-	NE_AssertPointer(NE_PhysicsPointers,
-			 "NE_PhysicsSystemReset: Not enough memory to allocate array.");
+	NE_AssertPointer(NE_PhysicsPointers, "Not enough memory");
 
 	int i;
 	for (i = 0; i < NE_MAX_PHYSICS; i++)
@@ -125,7 +124,7 @@ void NE_PhysicsSystemEnd(void)
 
 void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetRadiusI: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	NE_Assert(pointer->type == NE_BoundingSphere,
 		  "NE_PhysicsSetRadiusI: Only bounding shperes allowed.");
 	NE_Assert(radius >= 0, "NE_PhysicsSetRadiusI: Radius must be positive!!");
@@ -134,7 +133,7 @@ void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
 
 void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetSpeedI: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	pointer->xspeed = x;
 	pointer->yspeed = y;
 	pointer->zspeed = z;
@@ -142,7 +141,7 @@ void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
 
 void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetSizeI: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	NE_Assert(pointer->type == NE_BoundingBox,
 		  "NE_PhysicsSetSizeI: Only bounding boxes allowed.");
 	NE_Assert(x >= 0 && y >= 0 && z >= 0, "NE_PhysicsSetSizeI: Size must be positive!!");
@@ -153,52 +152,52 @@ void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
 
 void NE_PhysicsSetGravityI(NE_Physics *pointer, int gravity)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetGravityI: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	pointer->gravity = gravity;
 }
 
 void NE_PhysicsSetFrictionI(NE_Physics *pointer, int friction)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetFrictionI: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	NE_Assert(friction >= 0, "NE_PhysicsSetFrictionI: Friction mustn't be lower than 0.");
 	pointer->friction = friction;
 }
 
 void NE_PhysicsSetBounceEnergy(NE_Physics *pointer, int percent)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsSetBounceEnergy: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	NE_Assert(percent >= 0, "NE_PhysicsSetBounceEnergy: Percent must be higher than 0.");
 	pointer->keptpercent = percent;
 }
 
 void NE_PhysicsEnable(NE_Physics *pointer, bool value)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsEnable: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	pointer->enabled = value;
 }
 
 void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer)
 {
-	NE_AssertPointer(physics, "NE_PhysicsSetModel: NULL physics pointer.");
-	NE_AssertPointer(modelpointer, "NE_PhysicsSetModel: NULL model pointer.");
+	NE_AssertPointer(physics, "NULL physics pointer");
+	NE_AssertPointer(modelpointer, "NULL model pointer");
 	physics->model = modelpointer;
 }
 
 void NE_PhysicsSetGroup(NE_Physics *physics, int group)
 {
-	NE_AssertPointer(physics, "NE_PhysicsSetGroup: NULL pointer.");
+	NE_AssertPointer(physics, "NULL pointer");
 	physics->physicsgroup = group;
 }
 
 void NE_PhysicsOnCollision(NE_Physics *physics, NE_OnCollision action)
 {
-	NE_AssertPointer(physics, "NE_PhysicsOnCollision: NULL pointer.");
+	NE_AssertPointer(physics, "NULL pointer");
 	physics->oncollision = action;
 }
 
 bool NE_PhysicsIsColliding(NE_Physics *pointer)
 {
-	NE_AssertPointer(pointer, "NE_PhysicsIsColliding: NULL pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
 	return pointer->iscolliding;
 }
 
@@ -217,8 +216,8 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	if (!ne_physics_system_inited)
 		return;
 
-	NE_AssertPointer(pointer, "NE_PhysicsUpdate: NULL pointer.");
-	NE_AssertPointer(pointer->model, "NE_PhysicsUpdate: NULL model pointer.");
+	NE_AssertPointer(pointer, "NULL pointer");
+	NE_AssertPointer(pointer->model, "NULL model pointer");
 	NE_Assert(pointer->type != 0, "NE_PhysicsUpdate: No object type selected.");
 
 	if (pointer->enabled == false)
@@ -461,8 +460,8 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 
 bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2)
 {
-	NE_AssertPointer(pointer1, "NE_PhysicsCheckCollision: NULL pointer 1.");
-	NE_AssertPointer(pointer2, "NE_PhysicsCheckCollision: NULL pointer 2.");
+	NE_AssertPointer(pointer1, "NULL pointer 1");
+	NE_AssertPointer(pointer2, "NULL pointer 2");
 	NE_Assert(pointer1 != pointer2, "NE_PhysicsCheckCollision: Both objects are the same!");
 
 	//Get coordinates

@@ -18,8 +18,8 @@ static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer);
 int NE_FATMaterialTexLoadBMPtoRGBA(NE_Material *tex, char *filename,
 				   bool transpcolor)
 {
-	NE_AssertPointer(tex, "NE_FATMaterialTexLoadBMPtoRGBA: NULL material pointer.");
-	NE_AssertPointer(filename, "NE_FATMaterialTexLoadBMPtoRGBA: NULL filename pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(filename, "NULL filename pointer");
 
 	void *pointer = NE_FATLoadData(filename);
 	int a = NE_MaterialTexLoadBMPtoRGBA(tex, pointer, transpcolor);
@@ -31,9 +31,9 @@ int NE_FATMaterialTexLoadBMPtoRGBA(NE_Material *tex, char *filename,
 int NE_FATMaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, char *filename,
 				     bool transpcolor)
 {
-	NE_AssertPointer(tex, "NE_FATMaterialTexLoadBMPtoRGB256: NULL material pointer.");
-	NE_AssertPointer(pal, "NE_FATMaterialTexLoadBMPtoRGB256: NULL palette pointer.");
-	NE_AssertPointer(filename, "NE_FATMaterialTexLoadBMPtoRGB256: NULL filename pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(pal, "NULL palette pointer");
+	NE_AssertPointer(filename, "NULL filename pointer");
 
 	char *pointer = NE_FATLoadData(filename);
 	int a = NE_MaterialTexLoadBMPtoRGB256(tex, pal, pointer, transpcolor);
@@ -44,8 +44,8 @@ int NE_FATMaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, char *fi
 
 int NE_MaterialTexLoadBMPtoRGBA(NE_Material *tex, void *pointer, bool transpcolor)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexLoadBMPtoRGBA: NULL material pointer.");
-	NE_AssertPointer(pointer, "NE_MaterialTexLoadBMPtoRGBA: NULL data pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(pointer, "NULL data pointer");
 
 	void *datapointer = __NE_ConvertBMPtoRGBA(pointer, transpcolor);
 	if (datapointer == NULL)
@@ -60,19 +60,19 @@ int NE_MaterialTexLoadBMPtoRGBA(NE_Material *tex, void *pointer, bool transpcolo
 int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, void *pointer,
 				  bool transpcolor)
 {
-	NE_AssertPointer(tex, "NE_MaterialTexLoadBMPtoRGB256: NULL material pointer.");
-	NE_AssertPointer(pal, "NE_MaterialTexLoadBMPtoRGB256: NULL palette pointer.");
-	NE_AssertPointer(pointer, "NE_MaterialTexLoadBMPtoRGB256: NULL data pointer.");
+	NE_AssertPointer(tex, "NULL material pointer");
+	NE_AssertPointer(pal, "NULL palette pointer");
+	NE_AssertPointer(pointer, "NULL data pointer");
 
 	u16 *palettebuffer = malloc(256 * sizeof(u16));
 	NE_AssertPointer(palettebuffer,
-			 "NE_MaterialTexLoadBMPtoRGB256: Couldn't allocate temporal palette buffer.");
+			 "Couldn't allocate temporary palette buffer");
 	if (palettebuffer == NULL)
 		return 0;
 
 	void *datapointer = __NE_ConvertBMPtoRGB256(pointer, palettebuffer);
 	NE_AssertPointer(datapointer,
-			 "NE_MaterialTexLoadBMPtoRGB256: Couldn't convert BMP file to GL_RGB256 format.");
+			 "Couldn't convert BMP file to GL_RGB256 format");
 	if (datapointer == NULL) {
 		free(palettebuffer);
 		return 0;
@@ -133,7 +133,7 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 	}
 	//Decode
 	u16 *buffer = malloc(2 * sizex * sizey);
-	NE_AssertPointer(buffer, "__NE_ConvertBMPtoRGBA: Couldn't allocate temporal buffer.");
+	NE_AssertPointer(buffer, "Couldn't allocate temporary buffer");
 
 	u8 transr = 0, transb = 0, transg = 0;
 	u16 transcolor16bit = 0;
@@ -261,7 +261,7 @@ static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 	}
 
 	u8 *buffer = malloc(sizex * sizey);
-	NE_AssertPointer(buffer, "__NE_ConvertBMPtoRGB256: Couldn't allocate temporal buffer.");
+	NE_AssertPointer(buffer, "Couldn't allocate temporary buffer");
 
 	int y, x;		//Then, the image
 	if (colornumber == 256) {

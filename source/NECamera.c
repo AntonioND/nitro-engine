@@ -65,8 +65,7 @@ NE_Camera *NE_CameraCreate(void)
 			continue;
 
 		NE_Camera *cam = malloc(sizeof(NE_Camera));
-		NE_AssertPointer(cam,
-				 "NE_CameraCreate: Couldn't allocate camera.");
+		NE_AssertPointer(cam, "Not enough memory");
 
 		cam->from[0] = cam->from[1] = cam->from[2] = 0;
 		cam->to[0] = cam->to[1] = 0;
@@ -89,7 +88,7 @@ NE_Camera *NE_CameraCreate(void)
 void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
 		   int xto, int yto, int zto, int xup, int yup, int zup)
 {
-	NE_AssertPointer(cam, "NE_CameraSetI: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	cam->from[0] = xfrom;
 	cam->from[1] = yfrom;
@@ -106,7 +105,7 @@ void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
 
 void NE_CameraUse(NE_Camera *cam)
 {
-	NE_AssertPointer(cam, "NE_CameraUse: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	if (!cam->matrix_is_updated) {
 		__NE_CameraUpdateMatrix(cam);
@@ -118,7 +117,7 @@ void NE_CameraUse(NE_Camera *cam)
 
 void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 {
-	NE_AssertPointer(cam, "NE_CameraMoveFreeI: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	cam->matrix_is_updated = false;
 
@@ -176,7 +175,7 @@ void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 
 void NE_CameraMoveI(NE_Camera *cam, int x, int y, int z)
 {
-	NE_AssertPointer(cam, "NE_CameraMoveI: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	cam->matrix_is_updated = false;
 
@@ -191,7 +190,7 @@ void NE_CameraMoveI(NE_Camera *cam, int x, int y, int z)
 
 void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 {
-	NE_AssertPointer(cam, "NE_CameraRotate: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	int cam_vector[3], result_vector[3];
 
@@ -308,9 +307,9 @@ static void __NE_RotateVectorAxis(int32 *vector, int angle, int x, int y, int z)
 
 //----------------------------------------------------------------
 
-void NE_CameraRotateAxisI(NE_Camera * cam, int angle, int x, int y, int z)
+void NE_CameraRotateAxisI(NE_Camera *cam, int angle, int x, int y, int z)
 {
-	NE_AssertPointer(cam, "NE_CameraRotateAxisI: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 	if (angle == 0)
 		return;
 
@@ -329,9 +328,9 @@ void NE_CameraRotateAxisI(NE_Camera * cam, int angle, int x, int y, int z)
 		cam->to[i] = cam->from[i] + cam_vector[i];
 }
 
-void NE_CameraRotateFree(NE_Camera * cam, int rx, int ry, int rz)
+void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz)
 {
-	NE_AssertPointer(cam, "NE_CameraRotateFree: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	if (!(rx || ry || rz))
 		return;
@@ -376,7 +375,7 @@ void NE_CameraRotateFree(NE_Camera * cam, int rx, int ry, int rz)
 
 void NE_CameraDelete(NE_Camera *cam)
 {
-	NE_AssertPointer(cam, "NE_CameraDelete: NULL pointer.");
+	NE_AssertPointer(cam, "NULL pointer");
 
 	int i;
 	for (i = 0; i < NE_MAX_CAMERAS; i++) {
@@ -402,8 +401,7 @@ void NE_CameraSystemReset(int numcameras)
 		NE_MAX_CAMERAS = numcameras;
 
 	NE_UserCamera = malloc(NE_MAX_CAMERAS * sizeof(NE_UserCamera));
-	NE_AssertPointer(NE_UserCamera,
-			 "NE_CameraSystemReset: Not enough memory to allocate array.");
+	NE_AssertPointer(NE_UserCamera, "Not enough memory");
 
 	int i;
 	for (i = 0; i < NE_MAX_CAMERAS; i++)
