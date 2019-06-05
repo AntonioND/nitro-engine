@@ -247,7 +247,8 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 
 	NEChunk *chunk_search = first_chunk;
 
-	while (1) {
+	for ( ; chunk_search != NULL; chunk_search = chunk_search->next) {
+
 		if (chunk_search->start == pointer) {
 			// If it isn't used, it is free or locked, so don't touch it.
 			if (chunk_search->status != NE_STATE_USED)
@@ -367,11 +368,6 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 
 			return;
 		}
-
-		if (chunk_search->next == NULL)
-			return;
-
-		chunk_search = chunk_search->next;
 	}
 }
 
