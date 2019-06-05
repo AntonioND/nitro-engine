@@ -125,9 +125,8 @@ void NE_PhysicsSystemEnd(void)
 void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius)
 {
 	NE_AssertPointer(pointer, "NULL pointer");
-	NE_Assert(pointer->type == NE_BoundingSphere,
-		  "NE_PhysicsSetRadiusI: Only bounding shperes allowed.");
-	NE_Assert(radius >= 0, "NE_PhysicsSetRadiusI: Radius must be positive!!");
+	NE_Assert(pointer->type == NE_BoundingSphere, "Not a bounding shpere");
+	NE_Assert(radius >= 0, "Radius must be positive");
 	pointer->radius = radius;
 }
 
@@ -142,9 +141,8 @@ void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z)
 void NE_PhysicsSetSizeI(NE_Physics *pointer, int x, int y, int z)
 {
 	NE_AssertPointer(pointer, "NULL pointer");
-	NE_Assert(pointer->type == NE_BoundingBox,
-		  "NE_PhysicsSetSizeI: Only bounding boxes allowed.");
-	NE_Assert(x >= 0 && y >= 0 && z >= 0, "NE_PhysicsSetSizeI: Size must be positive!!");
+	NE_Assert(pointer->type == NE_BoundingBox, "Not a bounding box");
+	NE_Assert(x >= 0 && y >= 0 && z >= 0, "Size must be positive!!");
 	pointer->xsize = x;
 	pointer->ysize = y;
 	pointer->zsize = z;
@@ -159,14 +157,14 @@ void NE_PhysicsSetGravityI(NE_Physics *pointer, int gravity)
 void NE_PhysicsSetFrictionI(NE_Physics *pointer, int friction)
 {
 	NE_AssertPointer(pointer, "NULL pointer");
-	NE_Assert(friction >= 0, "NE_PhysicsSetFrictionI: Friction mustn't be lower than 0.");
+	NE_Assert(friction >= 0, "Friction must be positive");
 	pointer->friction = friction;
 }
 
 void NE_PhysicsSetBounceEnergy(NE_Physics *pointer, int percent)
 {
 	NE_AssertPointer(pointer, "NULL pointer");
-	NE_Assert(percent >= 0, "NE_PhysicsSetBounceEnergy: Percent must be higher than 0.");
+	NE_Assert(percent >= 0, "Percentage must be positive");
 	pointer->keptpercent = percent;
 }
 
@@ -218,7 +216,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 
 	NE_AssertPointer(pointer, "NULL pointer");
 	NE_AssertPointer(pointer->model, "NULL model pointer");
-	NE_Assert(pointer->type != 0, "NE_PhysicsUpdate: No object type selected.");
+	NE_Assert(pointer->type != 0, "Object has no type");
 
 	if (pointer->enabled == false)
 		return;
@@ -462,7 +460,7 @@ bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2)
 {
 	NE_AssertPointer(pointer1, "NULL pointer 1");
 	NE_AssertPointer(pointer2, "NULL pointer 2");
-	NE_Assert(pointer1 != pointer2, "NE_PhysicsCheckCollision: Both objects are the same!");
+	NE_Assert(pointer1 != pointer2, "Both objects are the same one");
 
 	//Get coordinates
 	int posx = 0, posy = 0, posz = 0;

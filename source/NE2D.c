@@ -344,8 +344,7 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 			   NE_Material *mat)
 {
 	NE_AssertPointer(mat, "NULL pointer");
-	NE_Assert(mat->texindex != NE_NO_TEXTURE,
-		  "NE_2DDrawTexturedQuad: No texture.");
+	NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
 	int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
 	int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);
@@ -372,8 +371,7 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 				NE_Material *mat, u32 color)
 {
 	NE_AssertPointer(mat, "NULL pointer");
-	NE_Assert(mat->texindex != NE_NO_TEXTURE,
-		  "NE_2DDrawTexturedQuadColor: No texture.");
+	NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
 	int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
 	int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);
@@ -403,8 +401,7 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 				   u32 color3, u32 color4)
 {
 	NE_AssertPointer(mat, "NULL pointer");
-	NE_Assert(mat->texindex != NE_NO_TEXTURE,
-		  "NE_2DDrawTexturedQuadGradient: No texture.");
+	NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
 	int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
 	int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);

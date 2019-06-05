@@ -665,7 +665,7 @@ void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material, u32 color,
 			u32 pressedcolor, u32 pressedalpha)
 {
 	NE_AssertPointer(btn, "NULL pointer");
-	NE_Assert(btn->type == NE_Button, "NE_GUIButtonConfig: Not a button.");
+	NE_Assert(btn->type == NE_Button, "Not a button");
 
 	_NE_Button_ *button = btn->pointer;
 
@@ -682,7 +682,7 @@ void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
 			  u32 pressedcolor, u32 pressedalpha)
 {
 	NE_AssertPointer(chbx, "NULL pointer");
-	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxConfig: Not a check box.");
+	NE_Assert(chbx->type == NE_CheckBox, "Not a check box");
 
 	_NE_CheckBox_ *checkbox = chbx->pointer;
 
@@ -699,7 +699,7 @@ void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn, NE_Material *materialtrue,
 			     u32 pressedcolor, u32 pressedalpha)
 {
 	NE_AssertPointer(rdbtn, "NULL pointer");
-	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonConfig: Not a radio button.");
+	NE_Assert(rdbtn->type == NE_RadioButton, "Not a radio button");
 
 	_NE_RadioButton_ *radiobutton = rdbtn->pointer;
 
@@ -717,7 +717,7 @@ void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 			  u32 alpha, u32 pressedalpha, u32 baralpha)
 {
 	NE_AssertPointer(sldbar, "NULL pointer");
-	NE_Assert(sldbar->type == NE_SlideBar, "NE_GUISlideBarConfig: Not a slide bar.");
+	NE_Assert(sldbar->type == NE_SlideBar, "Not a slide bar");
 
 	_NE_SlideBar_ *slidebar = sldbar->pointer;
 
@@ -735,7 +735,7 @@ void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 {
 	NE_AssertPointer(sldbr, "NULL pointer");
-	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarSetMinMax: Not a slide bar.");
+	NE_Assert(sldbr->type == NE_SlideBar, "Not a slide bar");
 
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
 
@@ -782,21 +782,21 @@ NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx)
 {
 	NE_AssertPointer(chbx, "NULL pointer");
-	NE_Assert(chbx->type == NE_CheckBox, "NE_GUICheckBoxGetValue: Not a check box.");
+	NE_Assert(chbx->type == NE_CheckBox, "Not a check box");
 	return ((_NE_CheckBox_ *) (chbx->pointer))->checked;
 }
 
 bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn)
 {
 	NE_AssertPointer(rdbtn, "NULL pointer");
-	NE_Assert(rdbtn->type == NE_RadioButton, "NE_GUIRadioButtonGetValue: Not a radio button.");
+	NE_Assert(rdbtn->type == NE_RadioButton, "Not a radio button");
 	return ((_NE_RadioButton_ *) (rdbtn->pointer))->checked;
 }
 
 int NE_GUISlideBarGetValue(NE_GUIObj *sldbr)
 {
 	NE_AssertPointer(sldbr, "NULL pointer");
-	NE_Assert(sldbr->type == NE_SlideBar, "NE_GUISlideBarGetValue: Not a slide bar.");
+	NE_Assert(sldbr->type == NE_SlideBar, "Not a slide bar");
 	_NE_SlideBar_ *slidebar = sldbr->pointer;
 	return slidebar->value + slidebar->desp;
 }

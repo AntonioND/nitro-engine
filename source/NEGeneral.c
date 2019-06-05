@@ -384,7 +384,7 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
 void NE_ClippingPlanesSetI(int znear, int zfar)
 {
-	NE_Assert(znear < zfar, "NE_ClippingPlanesSet: znear should be smaller than zfar.");
+	NE_Assert(znear < zfar, "znear must be smaller than zfar");
 	ne_znear = znear;
 	ne_zfar = zfar;
 }
@@ -601,15 +601,14 @@ void NE_TouchTestStart(void)
 
 	glMatrixMode(GL_MODELVIEW);
 
-	NE_Assert(!NE_TestTouch, "NE_TouchTestStart: This has been called previously.");
+	NE_Assert(!NE_TestTouch, "Test already active");
 
 	NE_TestTouch = true;
 }
 
 void NE_TouchTestObject(void)
 {
-	NE_Assert(NE_TestTouch,
-		  "NE_TouchTestObject: NE_TouchTestStart hasn't been called previously.");
+	NE_Assert(NE_TestTouch, "No active test");
 
 	// Wait for the position test to finish
 	while (PosTestBusy()) ;
@@ -622,8 +621,8 @@ void NE_TouchTestObject(void)
 
 int NE_TouchTestResult(void)
 {
-	NE_Assert(NE_TestTouch,
-		  "NE_TouchTestResult: NE_TouchTestStart hasn't been called previously.");
+	NE_Assert(NE_TestTouch, "No active test");
+
 	// Wait for all the polygons to get drawn
 	while (GFX_BUSY) ;
 	// Wait for the position test to finish
@@ -639,8 +638,7 @@ int NE_TouchTestResult(void)
 
 void NE_TouchTestEnd(void)
 {
-	NE_Assert(NE_TestTouch,
-		  "NE_TouchTestEnd: NE_TouchTestStart hasn't been called previously.");
+	NE_Assert(NE_TestTouch, "No active test");
 
 	NE_TestTouch = false;
 

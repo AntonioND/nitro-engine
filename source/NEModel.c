@@ -103,9 +103,8 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path)
 
 	NE_AssertPointer(model, "NULL model pointer");
 	NE_AssertPointer(path, "NULL path pointer");
-	NE_Assert(model->modeltype == NE_Static, "NE_ModelLoadStaticMeshFAT: Not a static model.");
-	NE_Assert(!model->iscloned,
-		  "NE_ModelLoadStaticMeshFAT: Can't load a mesh to a cloned model.");
+	NE_Assert(model->modeltype == NE_Static, "Not a static model");
+	NE_Assert(!model->iscloned, "Can't load a mesh to a cloned model");
 
 	// Free previous data...
 	if (model->meshfromfat && model->meshdata != NULL) {
@@ -130,8 +129,8 @@ int NE_ModelLoadStaticMesh(NE_Model *model, u32 *pointer)
 
 	NE_AssertPointer(model, "NULL model pointer");
 	NE_AssertPointer(pointer, "NULL data pointer");
-	NE_Assert(model->modeltype == NE_Static, "NE_ModelLoadStaticMesh: Not a static model.");
-	NE_Assert(!model->iscloned, "NE_ModelLoadStaticMesh: Can't load a mesh to a cloned model.");
+	NE_Assert(model->modeltype == NE_Static, "Not a static model");
+	NE_Assert(!model->iscloned, "Can't load a mesh to a cloned model");
 
 	//Free previous data...
 	if (model->meshfromfat && model->meshdata != NULL) {
@@ -202,7 +201,7 @@ void NE_ModelClone(NE_Model *dest, NE_Model *source)
 {
 	NE_AssertPointer(dest, "NULL dest pointer");
 	NE_AssertPointer(source, "NULL source pointer");
-	NE_Assert(dest->modeltype == source->modeltype, "NE_ModelClone: Different model types.");
+	NE_Assert(dest->modeltype == source->modeltype, "Different model types");
 
 	if (dest->modeltype == NE_Animated) {
 		swiCopy(source->meshdata, dest->meshdata,
@@ -288,9 +287,8 @@ static void __ne_drawanimatedmodel_interpolate(NE_AnimData *data)
 	}
 
 	u32 *fileptr = data->fileptrtr + 2;
-	NE_Assert(frame_one < *fileptr
-		  && frame_two < *fileptr,
-		  "__ne_drawanimatedmodel_interpolate: Trying to draw unnexistent frame.");
+	NE_Assert(frame_one < *fileptr && frame_two < *fileptr,
+		  "Drawing nonexistent frame.");
 	fileptr++;
 	u32 vtxcount = *fileptr++;
 	u16 *framearrayptr = (u16 *) ((int)data->fileptrtr + (int)*fileptr++);
@@ -357,8 +355,7 @@ static void __ne_drawanimatedmodel_nointerpolate(NE_AnimData *data)
 	int frame = data->currframe;
 
 	u32 *fileptr = data->fileptrtr + 2;
-	NE_Assert(frame < *fileptr,
-		  "__ne_drawanimatedmodel_nointerpolate: Trying to draw unnexistent frame.");
+	NE_Assert(frame < *fileptr, "Drawing nonexistent frame");
 	fileptr++;
 	u32 vtxcount = *fileptr++;
 	u16 *framearrayptr = (u16 *) ((int)data->fileptrtr + (int)*fileptr++);
@@ -486,7 +483,7 @@ void NE_ModelAnimStart(NE_Model *model, int min, int start, int max, NE_Animatio
 		       int speed)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimStart: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	((NE_AnimData *) model->meshdata)->animtype = type;
 	((NE_AnimData *) model->meshdata)->currframe = start;
@@ -503,7 +500,7 @@ void NE_ModelAnimStart(NE_Model *model, int min, int start, int max, NE_Animatio
 void NE_ModelAnimSetSpeed(NE_Model *model, int speed)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimSetSpeed: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	int i;
 	for (i = 0; i < NE_MAX_FRAMES; i++)
@@ -515,22 +512,21 @@ void NE_ModelAnimSetSpeed(NE_Model *model, int speed)
 void NE_ModelAnimSetFrameSpeed(NE_Model *model, int frame, int speed)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated,
-		  "NE_ModelAnimSetFrameSpeed: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 	((NE_AnimData *) model->meshdata)->speed[frame] = speed;
 }
 
 int NE_ModelAnimGetFrame(NE_Model *model)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimGetFrame: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 	return ((NE_AnimData *) model->meshdata)->currframe;
 }
 
 void NE_ModelAnimSetFrame(NE_Model *model, int frame)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelAnimSetFrame: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 	((NE_AnimData *) model->meshdata)->currframe = frame;
 	((NE_AnimData *) model->meshdata)->nextframetime = 0;
 }
@@ -538,8 +534,7 @@ void NE_ModelAnimSetFrame(NE_Model *model, int frame)
 void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate)
 {
 	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated,
-		  "NE_ModelAnimInterpolate: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 	model->anim_interpolate = interpolate;
 }
 
@@ -550,7 +545,7 @@ int NE_ModelLoadNEAFAT(NE_Model *model, char *path)
 
 	NE_AssertPointer(model, "NULL model pointer");
 	NE_AssertPointer(path, "NULL path pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelLoadNEAFAT: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	if (model->meshfromfat)
 		free(((NE_AnimData *) model->meshdata)->fileptrtr);
@@ -585,7 +580,7 @@ int NE_ModelLoadNEA(NE_Model *model, u32 *pointer)
 
 	NE_AssertPointer(model, "NULL model pointer");
 	NE_AssertPointer(pointer, "NULL data pointer");
-	NE_Assert(model->modeltype == NE_Animated, "NE_ModelLoadNEA: Not an animated model.");
+	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	if (model->meshfromfat)
 		free(((NE_AnimData *) model->meshdata)->fileptrtr);

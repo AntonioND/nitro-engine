@@ -59,11 +59,12 @@ static inline void NE_MaterialTexParam(NE_Material *tex, int sizeX, int sizeY,
 				       u32 param)
 {
 	NE_AssertPointer(tex, "NULL pointer");
-	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_MaterialTexParam: No texture asigned to material.");
-	NE_Texture[tex->texindex].param =
-	    param | (__NE_ConvertSizeRaw(sizeX) << 20) | (__NE_ConvertSizeRaw(sizeY) << 23) |
-	    (((uint32) addr >> 3) & 0xFFFF) | (mode << 26);
+	NE_Assert(tex->texindex != NE_NO_TEXTURE, "No assigned texture");
+	NE_Texture[tex->texindex].param = param
+					| (__NE_ConvertSizeRaw(sizeX) << 20)
+					| (__NE_ConvertSizeRaw(sizeY) << 23)
+					| (((uint32) addr >> 3) & 0xFFFF)
+					| (mode << 26);
 }
 
 //--------------------------------------------------------------------------
@@ -115,7 +116,7 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
 {
 	NE_AssertPointer(tex, "NULL material pointer");
 	NE_AssertPointer(path, "NULL path pointer");
-	NE_Assert(sizeX > 0 && sizeY > 0, "NE_MaterialTexLoadFAT: Size must be positive.");
+	NE_Assert(sizeX > 0 && sizeY > 0, "Size must be positive");
 
 	char *ptr = NE_FATLoadData(path);
 	NE_AssertPointer(ptr, "Couldn't load file from FAT");
@@ -348,7 +349,7 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
 	NE_AssertPointer(source, "NULL source pointer");
 	NE_AssertPointer(dest, "NULL dest pointer");
 	NE_Assert(source->texindex != NE_NO_TEXTURE,
-		  "NE_MaterialTexClone: No texture asigned to source material.");
+		  "No texture asigned to source material");
 	NE_Texture[source->texindex].uses++;
 	dest->texindex = source->texindex;
 }
@@ -358,7 +359,7 @@ void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
 	NE_AssertPointer(tex, "NULL material pointer");
 	NE_AssertPointer(pal, "NULL palette pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_MaterialTexSetPal: No texture asigned to material.");
+		  "No texture asigned to material");
 	NE_Texture[tex->texindex].palette = pal;
 }
 
@@ -382,7 +383,7 @@ void NE_MaterialUse(NE_Material *tex)
 			      | (tex->useshininess << 15);
 
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_MaterialUse: No texture asigned to material.");
+		  "No texture asigned to material");
 
 	if (NE_Texture[tex->texindex].palette)
 		NE_PaletteUse(NE_Texture[tex->texindex].palette);
@@ -406,7 +407,7 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 
 	NE_AllocInit(&NE_TexAllocList, (void *)VRAM_A, (void *)VRAM_E);
 
-	NE_Assert((bank_flags & 0xF) != 0, "NE_TextureSystemReset: No VRAM banks selected.");
+	NE_Assert((bank_flags & 0xF) != 0, "No VRAM banks selected");
 
 	if ((bank_flags & 0xF) == 0) // Prevent user from not selecting any bank
 		bank_flags = NE_VRAM_ABCD;
@@ -514,7 +515,7 @@ int NE_TextureFreeMemPercent(void)
 
 void NE_TextureDefragMem(void)
 {
-	NE_Assert(0, "NE_TextureDefragMem doesn't work.\n");
+	NE_Assert(0, "This function doesn't work");
 	return;
 	/*
 	// REALLY OLD CODE -- DOESN'T WORK
@@ -582,7 +583,7 @@ int __NE_TextureGetRawX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "__NE_TextureGetRawX: No texture asigned to material.");
+		  "No texture asigned to material");
 	return (NE_Texture[tex->texindex].param & (0x7 << 20)) >> 20;
 }
 
@@ -590,7 +591,7 @@ int __NE_TextureGetRawY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "__NE_TextureGetRawY: No texture asigned to material.");
+		  "No texture asigned to material");
 	return (NE_Texture[tex->texindex].param & (0x7 << 23)) >> 23;
 }
 
@@ -600,7 +601,7 @@ int NE_TextureGetRealSizeX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_TextureGetRealSizeX: No texture asigned to material.");
+		  "No texture asigned to material");
 	return 8 << __NE_TextureGetRawX(tex);
 }
 
@@ -608,7 +609,7 @@ int NE_TextureGetRealSizeY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_TextureGetRealSizeY: No texture asigned to material.");
+		  "No texture asigned to material");
 	return 8 << __NE_TextureGetRawY(tex);
 }
 
@@ -616,7 +617,7 @@ int NE_TextureGetSizeX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_TextureGetSizeX: No texture asigned to material.");
+		  "No texture asigned to material");
 	return NE_Texture[tex->texindex].sizex;
 }
 
@@ -624,7 +625,7 @@ int NE_TextureGetSizeY(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_TextureGetSizeY: No texture asigned to material.");
+		  "No texture asigned to material");
 	return NE_Texture[tex->texindex].sizey;
 }
 
@@ -669,10 +670,10 @@ void *NE_TextureDrawingStart(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	NE_Assert(tex->texindex != NE_NO_TEXTURE,
-		  "NE_TextureDrawingStart: No texture asigned to material.");
+		  "No texture asigned to material");
 
 	NE_Assert(drawingtexture_adress == NULL,
-		  "NE_TextureDrawingStart: Another texture enabled for drawing.");
+		  "Another texture is already active");
 
 	drawingtexture_x = NE_TextureGetSizeX(tex);
 	drawingtexture_realx = NE_TextureGetRealSizeX(tex);
@@ -691,7 +692,7 @@ void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
 	NE_AssertPointer(drawingtexture_adress,
 			 "No texture active for drawing");
 	NE_Assert(drawingtexture_type == GL_RGBA,
-		  "NE_TexturePutPixelRGBA: Enabled texture isn't GL_RGBA.");
+		  "Ative texture isn't GL_RGBA");
 
 	if (x >= drawingtexture_x || y >= drawingtexture_y)
 		return;
@@ -704,7 +705,7 @@ void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
 	NE_AssertPointer(drawingtexture_adress,
 			 "No texture active for drawing.");
 	NE_Assert(drawingtexture_type == GL_RGB256,
-		  "NE_TexturePutPixelRGB256: Enabled texture isn't GL_RGB256.");
+		  "Active texture isn't GL_RGB256");
 
 	if (x >= drawingtexture_x || y >= drawingtexture_y)
 		return;
@@ -718,8 +719,7 @@ void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
 
 void NE_TextureDrawingEnd(void)
 {
-	NE_Assert(drawingtexture_adress != NULL,
-		  "NE_TextureDrawingEnd: No texture enabled for drawing.");
+	NE_Assert(drawingtexture_adress != NULL, "No active texture");
 
 	vramRestorePrimaryBanks(ne_vram_saved);
 

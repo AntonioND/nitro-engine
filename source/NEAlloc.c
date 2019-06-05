@@ -12,7 +12,7 @@
 void NE_AllocInit(NEChunk **first_chunk, void *start, void *end)
 {
 	NE_AssertPointer(first_chunk, "NULL pointer");
-	NE_Assert(end > start, "NE_AllocInit: End must be after the start.");
+	NE_Assert(end > start, "End must be after the start");
 
 	*first_chunk = malloc(sizeof(NEChunk));
 	NE_AssertPointer(*first_chunk, "Couldn't allocate chunk");
@@ -44,7 +44,7 @@ void NE_AllocEnd(NEChunk *first_chunk)
 void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 {
 	NE_AssertPointer(first_chunk, "NULL pointer");
-	NE_Assert(size > 0, "NE_Alloc: Size must be positive.");
+	NE_Assert(size > 0, "Size must be positive");
 
 	NEChunk *chunk_search = first_chunk;
 
@@ -100,7 +100,7 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 
 						// Shouldn't be free
 						NE_Assert(next_chunk->status != NE_STATE_FREE,
-							  "NE_Alloc: Possible list corruption. (1)");
+							  "Possible list corruption. (1)");
 					} else {
 						new_chunk->next = NULL;
 					}
@@ -162,7 +162,7 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 
 							// Shouldn't be free
 							NE_Assert(next_chunk->status != NE_STATE_FREE,
-								  "NE_Alloc: Possible list corruption. (2)");
+								  "Possible list corruption. (2)");
 						} else {
 							new2_chunk->next = NULL;
 						}
@@ -201,9 +201,9 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 							new_chunk->next = next_chunk;
 							next_chunk->previous = new_chunk;
 
-							//Shouldn't be free
+							// Shouldn't be free
 							NE_Assert(next_chunk->status != NE_STATE_FREE,
-								  "NE_Alloc: Possible list corruption. (3)");
+								  "Possible list corruption. (3)");
 						} else {
 							new_chunk->next = NULL;
 						}
@@ -294,7 +294,7 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 							if (next_next_chunk) {
 								// Next Next shouldn't be free. If not, something bad happens here.
 								NE_Assert(next_next_chunk->status != NE_STATE_FREE,
-									  "NE_Free: Possible list corruption. (1)");
+									  "Possible list corruption. (1)");
 
 								// First, join the previous and the next next
 								next_next_chunk->previous = previous_chunk;
@@ -334,7 +334,7 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 					if (next_next_chunk) {
 						// Next Next should be used or locked. If not, something bad happens here.
 						NE_Assert(next_next_chunk->status != NE_STATE_FREE,
-							  "NE_Free: Possible list corruption. (2)");
+							  "Possible list corruption. (2)");
 
 						// First, join the free and the next next
 						next_next_chunk->previous = chunk_search;

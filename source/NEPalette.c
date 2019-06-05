@@ -138,7 +138,7 @@ void NE_PaletteDelete(NE_Palette *pal)
 void NE_PaletteUse(NE_Palette *pal)
 {
 	NE_AssertPointer(pal, "NULL pointer");
-	NE_Assert(pal->index != NE_NO_PALETTE, "NE_PaletteUse: No asigned palette.");
+	NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
 	GFX_PAL_FORMAT = (int)NE_PalInfo[pal->index].pointer
 			 >> (4 - (NE_PalInfo[pal->index].format == GL_RGB4));
 }
@@ -192,7 +192,7 @@ int NE_PaletteFreeMemPercent(void)
 
 void NE_PaletteDefragMem(void)
 {
-	NE_Assert(0, "NE_PaletteDefragMem doesn't work.\n");
+	NE_Assert(0, "This function doesn't work");
 	return;
 
 	// TODO: Fix
@@ -254,10 +254,8 @@ static int palette_format;
 void *NE_PaletteModificationStart(NE_Palette *pal)
 {
 	NE_AssertPointer(pal, "NULL pointer");
-	NE_Assert(pal->index != NE_NO_PALETTE, "NE_PaletteModificationStart: No asigned palette.");
-
-	NE_Assert(palette_adress == NULL,
-		  "NE_PaletteModificationStart: Another palette enabled for drawing.");
+	NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
+	NE_Assert(palette_adress == NULL, "Another palette already active");
 
 	palette_adress = NE_PalInfo[pal->index].pointer;
 	palette_format = NE_PalInfo[pal->index].format;
@@ -269,17 +267,15 @@ void *NE_PaletteModificationStart(NE_Palette *pal)
 
 void NE_PaletteRGB256SetColor(u8 colorindex, u16 color)
 {
-	NE_AssertPointer(palette_adress, "No palette active for modifying");
-	NE_Assert(palette_format == GL_RGB256,
-		  "NE_PaletteRGB256SetColor: Enabled palette isn't GL_RGB256.");
+	NE_AssertPointer(palette_adress, "No active palette");
+	NE_Assert(palette_format == GL_RGB256, "Active palette isn't GL_RGB256");
 
 	palette_adress[colorindex] = color;
 }
 
 void NE_PaletteModificationEnd(void)
 {
-	NE_Assert(palette_adress != NULL,
-		  "NE_PaletteModificationEnd: No palette enabled for modifying.");
+	NE_Assert(palette_adress != NULL, "No active palette");
 
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 
