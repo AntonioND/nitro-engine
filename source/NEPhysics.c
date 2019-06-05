@@ -18,7 +18,7 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	if (!ne_physics_system_inited)
 		return NULL;
 
-	//TODO:
+	// TODO
 	if (type == NE_BoundingSphere) {
 		NE_DebugPrint("Bounding spheres not supported");
 		return NULL;
@@ -78,14 +78,13 @@ void NE_PhysicsDelete(NE_Physics *pointer)
 	}
 
 	NE_DebugPrint("Object not found");
-
-	return;
 }
 
 void NE_PhysicsDeleteAll(void)
 {
 	if (!ne_physics_system_inited)
 		return;
+
 	int i;
 	for (i = 0; i < NE_MAX_PHYSICS; i++)
 		NE_PhysicsDelete(NE_PhysicsPointers[i]);
@@ -204,6 +203,7 @@ void NE_PhysicsUpdateAll(void)
 {
 	if (!ne_physics_system_inited)
 		return;
+
 	int i;
 	for (i = 0; i < NE_MAX_PHYSICS; i++)
 		if (NE_PhysicsPointers[i] != NULL)
@@ -247,115 +247,110 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 		yenabled = false;
 	if (bposz == posz)
 		zenabled = false;
+
 	//int xlastcol = 0, ylastcol = 0, zlastcol = 0;  //To fix other things...
 	int i;
 	for (i = 0; i < NE_MAX_PHYSICS; i++) {
-		if (NE_PhysicsPointers[i] != NULL &&	//If exists
-		    NE_PhysicsPointers[i] != pointer &&	//and is NOT the same object
-		    NE_PhysicsPointers[i]->physicsgroup == pointer->physicsgroup) { //and is same group...
-			NE_Physics *otherpointer = NE_PhysicsPointers[i];
-			//Get coordinates
-			int otherposx = 0, otherposy = 0, otherposz = 0;
+		if (NE_PhysicsPointers[i] == NULL)
+			continue;
 
-			model = otherpointer->model;
-			otherposx = model->x;
-			otherposy = model->y;
-			otherposz = model->z;
+		// Check that we aren't checking an object with itself
+		if (NE_PhysicsPointers[i] == pointer)
+			continue;
 
-			//Both are boxes
-//              if(pointer->type == NE_BoundingBox && otherpointer->type == NE_BoundingBox)
-//              {
-			//If collision...
-			if ((abs(posx - otherposx) < (pointer->xsize + otherpointer->xsize) >> 1) &&
-			    (abs(posy - otherposy) < (pointer->ysize + otherpointer->ysize) >> 1) &&
-			    (abs(posz - otherposz) < (pointer->zsize + otherpointer->zsize) >> 1)) {
-				pointer->iscolliding = true;
+		// Check that both objects are in the same group
+		if (NE_PhysicsPointers[i]->physicsgroup != pointer->physicsgroup)
+			continue;
 
-				if (pointer->oncollision == NE_ColBounce) {
-					// Used to reduce speed:
-					int temp = divf32(inttof32(pointer->keptpercent), inttof32(100));
-					if ((yenabled) && ((abs(bposy - otherposy) >= (pointer->ysize + otherpointer->ysize) >> 1))) {
-						yenabled = false;
-						pointer->yspeed += pointer->gravity;
+		NE_Physics *otherpointer = NE_PhysicsPointers[i];
+		//Get coordinates
+		int otherposx = 0, otherposy = 0, otherposz = 0;
 
-						if (posy > otherposy)
-							(pointer->model)->y = otherposy + ((pointer->ysize + otherpointer->ysize) >> 1);
-						if (posy < otherposy)
-							(pointer->model)->y = otherposy - ((pointer->ysize + otherpointer->ysize) >> 1);
+		model = otherpointer->model;
+		otherposx = model->x;
+		otherposy = model->y;
+		otherposz = model->z;
 
-						if (pointer->gravity == 0) {
-							pointer->yspeed =
-							    -mulf32(temp, pointer->yspeed);
+		// Both are boxes
+		if (pointer->type == NE_BoundingBox && otherpointer->type == NE_BoundingBox) {
+			bool collision =
+				((abs(posx - otherposx) < (pointer->xsize + otherpointer->xsize) >> 1) &&
+				(abs(posy - otherposy) < (pointer->ysize + otherpointer->ysize) >> 1) &&
+				(abs(posz - otherposz) < (pointer->zsize + otherpointer->zsize) >> 1));
+
+			if (!collision)
+				continue;
+
+			pointer->iscolliding = true;
+
+			if (pointer->oncollision == NE_ColBounce) {
+				// Used to reduce speed:
+				int temp = divf32(inttof32(pointer->keptpercent), inttof32(100));
+				if ((yenabled) && ((abs(bposy - otherposy) >= (pointer->ysize + otherpointer->ysize) >> 1))) {
+					yenabled = false;
+					pointer->yspeed += pointer->gravity;
+
+					if (posy > otherposy)
+						(pointer->model)->y = otherposy + ((pointer->ysize + otherpointer->ysize) >> 1);
+					if (posy < otherposy)
+						(pointer->model)->y = otherposy - ((pointer->ysize + otherpointer->ysize) >> 1);
+
+					if (pointer->gravity == 0) {
+						pointer->yspeed =
+							-mulf32(temp, pointer->yspeed);
+					} else {
+						if (abs(pointer->yspeed) > NE_MIN_BOUNCE_SPEED) {
+							pointer->yspeed = -mulf32(temp, pointer->yspeed - pointer->gravity);
 						} else {
-							if (abs(pointer->yspeed) > NE_MIN_BOUNCE_SPEED) {
-								pointer->yspeed = -mulf32(temp, pointer->yspeed - pointer->gravity);
-							} else {
-								pointer->yspeed = 0;
-							}
+							pointer->yspeed = 0;
 						}
-					} else if ((xenabled) && ((abs(bposx - otherposx) >= (pointer->xsize + otherpointer->xsize) >> 1))) {
-						xenabled = false;
-
-						if (posx > otherposx)
-							(pointer->model)->x = otherposx + ((pointer->xsize + otherpointer->xsize) >> 1);
-						if (posx < otherposx)
-							(pointer->model)->x = otherposx - ((pointer->xsize + otherpointer->xsize) >> 1);
-
-						pointer->xspeed = -mulf32(temp, pointer->xspeed);
-					} else if ((zenabled) && ((abs(bposz - otherposz) >= (pointer->zsize + otherpointer->zsize) >> 1))) {
-						zenabled = false;
-
-						if (posz > otherposz)
-							(pointer->model)->z = otherposz + ((pointer->zsize + otherpointer->zsize) >> 1);
-						if (posz < otherposz)
-							(pointer->model)->z = otherposz - ((pointer->zsize + otherpointer->zsize) >> 1);
-
-						pointer->zspeed = -mulf32(temp, pointer->zspeed);
 					}
-				} else if (pointer->oncollision == NE_ColStop) {
-					if ((yenabled) && ((abs(bposy - otherposy) >= (pointer->ysize + otherpointer->ysize) >> 1))) {
-						yenabled = false;
+				} else if ((xenabled) && ((abs(bposx - otherposx) >= (pointer->xsize + otherpointer->xsize) >> 1))) {
+					xenabled = false;
 
-						if (posy > otherposy)
-							(pointer->model)->y = otherposy + ((pointer->ysize + otherpointer->ysize) >> 1);
-						if (posy < otherposy)
-							(pointer->model)->y = otherposy - ((pointer->ysize + otherpointer->ysize) >> 1);
-					}
-					if ((xenabled) && ((abs(bposx - otherposx) >= (pointer->xsize + otherpointer->xsize) >> 1))) {
-						xenabled = false;
+					if (posx > otherposx)
+						(pointer->model)->x = otherposx + ((pointer->xsize + otherpointer->xsize) >> 1);
+					if (posx < otherposx)
+						(pointer->model)->x = otherposx - ((pointer->xsize + otherpointer->xsize) >> 1);
 
-						if (posx > otherposx)
-							(pointer->model)->x = otherposx + ((pointer->xsize + otherpointer->xsize) >> 1);
-						if (posx < otherposx)
-							(pointer->model)->x = otherposx - ((pointer->xsize + otherpointer->xsize) >> 1);
-					}
-					if ((zenabled) && ((abs(bposz - otherposz) >= (pointer->zsize + otherpointer->zsize) >> 1))) {
-						zenabled = false;
+					pointer->xspeed = -mulf32(temp, pointer->xspeed);
+				} else if ((zenabled) && ((abs(bposz - otherposz) >= (pointer->zsize + otherpointer->zsize) >> 1))) {
+					zenabled = false;
 
-						if (posz > otherposz)
-							(pointer->model)->z = otherposz + ((pointer->zsize + otherpointer->zsize) >> 1);
-						if (posz < otherposz)
-							(pointer->model)->z = otherposz - ((pointer->zsize + otherpointer->zsize) >> 1);
-					}
-					pointer->xspeed = pointer->yspeed = pointer->zspeed = 0;
+					if (posz > otherposz)
+						(pointer->model)->z = otherposz + ((pointer->zsize + otherpointer->zsize) >> 1);
+					if (posz < otherposz)
+						(pointer->model)->z = otherposz - ((pointer->zsize + otherpointer->zsize) >> 1);
+
+					pointer->zspeed = -mulf32(temp, pointer->zspeed);
 				}
+			} else if (pointer->oncollision == NE_ColStop) {
+				if ((yenabled) && ((abs(bposy - otherposy) >= (pointer->ysize + otherpointer->ysize) >> 1))) {
+					yenabled = false;
+
+					if (posy > otherposy)
+						(pointer->model)->y = otherposy + ((pointer->ysize + otherpointer->ysize) >> 1);
+					if (posy < otherposy)
+						(pointer->model)->y = otherposy - ((pointer->ysize + otherpointer->ysize) >> 1);
+				}
+				if ((xenabled) && ((abs(bposx - otherposx) >= (pointer->xsize + otherpointer->xsize) >> 1))) {
+					xenabled = false;
+
+					if (posx > otherposx)
+						(pointer->model)->x = otherposx + ((pointer->xsize + otherpointer->xsize) >> 1);
+					if (posx < otherposx)
+						(pointer->model)->x = otherposx - ((pointer->xsize + otherpointer->xsize) >> 1);
+				}
+				if ((zenabled) && ((abs(bposz - otherposz) >= (pointer->zsize + otherpointer->zsize) >> 1))) {
+					zenabled = false;
+
+					if (posz > otherposz)
+						(pointer->model)->z = otherposz + ((pointer->zsize + otherpointer->zsize) >> 1);
+					if (posz < otherposz)
+						(pointer->model)->z = otherposz - ((pointer->zsize + otherpointer->zsize) >> 1);
+				}
+				pointer->xspeed = pointer->yspeed = pointer->zspeed = 0;
 			}
-//              }
-/*		//Both spheres
-		else if(pointer->type == NE_BoundingSphere && otherpointer->type == NE_BoundingSphere)
-		{
-
-		}
-		//Box - sphere
-		else if(pointer->type == NE_BoundingBox && otherpointer->type == NE_BoundingSphere)
-		{
-				int radius; //for shpere
-		}
-		//Sphere - box
-		else if(pointer->type == NE_BoundingSphere && otherpointer->type == NE_BoundingBox)
-		{
-
-		}*/
 		}
 	}
 
