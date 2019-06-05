@@ -519,7 +519,7 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_GUIButtonCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -556,7 +556,7 @@ NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
 		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_GUICheckBoxCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -598,7 +598,7 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_GUIRadioButtonCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -655,7 +655,7 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 		return NE_guipointers[i];
 	}
 
-	NE_DebugPrint("NE_GUISlideBarCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -768,9 +768,9 @@ NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 		return ((_NE_RadioButton_ *) (obj->pointer))->event;
 		break;
 	case NE_SlideBar:
-		break;		//Calculated after switch
+		break;	 	// Calculated after switch
 	default:
-		NE_DebugPrint("NE_GUIObjectGetEvent: Unknown object type.");
+		NE_DebugPrint("Unknown object type");
 		return -1;
 	}
 
@@ -815,7 +815,7 @@ void NE_GUIDeleteObject(NE_GUIObj *obj)
 		}
 	}
 
-	NE_DebugPrint("NE_GUIDeleteObject: Pointer not found in array.");
+	NE_DebugPrint("Object not found");
 }
 
 void NE_GUIDeleteAll(void)

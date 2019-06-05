@@ -85,7 +85,7 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, void *point
 	free(datapointer);
 
 	if (a == 0) {
-		NE_DebugPrint("NE_MaterialTexLoadBMPtoRGB256: Error while loading texture...");
+		NE_DebugPrint("Error while loading texture");
 		free(palettebuffer);
 		return 0;
 	}
@@ -93,7 +93,7 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, void *point
 	free(palettebuffer);
 
 	if (a == 0) {
-		NE_DebugPrint("NE_MaterialTexLoadBMPtoRGB256: Error while loading palette...");
+		NE_DebugPrint("Error while loading palette");
 		NE_MaterialDelete(tex);
 		return 0;
 	}
@@ -111,27 +111,29 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header + sizeof(NE_BMP_HEADER));
 	u8 *IMAGEDATA = (void *)((u8 *) infoheader + sizeof(NE_INFO_BMP_HEADER));
 	if (header->type != 0x4D42) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGBA: Not a BMP file.");
-		return NULL;	//Not a bmp file
+		NE_DebugPrint("Not a BMP file");
+		return NULL;
 	}
+
 	int sizex = infoheader->width;
 	int sizey = infoheader->height;
 	if (sizex > 1024 || sizey > 1024) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGBA: BMP file too big (%d,%d).", sizex, sizey);
-		return NULL;	//Wrong size
+		NE_DebugPrint("BMP file too big (%d, %d)", sizex, sizey);
+		return NULL;
 	}
 
 	if (infoheader->compression != 0) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGBA: Compressed BMP not supported.");
-		return NULL;	//Compressed bmp not supported
+		NE_DebugPrint("Compressed BMP not supported");
+		return NULL;
 	}
+
 	if (infoheader->bits != 16 && infoheader->bits != 24) {
-		NE_DebugPrint
-		    ("__NE_ConvertBMPtoRGBA: Unsuported depth for GL_RGBA conversion (%d).",
-		     infoheader->bits);
-		return NULL;	//Unsuported depth
+		NE_DebugPrint("Unsuported depth for GL_RGBA conversion (%d)",
+			      infoheader->bits);
+		return NULL;
 	}
-	//Decode
+
+	// Decode
 	u16 *buffer = malloc(2 * sizex * sizey);
 	NE_AssertPointer(buffer, "Couldn't allocate temporary buffer");
 
@@ -139,7 +141,7 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 	u16 transcolor16bit = 0;
 
 	if (transpcolor) {
-		if (infoheader->bits == 16) { //X1RGB5
+		if (infoheader->bits == 16) { // X1RGB5
 			u16 red, green, blue;
 			transcolor16bit = (u16) IMAGEDATA[2 * sizey * (sizex - 1)]
 					| (((u16) IMAGEDATA[2 * sizey * (sizex - 1) + 1]) << 8);
@@ -222,25 +224,26 @@ static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 	NE_BMP_HEADER *header = (void *)pointer;
 	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header + sizeof(NE_BMP_HEADER));
 	if (header->type != 0x4D42) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGB256: Not a BMP file.");
-		return NULL;	//Not a bmp file
+		NE_DebugPrint("Not a BMP file");
+		return NULL;
 	}
+
 	int sizex = infoheader->width;
 	int sizey = infoheader->height;
 	if (sizex > 1024 || sizey > 1024) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGB256: BMP file too big (%d,%d).", sizex, sizey);
-		return NULL;	//Wrong size
+		NE_DebugPrint("BMP file too big (%d, %d)", sizex, sizey);
+		return NULL;
 	}
 
 	if (infoheader->compression != 0) {
-		NE_DebugPrint("__NE_ConvertBMPtoRGB256: Compressed BMP not supported.");
-		return NULL;	//Compressed bmp not supported
+		NE_DebugPrint("Compressed BMP not supported");
+		return NULL;
 	}
+
 	if (infoheader->bits != 8 && infoheader->bits != 4) {
-		NE_DebugPrint
-		    ("__NE_ConvertBMPtoRGB256: Unsuported depth for GL_RGB256 conversion (%d).",
-		     infoheader->bits);
-		return NULL;	//Unsuported depth
+		NE_DebugPrint("Unsuported depth for GL_RGB256 conversion (%d)",
+			      infoheader->bits);
+		return NULL;
 	}
 	//Decode
 	int colornumber = (infoheader->bits == 8) ? 256 : 16;

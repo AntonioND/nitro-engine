@@ -454,7 +454,7 @@ void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 			info->Locked += size;
 			break;
 		default:
-			NE_DebugPrint("NE_MemGetInformation: Unknown chunk state.");
+			NE_DebugPrint("Unknown chunk state");
 			break;
 		}
 

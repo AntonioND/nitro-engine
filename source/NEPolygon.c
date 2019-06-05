@@ -167,7 +167,7 @@ void NE_ClearBMPEnable(bool value)
 {
 	if (NE_Dual) {
 		// It needs two banks that are used for the display capture
-		NE_DebugPrint("NE_ClearBMPEnable: Not available in dual 3D mode.");
+		NE_DebugPrint("Not available in dual 3D mode");
 		return;
 	}
 

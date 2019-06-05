@@ -25,7 +25,7 @@ NE_Sprite *NE_SpriteCreate(void)
 	int i = 0;
 	while (1) {
 		if (i == NE_MAX_SPRITES) {
-			NE_DebugPrint("NE_SpriteCreate: No free slots...");
+			NE_DebugPrint("No free slots");
 			return NULL;
 		}
 		if (NE_spritepointers[i] == NULL) {
@@ -122,7 +122,7 @@ void NE_SpriteDelete(NE_Sprite *sprite)
 		i++;
 	}
 
-	NE_DebugPrint("NE_SpriteDelete: Sprite not found in array.");
+	NE_DebugPrint("Object not found");
 
 	return;
 }

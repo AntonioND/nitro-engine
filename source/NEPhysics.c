@@ -20,11 +20,11 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 
 	//TODO:
 	if (type == NE_BoundingSphere) {
-		NE_DebugPrint("Bounding spheres not yet supported!");
+		NE_DebugPrint("Bounding spheres not supported");
 		return NULL;
 	}
 	if (type == NE_Dot) {
-		NE_DebugPrint("Dots not yet supported!");
+		NE_DebugPrint("Dots not supported");
 		return NULL;
 	}
 
@@ -35,7 +35,7 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	while (1) {
 		if (i == NE_MAX_PHYSICS) {
 			free(temp);
-			NE_DebugPrint("NE_PhysicsCreate: No free slots...");
+			NE_DebugPrint("No free slots");
 			return NULL;
 		}
 		if (NE_PhysicsPointers[i] == NULL) {
@@ -76,7 +76,7 @@ void NE_PhysicsDelete(NE_Physics *pointer)
 		i++;
 	}
 
-	NE_DebugPrint("NE_PhysicsDelete: Pointer not found in array.");
+	NE_DebugPrint("Object not found");
 
 	return;
 }

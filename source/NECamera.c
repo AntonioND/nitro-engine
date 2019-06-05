@@ -80,7 +80,7 @@ NE_Camera *NE_CameraCreate(void)
 		return cam;
 	}
 
-	NE_DebugPrint("NE_CameraCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -387,7 +387,7 @@ void NE_CameraDelete(NE_Camera *cam)
 		return;
 	}
 
-	NE_DebugPrint("NE_CameraDelete: Camera not found in array.");
+	NE_DebugPrint("Object not found");
 }
 
 void NE_CameraSystemReset(int numcameras)

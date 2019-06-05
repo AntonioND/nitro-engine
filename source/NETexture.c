@@ -94,7 +94,7 @@ NE_Material *NE_MaterialCreate(void)
 		return mat;
 	}
 
-	NE_DebugPrint("NE_MaterialCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -253,7 +253,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 	}
 
 	if (tex->texindex == NE_NO_TEXTURE) {
-		NE_DebugPrint("NE_MaterialTexLoad: No free texture slots.");
+		NE_DebugPrint("No free slots");
 		tex->texindex = 0;
 		return 0;
 	}
@@ -304,7 +304,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 	u32 *addr = (u32 *) NE_Alloc(NE_TexAllocList, size, 8);
 
 	if (!addr) {
-		NE_DebugPrint("NE_MaterialTexLoad: Not enough free space...");
+		NE_DebugPrint("Not enough memory");
 		if (invalidwidth)
 			free(texture);	// Free temp data
 		return 0;
@@ -488,7 +488,7 @@ void NE_MaterialDelete(NE_Material *tex)
 			return;
 		}
 
-	NE_DebugPrint("NE_MaterialDelete: Material not found in array.");
+	NE_DebugPrint("Object not found");
 }
 
 int NE_TextureFreeMem(void)

@@ -16,8 +16,7 @@ char *NE_FATLoadData(char *filename)
 
 	datafile = fopen(filename, "rb+");
 	if (datafile == NULL) {
-		NE_DebugPrint("NE_FATLoadData: %s could't be opened!",
-			      filename);
+		NE_DebugPrint("%s could't be opened", filename);
 		return NULL;
 	}
 
@@ -29,8 +28,7 @@ char *NE_FATLoadData(char *filename)
 		fread(buffer, 1, size, datafile);
 		fclose(datafile);
 	} else {
-		NE_DebugPrint("NE_FATLoadData: Not enought memory to load %s!",
-			      filename);
+		NE_DebugPrint("Not enought memory to load %s", filename);
 	}
 
 	return buffer;
@@ -44,8 +42,7 @@ u32 NE_FATFileSize(char *filename)
 	datafile = fopen(filename, "rb+");
 
 	if (datafile == NULL) {
-		NE_DebugPrint("NE_FATFileSize: %s could't be opened!",
-			      filename);
+		NE_DebugPrint("%s could't be opened", filename);
 		return -1;
 	}
 
@@ -88,7 +85,7 @@ int NE_ScreenshotBMP(char *filename)
 	FILE *file = fopen(filename, "wb");
 
 	if (file == NULL) {
-		NE_DebugPrint("NE_ScreenshotBMP: %s could't be opened!", filename);
+		NE_DebugPrint("%s could't be opened", filename);
 		return 0;
 	}
 

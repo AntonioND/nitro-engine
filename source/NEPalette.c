@@ -40,7 +40,7 @@ NE_Palette *NE_PaletteCreate(void)
 		return ptr;
 	}
 
-	NE_DebugPrint("NE_PaletteCreate: No free slots...");
+	NE_DebugPrint("No free slots");
 
 	return NULL;
 }
@@ -55,7 +55,7 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format)
 
 	u32 size = NE_FATFileSize(path);
 	if (size < 1) {
-		NE_DebugPrint("NE_PaletteLoadFAT: Couldn't read file size.");
+		NE_DebugPrint("Couldn't obtain file size");
 		return 0;
 	}
 
@@ -75,7 +75,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 	NE_AssertPointer(pal, "NULL pointer");
 
 	if (pal->index != NE_NO_PALETTE) {
-		NE_DebugPrint("NE_PaletteLoad: Another palette loaded.");
+		NE_DebugPrint("Palette already loaded");
 		NE_PaletteDelete(pal);
 	}
 
@@ -91,14 +91,15 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 	}
 
 	if (slot == NE_NO_PALETTE) {
-		NE_DebugPrint("NE_PaletteLoad: No free palette slots...");
+		NE_DebugPrint("No free lots");
 		return 0;
 	}
 
-	NE_PalInfo[slot].pointer =
-	    NE_Alloc(NE_PalAllocList, numcolor << 1, 1 << (4 - (format == GL_RGB4)));
+	NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList,
+					    numcolor << 1,
+					    1 << (4 - (format == GL_RGB4)));
 	if (NE_PalInfo[slot].pointer == NULL) {
-		NE_DebugPrint("NE_PaletteLoad: Not enough free space...");
+		NE_DebugPrint("Not enough memory");
 		return 0;
 	}
 
@@ -132,7 +133,7 @@ void NE_PaletteDelete(NE_Palette *pal)
 		}
 	}
 
-	NE_DebugPrint("NE_PaletteDelete: Material not found in array.");
+	NE_DebugPrint("Material not found");
 }
 
 void NE_PaletteUse(NE_Palette *pal)

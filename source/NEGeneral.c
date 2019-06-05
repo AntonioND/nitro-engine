@@ -64,7 +64,7 @@ void NE_End(void)
 	//Power off 3D hardware
 	powerOff(POWER_3D_CORE | POWER_MATRIX);
 
-	NE_DebugPrint("NE_End: Nitro Engine disactivated.");
+	NE_DebugPrint("Nitro Engine disabled");
 
 	ne_inited = false;
 }
@@ -215,7 +215,7 @@ void NE_Init3D(void)
 	ne_inited = true;
 	NE_Dual = false;
 
-	NE_DebugPrint("NE_Init3D: Nitro Engine has been inited in normal 3D mode.");
+	NE_DebugPrint("Nitro Engine initialized in normal 3D mode");
 }
 
 void NE_InitDual3D(void)
@@ -271,7 +271,7 @@ void NE_InitDual3D(void)
 	ne_inited = true;
 	NE_Dual = true;
 
-	NE_DebugPrint("NE_InitDual3D: Nitro Engine has been inited in dual 3D mode.");
+	NE_DebugPrint("Nitro Engine initialized in dual 3D mode");
 }
 
 void NE_InitConsole(void)

@@ -30,7 +30,7 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 		}
 		i++;
 		if (i == NE_MAX_MODELS) {
-			NE_DebugPrint("NE_ModelCreate: No free slots...");
+			NE_DebugPrint("No free slots");
 			free(model);
 			return NULL;
 		}
@@ -73,7 +73,7 @@ void NE_ModelDelete(NE_Model *model)
 	int i = 0;
 	while (1) {
 		if (i == NE_MAX_MODELS) {
-			NE_DebugPrint("NE_ModelDelete: Model not found in array.");
+			NE_DebugPrint("Model not found");
 			return;
 		}
 		if (NE_ModelPointers[i] == model) {
@@ -557,12 +557,12 @@ int NE_ModelLoadNEAFAT(NE_Model *model, char *path)
 	NE_AssertPointer(pointer, "Couldn't load file from FAT");
 
 	if (*pointer != 1296123214) {
-		NE_DebugPrint("NE_ModelLoadNEAFAT: Not a NEA file");
+		NE_DebugPrint("Not a NEA file");
 		free(pointer);
 		return 0;	// 'NEAM' - Not a nea file
 	}
 	if (*(pointer + 1) != 2) {
-		NE_DebugPrint("NE_ModelLoadNEAFAT: NEA file version is %ld, should be 2.",
+		NE_DebugPrint("NEA file version is %ld, should be 2",
 			      *(pointer + 1));
 		free(pointer);
 		return 0;	// version 2
@@ -590,12 +590,12 @@ int NE_ModelLoadNEA(NE_Model *model, u32 *pointer)
 
 	if (*pointer != 1296123214)	// 'NEAM' - Not a nea file
 	{
-		NE_DebugPrint("NE_ModelLoadNEA: Not a NEA file");
+		NE_DebugPrint("Not a NEA file");
 		return 0;
 	}
 	if (*(pointer + 1) != 2)	// version 2
 	{
-		NE_DebugPrint("NE_ModelLoadNEA: NEA file version is %ld, should be 2.",
+		NE_DebugPrint("NEA file version is %ld, should be 2",
 			      *(pointer + 1));
 		return 0;
 	}
