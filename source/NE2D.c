@@ -94,10 +94,9 @@ void NE_SpriteVisible(NE_Sprite *sprite, bool visible)
 void NE_SpriteSetParams(NE_Sprite *sprite, u8 alpha, u8 id, u32 color)
 {
 	NE_AssertPointer(sprite, "NULL pointer");
-	NE_AssertMinMax(0, alpha, 31,
-			"NE_SpriteSetParams: Wrong alpha value %d.", alpha);
-	NE_AssertMinMax(0, id, 63,
-			"NE_SpriteSetParams: Wrong polygon ID %d.", id);
+	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %d", alpha);
+	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %d", id);
+
 	sprite->alpha = alpha;
 	sprite->id = id;
 	sprite->color = color;

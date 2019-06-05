@@ -268,6 +268,9 @@ bool NE_GPUIsRendering(void);
 	do {							\
 		if (((min) > (value)) || ((max) < (value))) {	\
 			char string[256];			\
+			sprintf(string, "%s:%d:",		\
+				__func__, __LINE__);		\
+			__NE_debugprint(string);		\
 			sprintf(string, ##format);		\
 			__NE_debugprint(string);		\
 			__NE_debugprint("\n");			\

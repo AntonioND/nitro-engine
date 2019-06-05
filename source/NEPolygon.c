@@ -15,7 +15,7 @@ void NE_PolyColor(u32 color)
 
 void NE_LightOff(int num)
 {
-	NE_AssertMinMax(0, num, 3, "NE_LightOff: Unexistent light number %d.", num);
+	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
 	num = (num & 3) << 30;
 	GFX_LIGHT_VECTOR = num;
 	GFX_LIGHT_COLOR = num;
@@ -23,13 +23,13 @@ void NE_LightOff(int num)
 
 void NE_LightSetColor(int num, u32 color)
 {
-	NE_AssertMinMax(0, num, 3, "NE_LightSetColor: Unexistent light number %d.", num);
+	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
 	GFX_LIGHT_COLOR = ((num & 3) << 30) | (vuint32) color;
 }
 
 void NE_LightSetI(int num, u32 color, int x, int y, int z)
 {
-	NE_AssertMinMax(0, num, 3, "NE_LightSetI: Unexistent light number %d.", num);
+	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
 	num = (num & 3) << 30;
 	GFX_LIGHT_VECTOR = num | ((z & 0x3FF) << 20)
 			 | ((y & 0x3FF) << 10) | (x & 0x3FF);
@@ -65,8 +65,8 @@ void NE_PolyTexCoord(int u, int v)
 void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
 		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other)
 {
-	NE_AssertMinMax(0, alpha, 31, "NE_PolyFormat: Wrong alpha value %d.", alpha);
-	NE_AssertMinMax(0, id, 63, "NE_PolyFormat: Wrong polygon ID %d.", id);
+	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %d", alpha);
+	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %d", id);
 
 	GFX_POLY_FORMAT = POLY_ALPHA(alpha) | POLY_ID(id) | lights | culling
 			| other;
@@ -82,7 +82,7 @@ void NE_OutliningEnable(bool value)
 
 void NE_OutliningSetColor(u8 num, u32 color)
 {
-	NE_AssertMinMax(0, num, 7, "NE_OutliningSetColor: Wrong outlining color index %d.", num);
+	NE_AssertMinMax(0, num, 7, "Invalaid outlining color index %d", num);
 
 	glSetOutlineColor(num, color);
 }
@@ -149,8 +149,8 @@ void NE_FogDisable(void)
 
 void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
 {
-	NE_AssertMinMax(0, alpha, 31, "NE_ClearColorSet: Wrong alpha value %d.", alpha);
-	NE_AssertMinMax(0, id, 63, "NE_ClearColorSet: Wrong polygon ID %d.", id);
+	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %d", alpha);
+	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %d", id);
 
 	ne_clearcolor &= BIT(15);
 

@@ -29,8 +29,7 @@ void NE_TextPriorityReset(void)
 
 void NE_TextInit(int slot, NE_Material *mat, int sizex, int sizey)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextInit: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 	NE_AssertPointer(mat, "NULL pointer");
 
 	NE_TextInfo[slot].sizex = sizex;
@@ -40,8 +39,7 @@ void NE_TextInit(int slot, NE_Material *mat, int sizex, int sizey)
 
 void NE_TextEnd(int slot)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextEnd: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
 	NE_TextInfo[slot].sizex = 0;
 	NE_TextInfo[slot].sizey = 0;
@@ -93,8 +91,7 @@ static void _ne_charprint(_NE_TextInfo_ * textinfo, int xcrd1, int ycrd1,
 
 int NE_TextPrint(int slot, int x, int y, u32 color, const char *text)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextPrint: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
 	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
 
@@ -136,8 +133,7 @@ int NE_TextPrint(int slot, int x, int y, u32 color, const char *text)
 int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 		    int charnum, const char *text)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextPrintBox: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
 	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
 
@@ -185,8 +181,7 @@ int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 
 int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextPrintFree: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
 	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
 
@@ -220,8 +215,7 @@ int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text)
 int NE_TextPrintBoxFree(int slot, int x, int y, int endx, int endy, u32 color,
 			int charnum, const char *text)
 {
-	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS,
-			"NE_TextPrintBoxFree: Text slot %d unavailable.", slot);
+	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
 	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
 
