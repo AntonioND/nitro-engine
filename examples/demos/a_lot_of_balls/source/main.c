@@ -195,8 +195,11 @@ int main(void)
 
 		// Set all balls to (0, 0, 0) position.
 		if (keys & KEY_Y) {
-			for (int i = 0; i < NUM; i++)
-				NE_ModelSetCoord(Sphere[i], 0, 0, 0);
+			for (int i = 0; i < NUM; i++) {
+				Ball[i].x = 0;
+				Ball[i].y = 0;
+				Ball[i].z = 0;
+			}
 		}
 
 		printf("\x1b[3;0HPolygon count: %d      ", NUM * 48);
