@@ -46,188 +46,199 @@ void *NE_Alloc(NEChunk *first_chunk, int size, int align)
 	NE_AssertPointer(first_chunk, "NULL pointer");
 	NE_Assert(size > 0, "Size must be positive");
 
-	NEChunk *chunk_search = first_chunk;
-
 	// Minimum alignment...
 	if (align < 4)
 		align = 4;
 
-	while (1) {
-		if (chunk_search->status == NE_STATE_FREE) {
-			// Let's check if we can allocate here.
-			NEChunk *free_chunk = chunk_search;
+	NEChunk *chunk_search = first_chunk;
 
-			int chunk_size = ((int)free_chunk->end - (int)free_chunk->start);
+	for ( ; chunk_search != NULL; chunk_search = chunk_search->next) {
 
-			// If we only have the space requested, it's easy.
-			if (chunk_size == size) {
-				// If it is aligned...
-				if (((int)free_chunk->start & (align - 1)) == 0) {
-					// Ready
-					free_chunk->status = NE_STATE_USED;
-					return free_chunk->start;
-				}
-				// If not, there isn't enough space. Continue...
-			} else if (chunk_size > size) { //If we have more space...
-				// If it is aligned...
-				if (((int)free_chunk->start & (align - 1)) == 0) {
-					// Get next chunk and create a new one.
-					NEChunk *next_chunk = free_chunk->next;
-					NEChunk *new_chunk = malloc(sizeof(NEChunk));
-					NE_AssertPointer(new_chunk,
-							 "Couldn't allocate chunk. (1)");
+		// Skip non-free chunks
+		if (chunk_search->status != NE_STATE_FREE)
+			continue;
 
-					// Set as used
-					free_chunk->status = NE_STATE_USED;
+		// Let's check if we can allocate here.
+		NEChunk *free_chunk = chunk_search;
 
-					// Set as free
-					new_chunk->status = NE_STATE_FREE;
+		int chunk_size = ((int)free_chunk->end - (int)free_chunk->start);
 
-					// Now, free will point to new, and new will point to next.
-					//
-					// |      FREE       | NEXT |
-					// +-----------------+------+
-					// |    NOT USED     | USED |
-					//
-					// | FREE |   NEW    | NEXT |
-					// +------+----------+------+
-					// | USED | NOT USED | USED |
+		// If this chunk doesn't have enough space, simply skip it
+		if (chunk_size < size)
+			continue;
 
-					if (next_chunk != NULL) {
-						// If this is not last chunk...
-						new_chunk->next = next_chunk;
-						next_chunk->previous = new_chunk;
+		// If we only have the space requested, it can be easy
+		if (chunk_size == size) {
+			// If it is already aligned, we're done
+			if (((int)free_chunk->start & (align - 1)) == 0) {
+				free_chunk->status = NE_STATE_USED;
+				return free_chunk->start;
+			}
 
-						// Shouldn't be free
-						NE_Assert(next_chunk->status != NE_STATE_FREE,
-							  "Possible list corruption. (1)");
-					} else {
-						new_chunk->next = NULL;
-					}
+			// If not, there isn't enough space in this chunk.
+			// Continue with the next one.
+			continue;
+		}
 
-					new_chunk->previous = free_chunk;
-					free_chunk->next = new_chunk;
+		// If we have more space than requested
 
-					//Now, set pointers...
-					new_chunk->end = free_chunk->end;
+		// If it is aligned...
+		if (((int)free_chunk->start & (align - 1)) == 0) {
+			// Get next chunk and create a new one.
+			NEChunk *next_chunk = free_chunk->next;
+			NEChunk *new_chunk = malloc(sizeof(NEChunk));
+			NE_AssertPointer(new_chunk,
+					 "Couldn't allocate chunk. (1)");
 
-					free_chunk->end = (void *)((int)free_chunk->start + size);
+			// Set as used
+			free_chunk->status = NE_STATE_USED;
 
-					new_chunk->start = free_chunk->end;
+			// Set as free
+			new_chunk->status = NE_STATE_FREE;
 
-					//Ready!!
-					return free_chunk->start;
+			// Now, free will point to new, and new will point to
+			// next.
+
+			//
+			// |      FREE       | NEXT |
+			// +-----------------+------+
+			// |    NOT USED     | USED |
+			//
+			// | FREE |   NEW    | NEXT |
+			// +------+----------+------+
+			// | USED | NOT USED | USED |
+
+			if (next_chunk != NULL) {
+				// If this is not last chunk...
+				new_chunk->next = next_chunk;
+				next_chunk->previous = new_chunk;
+
+				// Shouldn't be free
+				NE_Assert(next_chunk->status != NE_STATE_FREE,
+					  "Possible list corruption. (1)");
+			} else {
+				new_chunk->next = NULL;
+			}
+
+			new_chunk->previous = free_chunk;
+			free_chunk->next = new_chunk;
+
+			// Now, set pointers...
+			new_chunk->end = free_chunk->end;
+
+			free_chunk->end = (void *)((int)free_chunk->start + size);
+
+			new_chunk->start = free_chunk->end;
+
+			// Ready!!
+			return free_chunk->start;
+		} else {
+			// If we need to align it, it is a bit more
+			// complicated... Check if even with disalignment we can
+			// create room for this
+			int end_ptr = (((int)free_chunk->start & (~(align - 1))) + align) + size;
+
+			if (end_ptr < (int)free_chunk->end) {
+				// Get chunks next to this, and create 2 new ones.
+				NEChunk *next_chunk = free_chunk->next;
+				NEChunk *new_chunk = malloc(sizeof(NEChunk));
+				NEChunk *new2_chunk = malloc(sizeof(NEChunk));
+				NE_AssertPointer(new_chunk,
+						 "Couldn't allocate chunk. (2)");
+				NE_AssertPointer(new2_chunk,
+						 "Couldn't allocate chunk. (3)");
+
+				// Set as used
+				new_chunk->status = NE_STATE_USED;
+
+				// Set as free
+				new2_chunk->status = NE_STATE_FREE;
+
+				// |         FREE         | NEXT |
+				// +----------------------+------+
+				// |      NOT USED        | USED |
+				//
+				// |  FREE  |NEW | NEW 2  | NEXT |
+				// +~~~~~~~~+----+--------+------+
+				// |NOT USED|USED|NOT USED| USED |
+
+				free_chunk->next = new_chunk;
+				new_chunk->previous = free_chunk;
+
+				new_chunk->next = new2_chunk;
+				new2_chunk->previous = new_chunk;
+
+				if (next_chunk != NULL) {
+					// If this is not last chunk...
+					new2_chunk->next = next_chunk;
+					next_chunk->previous = new2_chunk;
+
+					// Shouldn't be free
+					NE_Assert(next_chunk->status != NE_STATE_FREE,
+						  "Possible list corruption. (2)");
 				} else {
-					// If we need to align it, it is a bit
-					// more complicated... Check if even
-					// with disalignment we can create room
-					// for this
-					int end_ptr = (((int)free_chunk->start & (~(align - 1))) + align) + size;
-
-					if (end_ptr < (int)free_chunk->end) { //OK
-						// Get chunks next to this, and create 2 new ones.
-						NEChunk *next_chunk = free_chunk->next;
-						NEChunk *new_chunk = malloc(sizeof(NEChunk));
-						NEChunk *new2_chunk = malloc(sizeof(NEChunk));
-						NE_AssertPointer(new_chunk,
-								 "Couldn't allocate chunk. (2)");
-						NE_AssertPointer(new2_chunk,
-								 "Couldn't allocate chunk. (3)");
-
-						// Set as used
-						new_chunk->status = NE_STATE_USED;
-
-						// Set as free
-						new2_chunk->status = NE_STATE_FREE;
-
-						// |         FREE         | NEXT |
-						// +----------------------+------+
-						// |      NOT USED        | USED |
-						//
-						// |  FREE  |NEW | NEW 2  | NEXT |
-						// +~~~~~~~~+----+--------+------+
-						// |NOT USED|USED|NOT USED| USED |
-
-						free_chunk->next = new_chunk;
-						new_chunk->previous = free_chunk;
-
-						new_chunk->next = new2_chunk;
-						new2_chunk->previous = new_chunk;
-
-						if (next_chunk != NULL) {
-							// If this is not last
-							// chunk...
-							new2_chunk->next = next_chunk;
-							next_chunk->previous = new2_chunk;
-
-							// Shouldn't be free
-							NE_Assert(next_chunk->status != NE_STATE_FREE,
-								  "Possible list corruption. (2)");
-						} else {
-							new2_chunk->next = NULL;
-						}
-
-						// Now, set pointers acording to the size...
-						new2_chunk->end = free_chunk->end;
-
-						free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
-						new_chunk->start = free_chunk->end;
-						new_chunk->end = (void *)((int)new_chunk->start + size);
-						new2_chunk->start = new_chunk->end;
-
-						// Ready!!
-						return new_chunk->start;
-					} else if (end_ptr == (int)free_chunk->end) { //OK. Even easier...
-						// Get chunks next to this, and create 2 new ones.
-						NEChunk *next_chunk = free_chunk->next;
-						NEChunk *new_chunk = malloc(sizeof(NEChunk));
-						NE_AssertPointer(new_chunk, "NE_Alloc: Couldn't allocate chunk. (4)");
-
-						// Set as used
-						new_chunk->status = NE_STATE_USED;
-
-						// |         FREE         | NEXT |
-						// +----------------------+------+
-						// |      NOT USED        | USED |
-						//
-						// |  FREE  |     NEW     | NEXT |
-						// +~~~~~~~~+-------------+------+
-						// |NOT USED|     USED    | USED |
-
-						free_chunk->next = new_chunk;
-						new_chunk->previous = free_chunk;
-
-						if (next_chunk != NULL) { //If this is not last chunk...
-							new_chunk->next = next_chunk;
-							next_chunk->previous = new_chunk;
-
-							// Shouldn't be free
-							NE_Assert(next_chunk->status != NE_STATE_FREE,
-								  "Possible list corruption. (3)");
-						} else {
-							new_chunk->next = NULL;
-						}
-
-						// Now, set pointers acording to the size...
-						new_chunk->end = free_chunk->end;
-
-						free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
-						new_chunk->start = free_chunk->end;
-
-						// Ready!!
-						return new_chunk->start;
-					}
+					new2_chunk->next = NULL;
 				}
+
+				// Now, set pointers acording to the size...
+				new2_chunk->end = free_chunk->end;
+
+				free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
+				new_chunk->start = free_chunk->end;
+				new_chunk->end = (void *)((int)new_chunk->start + size);
+				new2_chunk->start = new_chunk->end;
+
+				// Ready!!
+				return new_chunk->start;
+			} else if (end_ptr == (int)free_chunk->end) {
+				// Easy case
+
+				// Get chunks next to this, and create 2 new ones.
+				NEChunk *next_chunk = free_chunk->next;
+				NEChunk *new_chunk = malloc(sizeof(NEChunk));
+				NE_AssertPointer(new_chunk,
+						 "NE_Alloc: Couldn't allocate chunk. (4)");
+
+				// Set as used
+				new_chunk->status = NE_STATE_USED;
+
+				// |         FREE         | NEXT |
+				// +----------------------+------+
+				// |      NOT USED        | USED |
+				//
+				// |  FREE  |     NEW     | NEXT |
+				// +~~~~~~~~+-------------+------+
+				// |NOT USED|     USED    | USED |
+
+				free_chunk->next = new_chunk;
+				new_chunk->previous = free_chunk;
+
+				if (next_chunk != NULL) {
+					// If this is not last chunk...
+					new_chunk->next = next_chunk;
+					next_chunk->previous = new_chunk;
+
+					// Shouldn't be free
+					NE_Assert(next_chunk->status != NE_STATE_FREE,
+						  "Possible list corruption. (3)");
+				} else {
+					new_chunk->next = NULL;
+				}
+
+				// Now, set pointers acording to the size...
+				new_chunk->end = free_chunk->end;
+
+				free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
+				new_chunk->start = free_chunk->end;
+
+				// Ready!!
+				return new_chunk->start;
 			}
 		}
-
-		if (chunk_search->next == NULL) {
-			// No more chunks... Not enough free space.
-			return NULL;
-		}
-
-		chunk_search = chunk_search->next;
 	}
+
+	// No more chunks... Not enough free space.
+	return NULL;
 }
 
 void NE_Free(NEChunk *first_chunk, void *pointer)
