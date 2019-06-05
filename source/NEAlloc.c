@@ -249,125 +249,126 @@ void NE_Free(NEChunk *first_chunk, void *pointer)
 
 	for ( ; chunk_search != NULL; chunk_search = chunk_search->next) {
 
-		if (chunk_search->start == pointer) {
-			// If it isn't used, it is free or locked, so don't touch it.
-			if (chunk_search->status != NE_STATE_USED)
-				return;
+		// If this isn't the chunk we're looking for, skip it
+		if (chunk_search->start != pointer)
+			continue;
 
-			// Found!
-			chunk_search->status = NE_STATE_FREE;
+		// The specified chunk is free or locked. It can't be freed.
+		if (chunk_search->status != NE_STATE_USED)
+			return;
 
-			// Check if we can put together this free chunk with the previous or the next one
-			NEChunk *previous_chunk = chunk_search->previous;
-			NEChunk *next_chunk = chunk_search->next;
+		// Chunk found. Free it.
+		chunk_search->status = NE_STATE_FREE;
 
-			// Check the previous one
-			if (previous_chunk) {
-				if (previous_chunk->status == NE_STATE_FREE) {
-					// We can join them
-					//
-					// | PREVIOUS | FREEING  | NEXT |
-					// +----------+----------+------+
-					// | NOT USED | NOT USED | ???? |
-					//
-					// |       PREVIOUS      | NEXT |
-					// +---------------------+------+
-					// |       NOT USED      | ???? |
+		// Now, check if we can join this free chunk with the previous
+		// or the next one
+		NEChunk *previous_chunk = chunk_search->previous;
+		NEChunk *next_chunk = chunk_search->next;
 
-					if (next_chunk) {
-						// First, join the previous and the next
-						next_chunk->previous = previous_chunk;
-						previous_chunk->next = next_chunk;
-					} else {
-						previous_chunk->next = NULL;
-					}
+		// Check the previous one
+		if (previous_chunk && previous_chunk->status == NE_STATE_FREE) {
+			// We can join them
+			//
+			// | PREVIOUS | FREEING  | NEXT |
+			// +----------+----------+------+
+			// | NOT USED | NOT USED | ???? |
+			//
+			// |       PREVIOUS      | NEXT |
+			// +---------------------+------+
+			// |       NOT USED      | ???? |
 
-					// Expand the previous one
-					previous_chunk->end = chunk_search->end;
-
-					// Delete current chunk
-					free(chunk_search);
-
-					// Check the next one
-					if (next_chunk) {
-						if (next_chunk->status == NE_STATE_FREE) {
-							// We can join them
-							//
-							// |       PREVIOUS      |   NEXT   | NEXT_NEXT |
-							// +---------------------+----------+-----------+
-							// |       NOT USED      | NOT USED |   USED    |
-							//
-							// |             PREVIOUS           | NEXT_NEXT |
-							// +--------------------------------+-----------+
-							// |             NOT USED           |   USED    |
-
-							NEChunk *next_next_chunk = next_chunk->next;
-
-							if (next_next_chunk) {
-								// Next Next shouldn't be free. If not, something bad happens here.
-								NE_Assert(next_next_chunk->status != NE_STATE_FREE,
-									  "Possible list corruption. (1)");
-
-								// First, join the previous and the next next
-								next_next_chunk->previous = previous_chunk;
-								previous_chunk->next = next_next_chunk;
-							} else {
-								previous_chunk->next = NULL;
-							}
-
-							// Expand the previous one
-							previous_chunk->end = next_chunk->end;
-
-							// Delete next chunk
-							free(next_chunk);
-						}
-					}
-
-					// Done!
-					return;
-				}
+			if (next_chunk) {
+				// First, join the previous and the next
+				next_chunk->previous = previous_chunk;
+				previous_chunk->next = next_chunk;
+			} else {
+				previous_chunk->next = NULL;
 			}
+
+			// Expand the previous one
+			previous_chunk->end = chunk_search->end;
+
+			// Delete current chunk
+			free(chunk_search);
 
 			// Check the next one
-			if (next_chunk) {
-				if (next_chunk->status == NE_STATE_FREE) {
-					// We can join them
-					//
-					// |   FREE   |   NEXT   | NEXT NEXT |
-					// +----------+----------+-----------+
-					// | NOT USED | NOT USED |   USED    |
-					//
-					// |         FREE        | NEXT NEXT |
-					// +---------------------+-----------+
-					// |       NOT USED      |   USED    |
+			if (next_chunk && next_chunk->status == NE_STATE_FREE) {
+				// We can join them
 
-					NEChunk *next_next_chunk = next_chunk->next;
+				// |      PREVIOUS      |   NEXT   | NEXT_NEXT |
+				// +--------------------+----------+-----------+
+				// |      NOT USED      | NOT USED |   USED    |
+				//
+				// |            PREVIOUS           | NEXT_NEXT |
+				// +-------------------------------+-----------+
+				// |            NOT USED           |   USED    |
 
-					if (next_next_chunk) {
-						// Next Next should be used or locked. If not, something bad happens here.
-						NE_Assert(next_next_chunk->status != NE_STATE_FREE,
-							  "Possible list corruption. (2)");
+				NEChunk *next_next_chunk = next_chunk->next;
 
-						// First, join the free and the next next
-						next_next_chunk->previous = chunk_search;
-						chunk_search->next = next_next_chunk;
-					} else {
-						chunk_search->next = NULL;
-					}
+				if (next_next_chunk) {
+					// Next Next shouldn't be free. If not,
+					// something bad happens here.
+					NE_Assert(next_next_chunk->status != NE_STATE_FREE,
+						  "Possible list corruption. (1)");
 
-					// Expand the free one
-					chunk_search->end = next_chunk->end;
-
-					// Delete next chunk
-					free(next_chunk);
-
-					// Done!
-					return;
+					// First, join the previous and the next
+					// next
+					next_next_chunk->previous = previous_chunk;
+					previous_chunk->next = next_next_chunk;
+				} else {
+					previous_chunk->next = NULL;
 				}
+
+				// Expand the previous one
+				previous_chunk->end = next_chunk->end;
+
+				// Delete next chunk
+				free(next_chunk);
 			}
 
+			// Done!
 			return;
 		}
+
+		// Check the next one
+		if (next_chunk && next_chunk->status == NE_STATE_FREE) {
+			// We can join them
+
+			// |   FREE   |   NEXT   | NEXT NEXT |
+			// +----------+----------+-----------+
+			// | NOT USED | NOT USED |   USED    |
+			//
+			// |         FREE        | NEXT NEXT |
+			// +---------------------+-----------+
+			// |       NOT USED      |   USED    |
+
+			NEChunk *next_next_chunk = next_chunk->next;
+
+			if (next_next_chunk) {
+				// Next Next should be used or locked. If not,
+				// something bad happens here.
+				NE_Assert(next_next_chunk->status != NE_STATE_FREE,
+					  "Possible list corruption. (2)");
+
+				// First, join the free and the next next
+				next_next_chunk->previous = chunk_search;
+				chunk_search->next = next_next_chunk;
+			} else {
+				chunk_search->next = NULL;
+			}
+
+			// Expand the free one
+			chunk_search->end = next_chunk->end;
+
+			// Delete next chunk
+			free(next_chunk);
+
+			// Done!
+			return;
+		}
+
+		// We've done everything we can after freeing the chunk, exit
+		return;
 	}
 }
 
