@@ -156,7 +156,7 @@ int main(void)
 		if (seconds != oldsec) {
 			oldsec = seconds; // old second = new second
 			printf("\x1b[0;20HFPS: %d", fpscount);
-			fpscount = 0; // prepare for next frame
+			fpscount = 0; // Reset FPS count for next second
 		}
 
 		// Get keys information
@@ -172,15 +172,12 @@ int main(void)
 		for (int i = 0; i < NUM; i++) {
 			// If the ball crashes with one of the faces of the cube
 			// invert the speed of the corresponding axis.
-			if ((Ball[i].x >= 10.5) || (Ball[i].x <= -10.5)) {
+			if ((Ball[i].x >= 10.5) || (Ball[i].x <= -10.5))
 				Ball[i].vx *= -1;
-			}
-			if ((Ball[i].y >= 9.5) || (Ball[i].y <= -9.0)) {
+			if ((Ball[i].y >= 9.5) || (Ball[i].y <= -9.0))
 				Ball[i].vy *= -1;
-			}
-			if ((Ball[i].z >= 10.5) || (Ball[i].z <= -10.5)) {
+			if ((Ball[i].z >= 10.5) || (Ball[i].z <= -10.5))
 				Ball[i].vz *= -1;
-			}
 
 			// Add speed to the position to calculate the new
 			// position
