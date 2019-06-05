@@ -74,9 +74,9 @@ int main(void)
 	NE_PhysicsSetGravity(Physics[2], 0.001);
 
 	// Tell the engine what to do if there is a collision
-	NE_PhysicsOnCollition(Physics[0], NE_ColBounce);
-	NE_PhysicsOnCollition(Physics[1], NE_ColBounce);
-	NE_PhysicsOnCollition(Physics[2], NE_ColBounce);
+	NE_PhysicsOnCollision(Physics[0], NE_ColBounce);
+	NE_PhysicsOnCollision(Physics[1], NE_ColBounce);
+	NE_PhysicsOnCollision(Physics[2], NE_ColBounce);
 
 	// Set percent of energy kept after a bounce
 	// Default is 50, 100 = no energy lost.

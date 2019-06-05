@@ -38,14 +38,14 @@ typedef enum {
 	NE_Dot			= 3	/*!< Use this with really small objects. */
 } NE_PhysicsTypes;
 
-/*! \enum NE_OnCollition
+/*! \enum NE_OnCollision
  *  \brief Possible actions that can be applied to an object after a collision.
  */
 typedef enum {
 	NE_ColNothing = 0,	/*!< Ignore the object. */
 	NE_ColBounce,		/*!< Bounce against the object. */
 	NE_ColStop		/*!< Stop. */
-} NE_OnCollition;
+} NE_OnCollision;
 
 /*! \struct NE_Physics
  *  \brief  Holds information of a physics object.
@@ -210,16 +210,16 @@ void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer);
  *  \param physics Pointer to the object.
  *  \param group New physics group.
  *
- * NOTE: Collitions do only work between objects with the same group.
+ * NOTE: Collisions do only work between objects with the same group.
  */
 void NE_PhysicsSetGroup(NE_Physics *physics, int group);
 
-/*! \fn    void NE_PhysicsOnCollition(NE_Physics *physics,
- *                                    NE_OnCollition action);
+/*! \fn    void NE_PhysicsOnCollision(NE_Physics *physics,
+ *                                    NE_OnCollision action);
  *  \brief Set action to do if collision.
  *  \param physics Pointer to the object.
  *  \param action Action. */
-void NE_PhysicsOnCollition(NE_Physics *physics, NE_OnCollition action);
+void NE_PhysicsOnCollision(NE_Physics *physics, NE_OnCollision action);
 
 /*! \fn    bool NE_PhysicsIsColliding(NE_Physics *pointer);
  *  \brief Returns true if given object was colliding with other object last
@@ -241,14 +241,14 @@ void NE_PhysicsUpdateAll(void);
  */
 void NE_PhysicsUpdate(NE_Physics *pointer);
 
-/*! \fn    bool NE_PhysicsCheckCollition(NE_Physics *pointer1,
+/*! \fn    bool NE_PhysicsCheckCollision(NE_Physics *pointer1,
  *                                       NE_Physics *pointer2);
  *  \brief Returns true if given objects are colliding without checking physics
  *         groups.
  *  \param pointer1 Pointer to first object.
  *  \param pointer2 Pointer to second object.
  */
-bool NE_PhysicsCheckCollition(NE_Physics *pointer1, NE_Physics *pointer2);
+bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2);
 
 /*! @} */
 

@@ -190,9 +190,9 @@ void NE_PhysicsSetGroup(NE_Physics *physics, int group)
 	physics->physicsgroup = group;
 }
 
-void NE_PhysicsOnCollition(NE_Physics *physics, NE_OnCollition action)
+void NE_PhysicsOnCollision(NE_Physics *physics, NE_OnCollision action)
 {
-	NE_AssertPointer(physics, "NE_PhysicsOnCollition: NULL pointer.");
+	NE_AssertPointer(physics, "NE_PhysicsOnCollision: NULL pointer.");
 	physics->oncollision = action;
 }
 
@@ -230,7 +230,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	pointer->yspeed -= pointer->gravity;
 
 	// Now, let's move the object
-	int posx = 0, posy = 0, posz = 0;	// Will use this in collition checking (to simplify code).
+	int posx = 0, posy = 0, posz = 0;	// Will use this in collision checking (to simplify code).
 	int bposx = 0, bposy = 0, bposz = 0;	// Position before movement
 
 	NE_Model *model = pointer->model;
@@ -241,7 +241,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	posy = model->y = model->y + pointer->yspeed;
 	posz = model->z = model->z + pointer->zspeed;
 
-	// Gravity and movement have been applied, time to check collitions...
+	// Gravity and movement have been applied, time to check collisions...
 	bool xenabled = true, yenabled = true, zenabled = true;	// To check some things
 	if (bposx == posx)
 		xenabled = false;
@@ -267,7 +267,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 			//Both are boxes
 //              if(pointer->type == NE_BoundingBox && otherpointer->type == NE_BoundingBox)
 //              {
-			//If collition...
+			//If collision...
 			if ((abs(posx - otherposx) < (pointer->xsize + otherpointer->xsize) >> 1) &&
 			    (abs(posy - otherposy) < (pointer->ysize + otherpointer->ysize) >> 1) &&
 			    (abs(posz - otherposz) < (pointer->zsize + otherpointer->zsize) >> 1)) {
@@ -459,11 +459,11 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	}
 }
 
-bool NE_PhysicsCheckCollition(NE_Physics *pointer1, NE_Physics *pointer2)
+bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2)
 {
-	NE_AssertPointer(pointer1, "NE_PhysicsCheckCollition: NULL pointer 1.");
-	NE_AssertPointer(pointer2, "NE_PhysicsCheckCollition: NULL pointer 2.");
-	NE_Assert(pointer1 != pointer2, "NE_PhysicsCheckCollition: Both objects are the same!");
+	NE_AssertPointer(pointer1, "NE_PhysicsCheckCollision: NULL pointer 1.");
+	NE_AssertPointer(pointer2, "NE_PhysicsCheckCollision: NULL pointer 2.");
+	NE_Assert(pointer1 != pointer2, "NE_PhysicsCheckCollision: Both objects are the same!");
 
 	//Get coordinates
 	int posx = 0, posy = 0, posz = 0;
