@@ -15,7 +15,6 @@ void Draw3DScene(void)
 void error_handler(const char * text)
 {
 	printf(text); // Simple handler, you could write this to a file, for example.
-	printf("\n");
 }
 
 int main()

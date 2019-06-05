@@ -551,7 +551,6 @@ void (*ne_userdebugfn)(const char *) = NULL;
 void __ne_debugoutputtoconsole(const char *text)
 {
 	printf(text);
-	printf("\n");
 }
 
 void __NE_debugprint(const char *text)

@@ -270,6 +270,7 @@ bool NE_GPUIsRendering(void);
 			char string[256];			\
 			sprintf(string, ##format);		\
 			__NE_debugprint(string);		\
+			__NE_debugprint("\n");			\
 		}						\
 	} while (0)
 
@@ -279,6 +280,7 @@ bool NE_GPUIsRendering(void);
 			char string[256];			\
 			sprintf(string, ##format);		\
 			__NE_debugprint(string);		\
+			__NE_debugprint("\n");			\
 		}						\
 	} while (0)
 
@@ -288,6 +290,7 @@ bool NE_GPUIsRendering(void);
 			char string[256];			\
 			sprintf(string, ##format);		\
 			__NE_debugprint(string);		\
+			__NE_debugprint("\n");			\
 		}						\
 	} while (0)
 
@@ -296,6 +299,7 @@ bool NE_GPUIsRendering(void);
 		char string[256];				\
 		sprintf(string, ##format);			\
 		__NE_debugprint(string);			\
+		__NE_debugprint("\n");				\
 	} while (0)
 
 /*! \fn    void __NE_debugprint(const char * text);
