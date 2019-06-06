@@ -8,8 +8,8 @@
 #include <NEMain.h>
 
 // Include model and textures
-#include "BMP8BIT_bin.h"
-#include "BMP4BIT_bin.h"
+#include "bmp8bit_bin.h"
+#include "bmp4bit_bin.h"
 #include "model_bin.h"
 
 NE_Camera *Camera;
@@ -59,10 +59,10 @@ int main(void)
 
 	// Load textures, this one's color 0 is transparent
 	NE_MaterialTexLoadBMPtoRGB256(Material4, Palette4,
-				      (void *)BMP4BIT_bin, 1);
+				      (void *)bmp4bit_bin, 1);
 	// This one is completely opaque
 	NE_MaterialTexLoadBMPtoRGB256(Material8, Palette8,
-				      (void *)BMP8BIT_bin, 0);
+				      (void *)bmp8bit_bin, 0);
 
 	// Assign material to model
 	NE_ModelSetMaterial(Model, Material8);

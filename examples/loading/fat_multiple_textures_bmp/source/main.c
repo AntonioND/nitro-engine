@@ -8,6 +8,11 @@
 
 #include <NEMain.h>
 
+// To use this example you have to patch the NDS ROM with DLDI and copy
+// nitro-engine folder to the root of your card.
+//
+// It will load the two BMPs and you will be able to take a screenshot.
+
 NE_Camera *Camera;
 NE_Model *Model;
 NE_Material *OpaqueMaterial, *TransparentMaterial;
@@ -47,11 +52,11 @@ int main(void)
 		     0, 1, 0);
 
 	// Load things from FAT...
-	NE_ModelLoadStaticMeshFAT(Model, "NitroEngine/cube.bin");
+	NE_ModelLoadStaticMeshFAT(Model, "nitro-engine/cube.bin");
 	NE_FATMaterialTexLoadBMPtoRGBA(TransparentMaterial,
-				       "NitroEngine/BMP16BIT_X1RGB5.bmp", 1);
+				       "nitro-engine/bmp16bit_x1rgb5.bmp", 1);
 	NE_FATMaterialTexLoadBMPtoRGBA(OpaqueMaterial,
-				       "NitroEngine/BMP24BIT.bmp", 0);
+				       "nitro-engine/bmp24bit.bmp", 0);
 
 	// Assign material to model
 	NE_ModelSetMaterial(Model, TransparentMaterial);

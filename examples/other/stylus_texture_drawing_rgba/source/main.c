@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "BMP24BIT_bin.h"
+#include "bmp24bit_bin.h"
 
 NE_Material *Texture;
 
@@ -26,7 +26,7 @@ int main()
 	lcdMainOnBottom();
 
 	Texture = NE_MaterialCreate();
-	NE_MaterialTexLoadBMPtoRGBA(Texture, (void *) BMP24BIT_bin, 1);
+	NE_MaterialTexLoadBMPtoRGBA(Texture, (void *) bmp24bit_bin, 1);
 
 	// Wait a bit...
 	scanKeys();

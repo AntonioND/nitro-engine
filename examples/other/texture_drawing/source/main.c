@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "BMP24BIT_bin.h"
+#include "bmp24bit_bin.h"
 
 NE_Camera *Camera;
 NE_Material *Texture;
@@ -59,7 +59,7 @@ int main(void)
 		     0, 0, 0,
 		     0, 1, 0);
 
-	NE_MaterialTexLoadBMPtoRGBA(Texture, (void *)BMP24BIT_bin, 1);
+	NE_MaterialTexLoadBMPtoRGBA(Texture, (void *)bmp24bit_bin, 1);
 
 	while (1) {
 

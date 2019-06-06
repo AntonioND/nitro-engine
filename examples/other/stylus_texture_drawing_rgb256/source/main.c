@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "BMP8BIT_bin.h"
+#include "bmp8bit_bin.h"
 
 NE_Material *Material;
 NE_Palette *Palette;
@@ -35,7 +35,7 @@ int main(void)
 	Palette = NE_PaletteCreate();
 
 	// Load texture
-	NE_MaterialTexLoadBMPtoRGB256(Material, Palette, (void *) BMP8BIT_bin,
+	NE_MaterialTexLoadBMPtoRGB256(Material, Palette, (void *) bmp8bit_bin,
 				      1);
 
 	// Modify color 254 of the palette so that we can use it to draw with a

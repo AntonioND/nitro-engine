@@ -45,13 +45,13 @@ int main(void)
 		     0, 0, 0,
 		     0, 1, 0);
 
-	if (NE_ModelLoadNEAFAT(Model, "NitroEngine/model.nea") == 0) {
+	if (NE_ModelLoadNEAFAT(Model, "nitro-engine/model.nea") == 0) {
 		printf("Couldn't load model...");
 		while(1) swiWaitForVBlank();
 	}
 
 	if (NE_FATMaterialTexLoadBMPtoRGBA(Material,
-					   "NitroEngine/texture.bmp",
+					   "nitro-engine/texture.bmp",
 					   true) == 0) {
 		printf("Couldn't load texture...");
 		while(1) swiWaitForVBlank();
