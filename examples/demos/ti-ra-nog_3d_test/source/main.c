@@ -70,43 +70,12 @@ int posz2 = 0;
 
 void Draw3DScene(void)
 {
-	scanKeys();
-	int keysd = keysHeld();
-	int keys = keysDown();
-
-	if (keysd & KEY_UP)
-		mode6 = 0;
-
-	if (keysd & KEY_DOWN)
-		mode6 = 1;
-
 	if (mode6 == 1)
 		NE_CameraUse(Camara);
 	else
 		NE_CameraUse(Camara2);
 
-	if (mode0 == 1) {
-		posx += sumx;
-		posy += sumy;
-		posz += sumz;
-
-		NE_ViewRotate(posx, posy, posz);
-	}
-
-	if (keysd & KEY_A) {
-		posx += sumx;
-		posy += sumy;
-		posz += sumz;
-
-		NE_ViewRotate(posx, posy, posz);
-	}
-
-	if (keys & KEY_START) {
-		if (mode1 == 0)
-			mode1 = 1;
-		else
-			mode1 = 0;
-	}
+	NE_ViewRotate(posx, posy, posz);
 
 	if (mode1 == 1)
 		NE_ViewRotate(posx, posy, posz);
@@ -128,34 +97,12 @@ void Draw3DScene(void)
 
 void Draw3DScene2(void)
 {
-	scanKeys();
-	int keysd = keysHeld();
-	int keys = keysDown();
-
 	if (mode6 == 1)
 		NE_CameraUse(Camara2);
 	else
 		NE_CameraUse(Camara);
 
-	if (keysd & KEY_A) {
-		NE_ViewRotate(posx2, posy2, posz2);
-		posx2 += sumx;
-		posy2 += sumy;
-		posz2 += sumz;
-	}
-
-	if (keys & KEY_START) {
-		if (mode1 == 0)
-			mode1=1;
-		else
-			mode1=0;
-	}
-	if (mode0 == 1) {
-		posx2 += sumx;
-		posy2 += sumy;
-		posz2 += sumz;
-		NE_ViewRotate(posx2, posy2, posz2);
-	}
+	NE_ViewRotate(posx2, posy2, posz2);
 
 	// Set the culling to none
 	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_NONE, 0);
@@ -337,6 +284,7 @@ void dual(void)
 
 		scanKeys();
 		int keysd = keysDown();
+		int keysh = keysHeld();
 
 		// Set rotation for every sphere
 		for (int i = 0; i < NUM; i++)
@@ -388,6 +336,22 @@ void dual(void)
 					 Ball[i].x, Ball[i].y, Ball[i].z);
 		}
 
+		if (keysd & KEY_UP)
+			mode6 = 0;
+
+		if (keysd & KEY_DOWN)
+			mode6 = 1;
+
+		if (keysh & KEY_A) {
+			posx += sumx;
+			posy += sumy;
+			posz += sumz;
+
+			posx2 += sumx;
+			posy2 += sumy;
+			posz2 += sumz;
+		}
+
 		NE_ProcessDual(Draw3DScene, Draw3DScene2);
 		fpscount++;
 		swiWaitForVBlank();
@@ -413,6 +377,16 @@ void dual(void)
 				mode0 = 1;
 			else
 				mode0 = 0;
+		}
+
+		if (mode0 == 1) {
+			posx += sumx;
+			posy += sumy;
+			posz += sumz;
+
+			posx2 += sumx;
+			posy2 += sumy;
+			posz2 += sumz;
 		}
 
 		if (keysd & KEY_R) {
