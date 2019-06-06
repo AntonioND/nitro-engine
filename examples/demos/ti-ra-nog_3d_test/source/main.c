@@ -32,32 +32,26 @@
 #define MIN_NUM_BALLS	0
 
 int NUM = NUM_BALLS;
+
 NE_Camera *Camara, *Camara2, *Camara3, *Camara4;
 NE_Model *Sphere[MAX_NUM_BALLS], *Cube, *Cube2;
 NE_Material *Material;
 NE_Material *Material2;
 NE_Material *Material3;
-char file[200];
-int nc = 0;
-int sc = 0;
-int mode0 = 0;
-int mode2 = 0;
-int mode3 = 0;
-int mode4 = 0;
-int mode5 = 0;
-int mode6 = 0;
-int sumx = 3;
-int sumy = 1;
-int sumz = 2;
+
+bool camera_swap = false;
+
+#define SUMX	3
+#define SUMY	1
+#define SUMZ	2
 
 typedef struct {
-	float x,y,z;
-	float vx,vy,vz;
+	float x, y, z;
+	float vx, vy, vz;
 } _BALL_;
 
 _BALL_ Ball[MAX_NUM_BALLS];
 
-int newanglex, newangley, newanglez;
 int posx = 0;
 int posy = 0;
 int posz = 0;
@@ -67,7 +61,7 @@ int posz2 = 0;
 
 void Draw3DScene(void)
 {
-	if (mode6 == 1)
+	if (camera_swap)
 		NE_CameraUse(Camara);
 	else
 		NE_CameraUse(Camara2);
@@ -91,7 +85,7 @@ void Draw3DScene(void)
 
 void Draw3DScene2(void)
 {
-	if (mode6 == 1)
+	if (camera_swap)
 		NE_CameraUse(Camara2);
 	else
 		NE_CameraUse(Camara);
@@ -115,6 +109,17 @@ void Draw3DScene2(void)
 
 void dual(void)
 {
+	char file[200];
+	bool noise_effect = false;
+	bool sine_effect = false;
+	bool recording = false;
+	bool auto_rotate = false;
+	bool hide_text = false;
+
+	// Screenshot number count
+	int nc = 0;
+	int sc = 0;
+
 	// Allocate all needed objects
 	for (int i = 0; i < MAX_NUM_BALLS; i++)
 		Sphere[i] = NE_ModelCreate(NE_Static);
@@ -171,7 +176,7 @@ void dual(void)
 
 	NE_LightSet(0, NE_White, 0, -1, 0);
 
-	if (mode6 == 1) {
+	if (camera_swap) {
 		NE_CameraSet(Camara2,
 			     -6, 6, -6,
 			     0, 0, 0,
@@ -331,19 +336,19 @@ void dual(void)
 		}
 
 		if (keysd & KEY_UP)
-			mode6 = 0;
+			camera_swap = false;
 
 		if (keysd & KEY_DOWN)
-			mode6 = 1;
+			camera_swap = true;
 
 		if (keysh & KEY_A) {
-			posx += sumx;
-			posy += sumy;
-			posz += sumz;
+			posx += SUMX;
+			posy += SUMY;
+			posz += SUMZ;
 
-			posx2 += sumx;
-			posy2 += sumy;
-			posz2 += sumz;
+			posx2 += SUMX;
+			posy2 += SUMY;
+			posz2 += SUMZ;
 		}
 
 		NE_ProcessDual(Draw3DScene, Draw3DScene2);
@@ -367,30 +372,30 @@ void dual(void)
 		}
 
 		if (keysd & KEY_START) {
-			if (mode0 == 0)
-				mode0 = 1;
+			if (!auto_rotate)
+				auto_rotate = true;
 			else
-				mode0 = 0;
+				auto_rotate = false;
 		}
 
-		if (mode0 == 1) {
-			posx += sumx;
-			posy += sumy;
-			posz += sumz;
+		if (auto_rotate) {
+			posx += SUMX;
+			posy += SUMY;
+			posz += SUMZ;
 
-			posx2 += sumx;
-			posy2 += sumy;
-			posz2 += sumz;
+			posx2 += SUMX;
+			posy2 += SUMY;
+			posz2 += SUMZ;
 		}
 
 		if (keysd & KEY_R) {
-			if (mode2 == 0)
-				mode2 = 1;
+			if (!recording)
+				recording = true;
 			else
-				mode2 = 0;
+				recording = false;
 		}
 
-		if (mode2 == 1) {
+		if (recording) {
 			// Generate file name
 			sprintf(file,"video/vid/video_%04d.bmp",nc);
 			// Save the screenshot
@@ -403,8 +408,8 @@ void dual(void)
 		}
 
 		if (keysd & KEY_Y) {
-			if (mode3 == 0) {
-				mode3 = 1;
+			if (!hide_text) {
+				hide_text = true;
 				printf("\x1b[0;0H"
 				       "                                "
 				       "                                "
@@ -426,7 +431,7 @@ void dual(void)
 				       " =================");
 				printf("\x1b[23;8HPowered By Nitro Engine");
 			} else {
-				mode3 = 0;
+				hide_text = false;
 				printf("\x1b[4;1HR: Save Video (So Sloooow).");
 				printf("\x1b[5;1HL: Save screenshot.");
 				printf("\x1b[6;1HA: Move camera (Held Button).");
@@ -442,21 +447,21 @@ void dual(void)
 
 		// If B is pressed use the sine effect. Stop if pressed again
 		if (keysd & KEY_B) {
-			if (mode4 == 0) {
-				mode4 = 1;
+			if (!sine_effect) {
+				sine_effect = true;
 				NE_SpecialEffectSet(NE_SINE);
 			} else {
-				mode4 = 0;
+				sine_effect = false;
 				NE_SpecialEffectSet(0);
 			}
 		}
 
 		if (keysd & KEY_X) {
-			if (mode5 == 0) {
-				mode5 = 1;
+			if (!noise_effect) {
+				noise_effect = true;
 				NE_SpecialEffectSet(NE_NOISE);
 			} else {
-				mode5 = 0;
+				noise_effect = false;
 				NE_SpecialEffectSet(0);
 			}
 		}
