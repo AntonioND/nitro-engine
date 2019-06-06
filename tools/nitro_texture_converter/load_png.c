@@ -4,10 +4,10 @@
 //
 // This file is part of Nitro Engine
 
-#include "stdafx.h"
-#include <png.h>
+#include <stdlib.h>
 #include <stdio.h>
-#include <malloc.h>
+
+#include <png.h>
 
 #define PNG_BYTES_TO_CHECK    4
 #define MAX_WIDTH_HEIGHT   1024
@@ -23,7 +23,7 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 	}
 
 	fseek(PNG_file, 0, SEEK_END);
-	printf("File size is %d bytes.\n\n", ftell(PNG_file));
+	printf("File size is %ld bytes.\n\n", ftell(PNG_file));
 	rewind(PNG_file);
 
 	int buffer[PNG_BYTES_TO_CHECK];
@@ -51,14 +51,13 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 	png_infop info_ptr = png_create_info_struct(png_ptr);
 	if (!info_ptr) {
 		fclose(PNG_file);
-		png_destroy_read_struct(&png_ptr, png_infopp_NULL,
-					png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
 		printf("Couldn't create png structs...\n\n");
 		return NULL;
 	}
 
 	if (setjmp(png_jmpbuf(png_ptr))) {
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(PNG_file);
 		return NULL;
 	}
@@ -126,7 +125,7 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 		if (PNG_depth < 8)
 			png_set_packing(png_ptr);	//Is this possible?
 	} else {
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(PNG_file);
 		printf("Not valid color type!!");
 		return NULL;
@@ -156,7 +155,7 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 
 	if (!(PNG_depth == 8 && PNG_color_type == PNG_COLOR_TYPE_RGB_ALPHA)) {
 		printf("PNG was not succesfully converted!!\n\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(PNG_file);
 		return NULL;
 	}
@@ -182,7 +181,7 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 
 	if (!IMAGE_BUFFER) {
 		printf("Couldn't allocate image data for convertion!!\n\n");
-		png_destroy_read_struct(&png_ptr, &info_ptr, png_infopp_NULL);
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(PNG_file);
 		return NULL;
 	}
@@ -204,8 +203,7 @@ void *LoadPNGtoARGB(char *filename, int *buffer_size)
 
 	// TODO: For some strange reason, if I uncomment this the program
 	// crashes... This means that some memory isn't deallocated...
-	png_destroy_read_struct( /*&png_ptr */ NULL, &info_ptr,
-				png_infopp_NULL);
+	png_destroy_read_struct( /*&png_ptr */ NULL, &info_ptr, NULL);
 
 	fclose(PNG_file);
 

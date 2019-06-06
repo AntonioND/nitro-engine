@@ -4,8 +4,8 @@
 //
 // This file is part of Nitro Engine
 
-#include "stdafx.h"
 #include <stdio.h>
+
 #include "palette.h"
 
 int ConvertARGBintoA5RGB8(void *data, int size, char *texture_filename,

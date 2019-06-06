@@ -4,7 +4,6 @@
 //
 // This file is part of Nitro Engine
 
-#include "stdafx.h"
 #include <stdio.h>
 
 int ConvertARGBintoDEPTHBMP(void *data, int size, char *texture_filename)

@@ -4,8 +4,9 @@
 //
 // This file is part of Nitro Engine
 
-#include "stdafx.h"
+#include <stdbool.h>
 #include <stdlib.h>
+
 #include "palette.h"
 
 typedef struct {

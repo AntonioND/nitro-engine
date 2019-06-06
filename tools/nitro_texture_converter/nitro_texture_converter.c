@@ -4,10 +4,9 @@
 //
 // This file is part of Nitro Engine
 
-#include "stdafx.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <malloc.h>
 
 #define NITRO_TEXTURE_CONVERTER_VERSION "1.0.0"
 
@@ -44,7 +43,7 @@ int GetFormat(char *string)
 			return a;
 	}
 
-	printf("Format %s unsupported!\n\n");
+	printf("Format %s unsupported!\n\n", string);
 	return -1;
 }
 
@@ -104,19 +103,21 @@ int main(int argc, char *argv[])
 	if (ARGB_BUFFER == NULL)
 		return -1;
 
-	//Get output filenames
+	// Get output filenames
 	int __strlen = strlen(argv[1]) - strlen(".png");
 	char OUTPUT_BASE_FILENAME[FILENAME_MAX];
 	strncpy(OUTPUT_BASE_FILENAME, argv[1], __strlen);
 	OUTPUT_BASE_FILENAME[__strlen] = '\0';
 
 	char OUTPUT_TEXTURE_FILENAME[FILENAME_MAX];
-	sprintf(OUTPUT_TEXTURE_FILENAME, "%s_tex.bin", OUTPUT_BASE_FILENAME);
+	snprintf(OUTPUT_TEXTURE_FILENAME, sizeof(OUTPUT_TEXTURE_FILENAME),
+		 "%s_tex.bin", OUTPUT_BASE_FILENAME);
 
 	char OUTPUT_PALETTE_FILENAME[FILENAME_MAX];
-	sprintf(OUTPUT_PALETTE_FILENAME, "%s_pal.bin", OUTPUT_BASE_FILENAME);
+	snprintf(OUTPUT_PALETTE_FILENAME, sizeof(OUTPUT_PALETTE_FILENAME),
+		 "%s_pal.bin", OUTPUT_BASE_FILENAME);
 
-	//Convert raw data into the format requested
+	// Convert raw data into the format requested
 
 	int returned_value = 0;
 
