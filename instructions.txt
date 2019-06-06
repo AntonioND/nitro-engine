@@ -1,6 +1,0 @@
-1-Copy NitroEngine folder to devkitPro folder.
-2-Compile it. Nitro Engine should be ready after this. :)
-3-Try to compile an example to see if everything's OK.
-
-
-By default, Nitro Engine is compiled with debug options, go to NEMain.h to disable them and save CPU usage and space.
