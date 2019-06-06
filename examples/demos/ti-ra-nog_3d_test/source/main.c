@@ -16,10 +16,10 @@
 #include <time.h>
 
 #ifndef FAT_MESH_TEXT
-#include "cubo_bin.h"
-#include "esfera_bin.h"
-#include "texcubo_bin.h"
-#include "texesfera_bin.h"
+#include "cube_bin.h"
+#include "sphere_bin.h"
+#include "texcube_bin.h"
+#include "texsphere_bin.h"
 #endif
 
 // Set the initial number of balls/spheres
@@ -133,42 +133,42 @@ void dual(void)
 
 #ifdef FAT_MESH_TEXT
 	NE_MaterialTexLoadFAT(Material, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-			      "texesfera.bin");
+			      "texsphere.bin");
 
 	for (int i = 0; i < MAX_NUM_BALLS; i++) {
 		// Load sphere model. Note that this is just to test. This is a
 		// really inefficient way to load the same model several times.
 		// Ideally, you'd load it once and then create models by cloning
 		// the first one.
-		NE_ModelLoadStaticMeshFAT(Sphere[i], "esfera.bin");
+		NE_ModelLoadStaticMeshFAT(Sphere[i], "sphere.bin");
 		// Set Material to every Sphere
 		NE_ModelSetMaterial(Sphere[i], Material);
 	}
 
 	NE_MaterialTexLoadFAT(Material2, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-			      "texcubo.bin");
-	NE_ModelLoadStaticMeshFAT(Cube, "cubo.bin");
+			      "texcube.bin");
+	NE_ModelLoadStaticMeshFAT(Cube, "cube.bin");
 	NE_ModelSetMaterial(Cube, Material2);
 
-	NE_ModelLoadStaticMeshFAT(Cube2, "cubo.bin");
+	NE_ModelLoadStaticMeshFAT(Cube2, "cube.bin");
 	NE_ModelSetMaterial(Cube2, Material2);
 #else
 	NE_MaterialTexLoad(Material, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-			   (u8 *) texesfera_bin);
+			   (u8 *) texsphere_bin);
 
 	for (int i = 0; i < MAX_NUM_BALLS; i++) {
 		// Load sphere model
-		NE_ModelLoadStaticMesh(Sphere[i], (u32 *)esfera_bin);
+		NE_ModelLoadStaticMesh(Sphere[i], (u32 *)sphere_bin);
 		// Set material to every sphere
 		NE_ModelSetMaterial(Sphere[i], Material);
 	}
 
 	NE_MaterialTexLoad(Material2, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-			   (u8 *) texcubo_bin);
-	NE_ModelLoadStaticMesh(Cube, (u32 *) cubo_bin);
+			   (u8 *) texcube_bin);
+	NE_ModelLoadStaticMesh(Cube, (u32 *) cube_bin);
 	NE_ModelSetMaterial(Cube, Material2);
 
-	NE_ModelLoadStaticMesh(Cube2, (u32 *) cubo_bin);
+	NE_ModelLoadStaticMesh(Cube2, (u32 *) cube_bin);
 	NE_ModelSetMaterial(Cube2, Material2);
 #endif
 
@@ -317,11 +317,11 @@ void dual(void)
 		for (int i = SCENE2_BALLS; i < NUM; i++) {
 			// If the ball crashes with one of the faces of the cube
 			// invert the speed of the corresponding axis.
-			if((Ball[i].x>=9.5) || (Ball[i].x<=-9.5))
+			if ((Ball[i].x >= 9.5) || (Ball[i].x <= -9.5))
 				Ball[i].vx *= -1;
-			if((Ball[i].y>=9.5) || (Ball[i].y<=-9.5))
+			if ((Ball[i].y >= 9.5) || (Ball[i].y <= -9.5))
 				Ball[i].vy *= -1;
-			if((Ball[i].z>=9.5) || (Ball[i].z<=-9.5))
+			if ((Ball[i].z >= 9.5) || (Ball[i].z <= -9.5))
 				Ball[i].vz *= -1;
 
 			// Add speed to the position to calculate the new

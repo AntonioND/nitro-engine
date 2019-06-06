@@ -11,10 +11,10 @@
 
 #include <NEMain.h>
 
+#include "cube_bin.h"
 #include "model_bin.h"
-#include "cubo_bin.h"
-#include "texcubo_bin.h"
-#include "texesfera_bin.h"
+#include "texcube_bin.h"
+#include "texsphere_bin.h"
 
 // Set the initial number of balls/spheres
 #define NUM_BALLS	50
@@ -96,7 +96,7 @@ int main(void)
 
 	// Load sphere texture to its material
 	NE_MaterialTexLoad(Material2, GL_RGB, 64, 64,TEXGEN_TEXCOORD,
-			   (u8 *) texesfera_bin);
+			   (u8 *) texsphere_bin);
 
 	// Loop until it arrives to the max ball number
 	for (int i = 0; i < MAX_NUM_BALLS; i++) {
@@ -108,9 +108,9 @@ int main(void)
 
 	// Load cube texture to its material
 	NE_MaterialTexLoad(Material, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-			   (u8 *) texcubo_bin);
+			   (u8 *) texcube_bin);
 	// Load the cube mesh
-	NE_ModelLoadStaticMesh(Cube,(u32*) cubo_bin);
+	NE_ModelLoadStaticMesh(Cube,(u32*) cube_bin);
 	// Set the cube material
 	NE_ModelSetMaterial(Cube,Material);
 	// Resize the cube (it's originally 7x7x7, now it's 21x21x21)
