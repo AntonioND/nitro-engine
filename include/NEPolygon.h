@@ -139,7 +139,7 @@ void NE_PolyVertexI(int x, int y, int z);
  * "When texture mapping, the Geometry Engine works faster if you issue commands
  * in the order TexCoord -> Normal -> Vertex."
  *
- * http://nocash.emubase.de/gbatek.htm#ds3dtextureattributes
+ * https://problemkaputt.de/gbatek.htm#ds3dtextureattributes
  */
 void NE_PolyTexCoord(int u, int v);
 
@@ -257,12 +257,13 @@ void NE_ClearColorSet(u32 color, u8 alpha, u8 id);
  * It uses VRAM_C as color bitmap and VRAM_D as depth bitmap. You have to copy
  * data there and then use this function. Those 2 VRAM banks can't be used as
  * texture banks with this enabled, so you have to call
- * NE_TextureSystemReset(0,0,USE_VRAM_AB); before using this.
+ * NE_TextureSystemReset(0, 0, USE_VRAM_AB) before using this.
  *
  * Dual 3D mode needs those two banks for the display capture, so you can't use
  * a clear BMP.
  *
  * VRAM_C: ABBBBBGGGGGRRRRR -- Alpha - Blue - Green - Red
+ *
  * VRAM_D: FDDDDDDDDDDDDDDD -- Fog - Depth (0 = near, 0x7FFF = far)
  *
  * Use this only if you really need it. If you want to display just an image,
@@ -296,7 +297,7 @@ void NE_ClearBMPScroll(u8 x, u8 y);
  *  \param color Fog color.
  *  \param alpha Alpha value.
  *  \param mass Quantity of fog.
- *  \param depth Start point of fog. (0 - 7FFFh)  [Use float_to_12d3(n)
+ *  \param depth Start point of fog. (0 - 7FFFh) [Use float_to_12d3(n)
  *         int_to_12d3(n) ?]
  *
  * You should try different values until you find the configuration you like.
