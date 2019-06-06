@@ -41,14 +41,11 @@ char file[200];
 int nc = 0;
 int sc = 0;
 int mode0 = 0;
-int mode1 = 0;
 int mode2 = 0;
 int mode3 = 0;
 int mode4 = 0;
 int mode5 = 0;
 int mode6 = 0;
-int min = -2;
-int max = 2;
 int sumx = 3;
 int sumy = 1;
 int sumz = 2;
@@ -76,9 +73,6 @@ void Draw3DScene(void)
 		NE_CameraUse(Camara2);
 
 	NE_ViewRotate(posx, posy, posz);
-
-	if (mode1 == 1)
-		NE_ViewRotate(posx, posy, posz);
 
 	// Set the culling to none
 	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_NONE, 0);
@@ -109,7 +103,7 @@ void Draw3DScene2(void)
 	NE_ModelDraw(Cube);
 	NE_ModelDraw(Cube2);
 
-	NE_PolyFormat(31,0,NE_LIGHT_ALL,NE_CULL_BACK,0);
+	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
 	// Draw all spheres
 	for (int i = SCENE2_BALLS; i < NUM; i++)
