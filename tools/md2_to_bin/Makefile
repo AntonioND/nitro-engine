@@ -4,8 +4,7 @@
 
 # Variables
 
-VERSION_STRING	:= `git describe --tags --dirty --always 2>/dev/null`
-CFLAGS		:= -g -Wall -DBUILD_VERSION_STRING=\"$(VERSION_STRING)\"
+CFLAGS		:= -g -Wall
 RM		:= rm -rf
 
 # Rules to build the binary
@@ -16,8 +15,6 @@ md2_2_bin_obj := md2_2_bin.o dlmaker.o
 
 md2_2_bin: $(md2_2_bin_obj)
 	$(CC) $(CFLAGS) -o $@ $(md2_2_bin_obj)
-
-# Rules to process files
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
