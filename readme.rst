@@ -57,10 +57,11 @@ The full text of the licenses can be found under the ``licenses`` folder.
 Credits
 -------
 
-- Joat, Dovoto and WinterMute for libnds
+- Michael Noland (joat), Jason Rogers (dovoto) and Dave Murphy (WinterMute) for
+  libnds
 - Chishm for libfat and DLDI
 - The guys of gbadev for their help
-- Martin for no$gba and gbatek
+- Martin Korth for no$gba and gbatek
 - Kasikiare for NDS Model Exporter
 - PadrinatoR for NDS Mesh Converter
 - Ti-Ra-Nog for his help testing the engine
