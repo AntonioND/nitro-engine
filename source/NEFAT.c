@@ -10,23 +10,23 @@
 
 char *NE_FATLoadData(char *filename)
 {
-	char *buffer = NULL;
-	FILE *datafile;
-	u32 size = 0;
+	size_t size;
+	char *buffer;
+	FILE *f;
 
-	datafile = fopen(filename, "rb+");
-	if (datafile == NULL) {
+	f = fopen(filename, "rb+");
+	if (f == NULL) {
 		NE_DebugPrint("%s could't be opened", filename);
 		return NULL;
 	}
 
-	fseek(datafile, 0, SEEK_END);
-	size = ftell(datafile);
-	rewind(datafile);
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	rewind(f);
 	buffer = malloc(size);
 	if (buffer) {
-		fread(buffer, 1, size, datafile);
-		fclose(datafile);
+		fread(buffer, 1, size, f);
+		fclose(f);
 	} else {
 		NE_DebugPrint("Not enought memory to load %s", filename);
 	}
@@ -34,21 +34,20 @@ char *NE_FATLoadData(char *filename)
 	return buffer;
 }
 
-u32 NE_FATFileSize(char *filename)
+size_t NE_FATFileSize(char *filename)
 {
-	FILE *datafile;
-	u32 size = 0;
+	FILE *f;
+	size_t size;
 
-	datafile = fopen(filename, "rb+");
-
-	if (datafile == NULL) {
+	f = fopen(filename, "rb+");
+	if (f == NULL) {
 		NE_DebugPrint("%s could't be opened", filename);
 		return -1;
 	}
 
-	fseek(datafile, 0, SEEK_END);
-	size = ftell(datafile);
-	fclose(datafile);
+	fseek(f, 0, SEEK_END);
+	size = ftell(f);
+	fclose(f);
 	return size;
 }
 
@@ -56,7 +55,7 @@ u32 NE_FATFileSize(char *filename)
 //                      Screenshots
 //----------------------------------------------------------------
 
-void NE_write16(u16 *address, u16 value)
+static void NE_write16(u16 *address, u16 value)
 {
 	u8 *first = (u8 *)address;
 	u8 *second = first + 1;
@@ -65,7 +64,7 @@ void NE_write16(u16 *address, u16 value)
 	*second = value >> 8;
 }
 
-void NE_write32(u32 *address, u32 value)
+static void NE_write32(u32 *address, u32 value)
 {
 	u8 *first = (u8 *) address;
 	u8 *second = first + 1;
@@ -82,19 +81,26 @@ extern bool NE_Dual;
 
 int NE_ScreenshotBMP(char *filename)
 {
-	FILE *file = fopen(filename, "wb");
+	FILE *f = fopen(filename, "wb");
 
-	if (file == NULL) {
+	if (f == NULL) {
 		NE_DebugPrint("%s could't be opened", filename);
 		return 0;
 	}
 
 	NE_SpecialEffectPause(true);
 
+	// In normal 3D mode we need to capture the composited (3D+2D output)
+	// and save it to VRAM. In dual 3D mode it already is in VRAM.
 	if (!NE_Dual) {
 		vramSetBankD(VRAM_D_LCD);
 
-		REG_DISPCAPCNT = DCAP_BANK(3) | DCAP_ENABLE | DCAP_SIZE(3);
+		REG_DISPCAPCNT = DCAP_BANK(DCAP_BANK_VRAM_D)
+			       | DCAP_SIZE(DCAP_SIZE_256x192)
+			       | DCAP_MODE(DCAP_MODE_A)
+			       | DCAP_SRC_A(DCAP_SRC_A_COMPOSITED)
+			       | DCAP_ENABLE;
+
 		while (REG_DISPCAPCNT & DCAP_ENABLE) ;
 	}
 
@@ -133,6 +139,7 @@ int NE_ScreenshotBMP(char *filename)
 	NE_write32(&infoheader->importantcolors, 0);
 	NE_write32(&infoheader->ncolors, 0);
 
+	// Allow CPU to access VRAM
 	uint32 vramTemp = 0;
 	if (NE_Dual) {
 		vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD,
@@ -171,8 +178,8 @@ int NE_ScreenshotBMP(char *filename)
 
 	DC_FlushAll();
 	fwrite(temp, 1, 256 * ysize * 3 + sizeof(NE_INFO_BMP_HEADER)
-					+ sizeof(NE_BMP_HEADER), file);
-	fclose(file);
+					+ sizeof(NE_BMP_HEADER), f);
+	fclose(f);
 	free(temp);
 
 	NE_SpecialEffectPause(false);

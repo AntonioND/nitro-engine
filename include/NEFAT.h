@@ -31,7 +31,7 @@ char *NE_FATLoadData(char *filename);
  *  \brief Returns size of a file. -1 if error.
  *  \param filename File to check.
  */
-u32 NE_FATFileSize(char *filename);
+size_t NE_FATFileSize(char *filename);
 
 /*! \fn    int NE_ScreenshotBMP(char * filename);
  *  \brief Takes a screenshot of main screen (or both screens in dual 3D mode)
