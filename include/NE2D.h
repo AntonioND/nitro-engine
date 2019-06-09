@@ -71,7 +71,7 @@ void NE_SpriteSetSize(NE_Sprite *sprite, int x, int y);
  *  \param angle Angle to rotate the sprite.
  *
  * If 0, no operations will be done when drawing the sprite. If different, 2D
- * view will be rotated using as center: spritecoordinates + (spritesize/2).
+ * view will be rotated using as center: spritecoordinates + (spritesize / 2).
  */
 void NE_SpriteSetRot(NE_Sprite *sprite, int angle);
 

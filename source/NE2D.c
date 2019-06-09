@@ -103,25 +103,21 @@ void NE_SpriteSetParams(NE_Sprite *sprite, u8 alpha, u8 id, u32 color)
 void NE_SpriteDelete(NE_Sprite *sprite)
 {
 	if (!ne_sprite_system_inited)
-		return;
+		return NULL;
 
 	NE_AssertPointer(sprite, "NULL pointer");
 
-	int i = 0;
-	while (1) {
-		if (i == NE_MAX_SPRITES)
-			break;
+	for (int i = 0; i < NE_MAX_SPRITES; i++) {
+		if (NE_spritepointers[i] != sprite)
+			continue;
 
-		if (NE_spritepointers[i] == sprite) {
-			NE_spritepointers[i] = NULL;
-			free((void *)sprite);
-			return;
-		}
-		i++;
+		NE_spritepointers[i] = NULL;
+		free((void *)sprite);
+
+		return;
 	}
 
 	NE_DebugPrint("Object not found");
-
 	return;
 }
 
@@ -148,8 +144,7 @@ void NE_SpriteSystemReset(int number_of_sprites)
 	NE_spritepointers = malloc(NE_MAX_SPRITES * sizeof(NE_spritepointers));
 	NE_AssertPointer(NE_spritepointers, "Not enough memory");
 
-	int i;
-	for (i = 0; i < NE_MAX_SPRITES; i++)
+	for (int i = 0; i < NE_MAX_SPRITES; i++)
 		NE_spritepointers[i] = NULL;
 
 	ne_sprite_system_inited = true;
@@ -169,6 +164,9 @@ void NE_SpriteSystemEnd(void)
 
 void NE_SpriteDraw(NE_Sprite *sprite)
 {
+	if (!ne_sprite_system_inited)
+		return;
+
 	NE_AssertPointer(sprite, "NULL pointer");
 
 	if (!sprite->visible)
@@ -242,14 +240,15 @@ void NE_SpriteDrawAll(void)
 
 //----------------------------------------------------------
 
-//              Functions to draw in 2D.
+//              Functions to draw freely in 2D.
 
 //----------------------------------------------------------
 
-//--------------------------------------------
-//INTERNAL USE -- See "NETexture.c"
-int __NE_TextureGetRawX(NE_Material * tex);
-int __NE_TextureGetRawY(NE_Material * tex);
+// Internal use. See NETexture.c
+
+int __NE_TextureGetRawX(NE_Material *tex);
+int __NE_TextureGetRawY(NE_Material *tex);
+
 //--------------------------------------------
 
 void NE_2DViewInit(void)
@@ -276,26 +275,33 @@ void NE_2DViewInit(void)
 void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale)
 {
 	NE_ViewMoveI(x, y, 0);
+
 	MATRIX_SCALE = scale;
 	MATRIX_SCALE = scale;
 	MATRIX_SCALE = inttof32(1);
+
 	glRotateZi(rotz << 6);
+
 	NE_ViewMoveI(-x, -y, 0);
 }
 
 void NE_2DViewRotateByPosition(int x, int y, int rotz)
 {
 	NE_ViewMoveI(x, y, 0);
+
 	glRotateZi(rotz << 6);
+
 	NE_ViewMoveI(-x, -y, 0);
 }
 
 void NE_2DViewScaleByPositionI(int x, int y, int scale)
 {
 	NE_ViewMoveI(x, y, 0);
+
 	MATRIX_SCALE = scale;
 	MATRIX_SCALE = scale;
 	MATRIX_SCALE = inttof32(1);
+
 	NE_ViewMoveI(-x, -y, 0);
 }
 
