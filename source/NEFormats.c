@@ -11,11 +11,11 @@
 static int lastx = 0, lasty = 0;
 static u32 numcolors = 0;
 
-static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
+static void *NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 {
-	NE_BMP_HEADER *header = (void *)pointer;
+	NE_BMP_HEADER *header = pointer;
 	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header + sizeof(NE_BMP_HEADER));
-	u8 *IMAGEDATA = (void *)((u8 *) infoheader + sizeof(NE_INFO_BMP_HEADER));
+	u8 *IMAGEDATA = (u8 *) infoheader + sizeof(NE_INFO_BMP_HEADER);
 	if (header->type != 0x4D42) {
 		NE_DebugPrint("Not a BMP file");
 		return NULL;
@@ -51,11 +51,13 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 			u16 red, green, blue;
 			transcolor16bit = (u16) IMAGEDATA[2 * sizey * (sizex - 1)]
 					| (((u16) IMAGEDATA[2 * sizey * (sizex - 1) + 1]) << 8);
+
+			// Swap R and B channels
 			red = (transcolor16bit & 0x7C00) >> 10;
-			green = (transcolor16bit & 0x3E0);	//don't move it, it's in the right position
+			green = (transcolor16bit & 0x3E0);
 			blue = (transcolor16bit & 0x1F);
 			transcolor16bit = red | green | (blue << 10);
-		} else { //24 bits
+		} else { // 24 bits
 			transr = IMAGEDATA[3 * sizey * (sizex - 1) + 2];
 			transg = IMAGEDATA[3 * sizey * (sizex - 1) + 1];
 			transb = IMAGEDATA[3 * sizey * (sizex - 1) + 0];
@@ -79,11 +81,12 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 					base_pos += disalign * (sizey - y - 1);
 				}
 
-				u16 color =
-				    (u16) IMAGEDATA[base_pos] | (IMAGEDATA[base_pos + 1] << 8);
+				u16 color = (u16) IMAGEDATA[base_pos]
+					  | ((u16)IMAGEDATA[base_pos + 1] << 8);
 
+				// Swap R and B channels
 				red = (color & 0x7C00) >> 10;
-				green = (color & 0x3E0);	//don't move it, it's in the right position
+				green = (color & 0x3E0);
 				blue = (color & 0x1F);
 				color = red | green | (blue << 10);
 
@@ -125,10 +128,11 @@ static void *__NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 	return (void *)buffer;
 }
 
-static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
+static void *NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 {
 	NE_BMP_HEADER *header = (void *)pointer;
-	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header + sizeof(NE_BMP_HEADER));
+	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header
+				       + sizeof(NE_BMP_HEADER));
 	if (header->type != 0x4D42) {
 		NE_DebugPrint("Not a BMP file");
 		return NULL;
@@ -151,28 +155,32 @@ static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 			      infoheader->bits);
 		return NULL;
 	}
-	//Decode
+
+	// Decode
 	int colornumber = (infoheader->bits == 8) ? 256 : 16;
-	u8 *PALETTEDATA = (void *)((u8 *) infoheader + sizeof(NE_INFO_BMP_HEADER));
-	u8 *IMAGEDATA = (u8 *) header + header->offset;
+	u8 *PALETTEDATA = (u8 *)infoheader + sizeof(NE_INFO_BMP_HEADER);
+	u8 *IMAGEDATA = (u8 *)header + header->offset;
 
-	numcolors = colornumber;	//numcolors is used by the other functions (look at the start of this file)
+	// numcolors is used by the other functions (look at the start of this
+	// file)
+	numcolors = colornumber;
 
-	int a = 0;
-	while (a < numcolors)	//First, we read the palette
-	{
+	// First, we read the palette
+	int i = 0;
+	while (i < numcolors) {
 		u8 r, g, b;
-		g = PALETTEDATA[(a << 2) + 1] & 0xFF;
-		r = PALETTEDATA[(a << 2) + 2] & 0xFF;
-		b = PALETTEDATA[(a << 2) + 0] & 0xFF;
-		palettebuffer[a] = RGB15(r >> 3, g >> 3, b >> 3);
-		a++;
+		g = PALETTEDATA[(i << 2) + 1] & 0xFF;
+		r = PALETTEDATA[(i << 2) + 2] & 0xFF;
+		b = PALETTEDATA[(i << 2) + 0] & 0xFF;
+		palettebuffer[i] = RGB15(r >> 3, g >> 3, b >> 3);
+		i++;
 	}
 
 	u8 *buffer = malloc(sizex * sizey);
 	NE_AssertPointer(buffer, "Couldn't allocate temporary buffer");
 
-	int y, x;		//Then, the image
+	// Then, the image
+	int y, x;
 	if (colornumber == 256) {
 		// For BMPs with width not multiple of 4
 		int disalign = sizex & 3;
@@ -203,32 +211,29 @@ static void *__NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 			disalign = 8 - disalign;
 			for (y = 0; y < sizey; y++) {
 				for (x = 0; x < sizex; x++) {
+					u32 value;
+					u32 srcidx = ((sizex * (sizey - y - 1) + x) + (disalign * (sizey - y - 1))) >> 1;
+
 					if (x & 1) {
-						buffer[y * sizex + x] =
-						    IMAGEDATA[((sizex * (sizey - y - 1) + x) +
-							       (disalign *
-								(sizey - y - 1))) >> 1] & 0x0F;
+						value = IMAGEDATA[srcidx] & 0x0F;
 					} else {
-						buffer[y * sizex + x] =
-						    (IMAGEDATA
-						     [((sizex * (sizey - y - 1) + x) +
-						       (disalign *
-							(sizey - y - 1))) >> 1] >> 4) & 0x0F;
+						value = (IMAGEDATA[srcidx] >> 4) & 0x0F;
 					}
+
+					buffer[y * sizex + x] = value;
 				}
 			}
 		} else {
 			for (y = 0; y < sizey; y++) {
 				for (x = 0; x < sizex; x++) {
+					u32 value;
+					u32 srcidx = (sizex * (sizey - y - 1) + x) >> 1;
 					if (x & 1) {
-						buffer[y * sizex + x] =
-						    IMAGEDATA[(sizex * (sizey - y - 1) +
-							       x) >> 1] & 0x0F;
+						value = IMAGEDATA[srcidx] & 0x0F;
 					} else {
-						buffer[y * sizex + x] =
-						    (IMAGEDATA[(sizex * (sizey - y - 1) + x) >> 1]
-						     >> 4) & 0x0F;
+						value = (IMAGEDATA[srcidx] >> 4) & 0x0F;
 					}
+					buffer[y * sizex + x] = value;
 				}
 			}
 		}
@@ -247,43 +252,48 @@ int NE_FATMaterialTexLoadBMPtoRGBA(NE_Material *tex, char *filename,
 	NE_AssertPointer(filename, "NULL filename pointer");
 
 	void *pointer = NE_FATLoadData(filename);
-	int a = NE_MaterialTexLoadBMPtoRGBA(tex, pointer, transpcolor);
+	int ret = NE_MaterialTexLoadBMPtoRGBA(tex, pointer, transpcolor);
 	free(pointer);
 
-	return a;
+	return ret;
 }
 
-int NE_FATMaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, char *filename,
-				     bool transpcolor)
+int NE_FATMaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal,
+				     char *filename, bool transpcolor)
 {
 	NE_AssertPointer(tex, "NULL material pointer");
 	NE_AssertPointer(pal, "NULL palette pointer");
 	NE_AssertPointer(filename, "NULL filename pointer");
 
 	char *pointer = NE_FATLoadData(filename);
-	int a = NE_MaterialTexLoadBMPtoRGB256(tex, pal, pointer, transpcolor);
+	int ret = NE_MaterialTexLoadBMPtoRGB256(tex, pal, pointer, transpcolor);
 	free(pointer);
 
-	return a;
+	return ret;
 }
 
-int NE_MaterialTexLoadBMPtoRGBA(NE_Material *tex, void *pointer, bool transpcolor)
+int NE_MaterialTexLoadBMPtoRGBA(NE_Material *tex, void *pointer,
+				bool transpcolor)
 {
 	NE_AssertPointer(tex, "NULL material pointer");
 	NE_AssertPointer(pointer, "NULL data pointer");
 
-	void *datapointer = __NE_ConvertBMPtoRGBA(pointer, transpcolor);
-	if (datapointer == NULL)
+	void *temp = NE_ConvertBMPtoRGBA(pointer, transpcolor);
+	if (temp == NULL)
 		return 0;
-	int a = NE_MaterialTexLoad(tex, GL_RGBA, lastx, lasty, TEXGEN_TEXCOORD, (u8 *) datapointer);
-	free(datapointer);
-	if (a == 0)
+
+	int ret = NE_MaterialTexLoad(tex, GL_RGBA, lastx, lasty,
+				     TEXGEN_TEXCOORD, (u8 *) temp);
+	free(temp);
+
+	if (ret == 0)
 		return 0;
+
 	return 1;
 }
 
-int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, void *pointer,
-				  bool transpcolor)
+int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal,
+				  void *pointer, bool transpcolor)
 {
 	NE_AssertPointer(tex, "NULL material pointer");
 	NE_AssertPointer(pal, "NULL palette pointer");
@@ -295,29 +305,30 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal, void *point
 	if (palettebuffer == NULL)
 		return 0;
 
-	void *datapointer = __NE_ConvertBMPtoRGB256(pointer, palettebuffer);
-	NE_AssertPointer(datapointer,
+	void *texturepointer = NE_ConvertBMPtoRGB256(pointer, palettebuffer);
+	NE_AssertPointer(texturepointer,
 			 "Couldn't convert BMP file to GL_RGB256 format");
-	if (datapointer == NULL) {
+	if (texturepointer == NULL) {
 		free(palettebuffer);
 		return 0;
 	}
 
-	int transp = transpcolor ? GL_TEXTURE_COLOR0_TRANSPARENT : 0;
+	u32 transp = transpcolor ? GL_TEXTURE_COLOR0_TRANSPARENT : 0;
 
-	int a = NE_MaterialTexLoad(tex, GL_RGB256, lastx, lasty,
-				   TEXGEN_TEXCOORD | transp, (u8 *)datapointer);
-	free(datapointer);
+	int ret = NE_MaterialTexLoad(tex, GL_RGB256, lastx, lasty,
+				     TEXGEN_TEXCOORD | transp,
+				     (u8 *)texturepointer);
+	free(texturepointer);
 
-	if (a == 0) {
+	if (ret == 0) {
 		NE_DebugPrint("Error while loading texture");
 		free(palettebuffer);
 		return 0;
 	}
-	a = NE_PaletteLoad(pal, palettebuffer, numcolors, GL_RGB256);
+	ret = NE_PaletteLoad(pal, palettebuffer, numcolors, GL_RGB256);
 	free(palettebuffer);
 
-	if (a == 0) {
+	if (ret == 0) {
 		NE_DebugPrint("Error while loading palette");
 		NE_MaterialDelete(tex);
 		return 0;
