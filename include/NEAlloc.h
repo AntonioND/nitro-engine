@@ -39,7 +39,7 @@ typedef struct {
 void NE_AllocInit(NEChunk **first_element, void *start, void *end);
 void NE_AllocEnd(NEChunk *first_element);
 
-void *NE_Alloc(NEChunk *first_element, int size, int align);
+void *NE_Alloc(NEChunk *first_element, size_t size, unsigned int align);
 void NE_Free(NEChunk *first_element, void *pointer);
 
 void NE_Lock(NEChunk *first_element, void *pointer);

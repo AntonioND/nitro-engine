@@ -41,10 +41,9 @@ void NE_AllocEnd(NEChunk *first_chunk)
 	return;
 }
 
-void *NE_Alloc(NEChunk *first_chunk, int size, int align)
+void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 {
 	NE_AssertPointer(first_chunk, "NULL pointer");
-	NE_Assert(size > 0, "Size must be positive");
 
 	// Minimum alignment...
 	if (align < 4)
