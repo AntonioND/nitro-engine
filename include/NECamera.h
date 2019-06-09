@@ -81,10 +81,10 @@ void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
  *  \param y3 (xup, yup, zup) Unit vector pointing up for the camera.
  *  \param z3 (xup, yup, zup) Unit vector pointing up for the camera.
  */
-#define NE_CameraSet(c, x1, y1, z1, x2, y2, z2, x3, y3, z3)			\
-		NE_CameraSetI(c, floattof32(x1), floattof32(y1), floattof32(z1),\
-			      floattof32(x2), floattof32(y2), floattof32(z2),	\
-			      floattof32(x3), floattof32(y3), floattof32(z3))
+#define NE_CameraSet(c, x1, y1, z1, x2, y2, z2, x3, y3, z3) \
+	NE_CameraSetI(c, floattof32(x1), floattof32(y1), floattof32(z1), \
+		      floattof32(x2), floattof32(y2), floattof32(z2), \
+		      floattof32(x3), floattof32(y3), floattof32(z3))
 
 /*! \fn    void NE_CameraUse(NE_Camera *cam);
  *  \brief Set view based on a NE_Camera struct.

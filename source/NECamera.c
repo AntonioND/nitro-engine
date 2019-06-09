@@ -17,9 +17,9 @@ static bool ne_camera_system_inited = false;
 static void __NE_CameraUpdateMatrix(NE_Camera * cam)
 {
 	// From libnds, modified a bit
-	int32 side[3], forward[3], up[3], i;
+	int32 side[3], forward[3], up[3];
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		forward[i] = cam->from[i] - cam->to[i];
 
 	normalizef32(forward);
@@ -59,8 +59,7 @@ NE_Camera *NE_CameraCreate(void)
 	if (!ne_camera_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_MAX_CAMERAS; i++) {
+	for (int i = 0; i < NE_MAX_CAMERAS; i++) {
 		if (NE_UserCamera[i] != NULL)
 			continue;
 
@@ -93,9 +92,11 @@ void NE_CameraSetI(NE_Camera *cam, int xfrom, int yfrom, int zfrom,
 	cam->from[0] = xfrom;
 	cam->from[1] = yfrom;
 	cam->from[2] = zfrom;
+
 	cam->to[0] = xto;
 	cam->to[1] = yto;
 	cam->to[2] = zto;
+
 	cam->up[0] = xup;
 	cam->up[1] = yup;
 	cam->up[2] = zup;
@@ -127,15 +128,14 @@ void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 	// Temporary vector used to normalize other vectors
 	int temp[3];
 
-	int i;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		vec_front[i] = cam->to[i] - cam->from[i];
 
 	if (front != 0) {
-		for (i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++)
 			temp[i] = vec_front[i];
-		normalizef32((int32 *) & temp);
-		for (i = 0; i < 3; i++)
+		normalizef32((int32 *) &temp);
+		for (int i = 0; i < 3; i++)
 			result[i] += mulf32(temp[i], front);
 	}
 
@@ -145,23 +145,23 @@ void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 		crossf32(vec_front, cam->up, vec_right);
 
 		if (right != 0) {
-			for (i = 0; i < 3; i++)
+			for (int i = 0; i < 3; i++)
 				temp[i] = vec_right[i];
-			normalizef32((int32 *) & temp);
-			for (i = 0; i < 3; i++)
+			normalizef32((int32 *) &temp);
+			for (int i = 0; i < 3; i++)
 				result[i] += mulf32(temp[i], right);
 		}
 
 		if (up != 0) {
 			crossf32(vec_right, vec_front, vec_up);
 			// Last vector, not needed to use "temp"
-			normalizef32((int32 *) & vec_up);
-			for (i = 0; i < 3; i++)
+			normalizef32((int32 *) &vec_up);
+			for (int i = 0; i < 3; i++)
 				result[i] += mulf32(vec_up[i], up);
 		}
 	}
 
-	for (i = 0; i < 3; i++) {
+	for (int i = 0; i < 3; i++) {
 		cam->from[i] += result[i];
 		cam->to[i] += result[i];
 	}
@@ -194,8 +194,7 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 
 	int cam_vector[3], result_vector[3];
 
-	int i;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		cam_vector[i] = cam->to[i] - cam->from[i];
 
 	int sine, cosine;
@@ -214,6 +213,7 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 		cam->to[1] = cam->from[1] + result_vector[1];
 		cam->to[2] = cam->from[2] + result_vector[2];
 	}
+
 	if (ry != 0) {
 		cam->matrix_is_updated = false;
 
@@ -228,6 +228,7 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 		cam->to[0] = cam->from[0] + result_vector[0];
 		cam->to[2] = cam->from[2] + result_vector[2];
 	}
+
 	if (rz != 0) {
 		cam->matrix_is_updated = false;
 
@@ -300,8 +301,7 @@ static void __NE_RotateVectorAxis(int32 *vector, int angle, int x, int y, int z)
 			 + mulf32(vector[1], matrix[5])
 			 + mulf32(vector[2], matrix[8]);
 
-	int i;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		vector[i] = result_vector[i];
 }
 
@@ -317,14 +317,13 @@ void NE_CameraRotateAxisI(NE_Camera *cam, int angle, int x, int y, int z)
 
 	int32 cam_vector[3];
 
-	int i;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		cam_vector[i] = cam->to[i] - cam->from[i];
 
 	//__NE_RotateVectorAxis(cam->up, angle, x, y, z);
 	__NE_RotateVectorAxis(cam_vector, angle, x, y, z);
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		cam->to[i] = cam->from[i] + cam_vector[i];
 }
 
@@ -339,8 +338,7 @@ void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz)
 
 	int32 vec_front[3], vec_right[3], vec_up[3];
 
-	int i;
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 		vec_front[i] = cam->to[i] - cam->from[i];
 
 	if (ry || rx) {
@@ -377,8 +375,7 @@ void NE_CameraDelete(NE_Camera *cam)
 {
 	NE_AssertPointer(cam, "NULL pointer");
 
-	int i;
-	for (i = 0; i < NE_MAX_CAMERAS; i++) {
+	for (int i = 0; i < NE_MAX_CAMERAS; i++) {
 		if (NE_UserCamera[i] != cam)
 			continue;
 
@@ -403,8 +400,7 @@ void NE_CameraSystemReset(int numcameras)
 	NE_UserCamera = malloc(NE_MAX_CAMERAS * sizeof(NE_UserCamera));
 	NE_AssertPointer(NE_UserCamera, "Not enough memory");
 
-	int i;
-	for (i = 0; i < NE_MAX_CAMERAS; i++)
+	for (int i = 0; i < NE_MAX_CAMERAS; i++)
 		NE_UserCamera[i] = NULL;
 
 	ne_camera_system_inited = true;
@@ -415,8 +411,7 @@ void NE_CameraSystemEnd(void)
 	if (!ne_camera_system_inited)
 		return;
 
-	int i;
-	for (i = 0; i < NE_MAX_CAMERAS; i++)
+	for (int i = 0; i < NE_MAX_CAMERAS; i++)
 		if (NE_UserCamera[i])
 			NE_CameraDelete(NE_UserCamera[i]);
 
