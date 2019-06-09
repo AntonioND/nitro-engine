@@ -60,7 +60,10 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 		// Let's check if we can allocate here.
 		NEChunk *free_chunk = chunk_search;
 
-		int chunk_size = ((int)free_chunk->end - (int)free_chunk->start);
+		uintptr_t free_chunk_start = (uintptr_t)free_chunk->start;
+		uintptr_t free_chunk_end = (uintptr_t)free_chunk->end;
+
+		size_t chunk_size = free_chunk_end - free_chunk_start;
 
 		// If this chunk doesn't have enough space, simply skip it
 		if (chunk_size < size)
@@ -69,7 +72,7 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 		// If we only have the space requested, it can be easy
 		if (chunk_size == size) {
 			// If it is already aligned, we're done
-			if (((int)free_chunk->start & (align - 1)) == 0) {
+			if ((free_chunk_start & (align - 1)) == 0) {
 				free_chunk->status = NE_STATE_USED;
 				return free_chunk->start;
 			}
@@ -82,7 +85,7 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 		// If we have more space than requested
 
 		// If it is aligned...
-		if (((int)free_chunk->start & (align - 1)) == 0) {
+		if ((free_chunk_start & (align - 1)) == 0) {
 			// Get next chunk and create a new one.
 			NEChunk *next_chunk = free_chunk->next;
 			NEChunk *new_chunk = malloc(sizeof(NEChunk));
@@ -125,7 +128,7 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 			// Now, set pointers...
 			new_chunk->end = free_chunk->end;
 
-			free_chunk->end = (void *)((int)free_chunk->start + size);
+			free_chunk->end = (void *)(free_chunk_start + size);
 
 			new_chunk->start = free_chunk->end;
 
@@ -135,10 +138,12 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 			// If we need to align it, it is a bit more
 			// complicated... Check if even with disalignment we can
 			// create room for this
-			int end_ptr = (((int)free_chunk->start & (~(align - 1))) + align) + size;
+			uintptr_t end_ptr = (free_chunk_start & (~(align - 1)))
+					  + align + size;
 
-			if (end_ptr < (int)free_chunk->end) {
-				// Get chunks next to this, and create 2 new ones.
+			if (end_ptr < free_chunk_end) {
+				// Get chunks adjacent to this one, and create 2
+				// new chunks
 				NEChunk *next_chunk = free_chunk->next;
 				NEChunk *new_chunk = malloc(sizeof(NEChunk));
 				NEChunk *new2_chunk = malloc(sizeof(NEChunk));
@@ -182,14 +187,14 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 				// Now, set pointers acording to the size...
 				new2_chunk->end = free_chunk->end;
 
-				free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
+				free_chunk->end = (void *)((free_chunk_start & ~(align - 1)) + align);
 				new_chunk->start = free_chunk->end;
-				new_chunk->end = (void *)((int)new_chunk->start + size);
+				new_chunk->end = (void *)((uintptr_t)new_chunk->start + size);
 				new2_chunk->start = new_chunk->end;
 
 				// Ready!!
 				return new_chunk->start;
-			} else if (end_ptr == (int)free_chunk->end) {
+			} else if (end_ptr == free_chunk_end) {
 				// Easy case
 
 				// Get chunks next to this, and create 2 new ones.
@@ -227,7 +232,7 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size, unsigned int align)
 				// Now, set pointers acording to the size...
 				new_chunk->end = free_chunk->end;
 
-				free_chunk->end = (void *)(((int)free_chunk->start & ~(align - 1)) + align);
+				free_chunk->end = (void *)((free_chunk_start & ~(align - 1)) + align);
 				new_chunk->start = free_chunk->end;
 
 				// Ready!!
@@ -446,7 +451,8 @@ void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 	NEChunk *chunk_search = first_chunk;
 
 	while (1) {
-		int size = chunk_search->end - chunk_search->start;
+		size_t size = (uintptr_t)chunk_search->end
+			    - (uintptr_t)chunk_search->start;
 
 		switch (chunk_search->status) {
 		case NE_STATE_FREE:
@@ -467,6 +473,7 @@ void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 
 		if (chunk_search->next == NULL)
 			break;
+
 		chunk_search = chunk_search->next;
 	}
 
