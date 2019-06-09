@@ -16,33 +16,32 @@ static bool ne_sprite_system_inited = false;
 
 NE_Sprite *NE_SpriteCreate(void)
 {
-	NE_Sprite *sprite;
-
-	if (!ne_sprite_system_inited)
+	if (!ne_sprite_system_inited) {
+		NE_DebugPrint("System not inited");
 		return NULL;
-
-	int i = 0;
-	while (1) {
-		if (i == NE_MAX_SPRITES) {
-			NE_DebugPrint("No free slots");
-			return NULL;
-		}
-		if (NE_spritepointers[i] == NULL) {
-			sprite = (NE_Sprite *) calloc(1, sizeof(NE_Sprite));
-			NE_AssertPointer(sprite, "Not enough memory");
-			NE_spritepointers[i] = sprite;
-			break;
-		}
-		i++;
 	}
 
-	sprite->visible = true;
-	sprite->scale = inttof32(1);
-	sprite->color = NE_White;
-	sprite->mat = NULL;
-	sprite->alpha = 31;
+	for (int i = 0; i < NE_MAX_SPRITES; i++) {
+		if (NE_spritepointers[i] != NULL)
+			continue;
 
-	return sprite;
+		NE_Sprite *sprite = (NE_Sprite *) calloc(1, sizeof(NE_Sprite));
+
+		NE_AssertPointer(sprite, "Not enough memory");
+
+		sprite->visible = true;
+		sprite->scale = inttof32(1);
+		sprite->color = NE_White;
+		sprite->mat = NULL;
+		sprite->alpha = 31;
+
+		NE_spritepointers[i] = sprite;
+
+		return sprite;
+	}
+
+	NE_DebugPrint("No free slots");
+	return NULL;
 }
 
 void NE_SpriteSetPos(NE_Sprite *sprite, int x, int y)
