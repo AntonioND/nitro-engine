@@ -15,9 +15,9 @@ typedef struct {
 	NE_Palette *palette;
 	int uses;
 	int sizex, sizey;
-} _NE_TEX_STRUCT_;
+} ne_textureinfo_t;
 
-static _NE_TEX_STRUCT_ *NE_Texture = NULL;
+static ne_textureinfo_t *NE_Texture = NULL;
 static NE_Material **NE_UserMaterials = NULL;
 
 static NEChunk *NE_TexAllocList;	// See NEAlloc.h
@@ -32,24 +32,22 @@ static u32 ne_defaultspecular, ne_defaultemission;
 static bool ne_defaultvtxcolor, ne_defaultuseshininess;
 
 //--------------------------------------------------------------------------
-//                                INTERNAL
+
 static int __NE_GetValidSize(int size)
 {
-	int i;
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++) {
 		if (size <= (8 << i))
 			return (8 << i);
+	}
 	return 0;
 }
 
 static int __NE_ConvertSizeRaw(int size)
 {
-	int i = 0;
-	while (i < 8) {
+	for (int i = 0; i < 8; i++) {
 		if (size == 8)
 			return i;
 		size >>= 1;
-		i++;
 	}
 	return 0;
 }
@@ -74,8 +72,7 @@ NE_Material *NE_MaterialCreate(void)
 	if (!ne_texture_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_MAX_TEXTURES; i++) {
+	for (int i = 0; i < NE_MAX_TEXTURES; i++) {
 		if (NE_UserMaterials[i] != NULL)
 			continue;
 
@@ -121,17 +118,23 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
 	char *ptr = NE_FATLoadData(path);
 	NE_AssertPointer(ptr, "Couldn't load file from FAT");
 
-	u8 i = NE_MaterialTexLoad(tex, type, sizeX, sizeY, param, (u8 *) ptr);
+	int ret = NE_MaterialTexLoad(tex, type, sizeX, sizeY, param, (u8 *)ptr);
 	free(ptr);
-	return i;
+	return ret;
 }
 
 //--------------------------------------------------------------
-//                 INTERNAL USE
-const int __NE_TextureDepth[] = {
-	0 /* Nothing */ , 8 /* RGB32_A3 */ , 2 /* RGB4 */ , 4 /* RGB16 */ ,
-	8 /* RGB256 */ , 0 /* Compressed */ , 8 /* RGB8_A5 */ , 16 /* RGBA*/,
-	16 /* RGB */
+
+static const int __NE_TextureDepth[] = {
+	0,  // Nothing
+	8,  // RGB32_A3
+	2,  // RGB4
+	4,  // RGB16
+	8,  // RGB256
+	0,  // Compressed
+	8,  // RGB8_A5
+	16, // RGBA
+	16  // RGB
 };
 
 static int __NE_TextureResizeWidth(void *source, void *dest,
@@ -145,79 +148,105 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
 
 	int bits = __NE_TextureDepth[type];
 
-	if (bits == 16) { // GL_RGBA or GL_RGB
-		u16 *_dest = dest, *_source = source;
+	if (bits == 16) {
+		// GL_RGBA or GL_RGB
+		// -----------------
+
+		// Cast to correct width
+		u16 *d = dest;
+		u16 *s = source;
 
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < newwidth; x++) {
 				if (x < width)
-					*_dest = *_source++;
-				_dest++;
+					*d = *s++;
+				d++;
 			}
 		}
+
 		return 1;
 
-	} else if (bits == 8) { //GL_RGB256 or GL_RGB32_A3 or GL_RGB8_A5
-		u8 *_dest = dest, *_source = source;
+	} else if (bits == 8) {
+		// GL_RGB256, GL_RGB32_A3 or GL_RGB8_A5
+		// ------------------------------------
+
+		// Cast to correct width
+		u8 *d = dest;
+		u8 *s = source;
 
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < newwidth; x++) {
 				if (x < width)
-					*_dest = *_source++;
-				_dest++;
+					*d = *s++;
+				d++;
 			}
 		}
+
 		return 1;
 
-	} else if (bits == 4) { // GL_RGB16
-		u8 *_dest = dest, *_source = source;
-		int source_index = 0, dest_index = 0;
+	} else if (bits == 4) {
+		// GL_RGB16
+		// --------
+
+		// Cast to correct width
+		u8 *d = dest;
+		u8 *s = source;
+		int src_idx = 0;
+		int dst_idx = 0;
 
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < newwidth; x++) {
 				if (x < width) {
-					if (dest_index == 0)
-						*_dest = 0;
+					if (dst_idx == 0)
+						*d = 0;
 
-					*_dest |=
-					    ((*_source >> (source_index << 2)) & 0xF) << (dest_index << 2);
+					*d |= ((*s >> (src_idx << 2)) & 0xF)
+						<< (dst_idx << 2);
 
-					if (source_index == 1)
-						_source++;
-					source_index ^= 1;
+					if (src_idx == 1)
+						s++;
+					src_idx ^= 1;
 				}
 
-				if (dest_index == 1)
-					_dest++;
+				if (dst_idx == 1)
+					d++;
 
-				dest_index ^= 1;
+				dst_idx ^= 1;
 			}
 		}
+
 		return 1;
 
-	} else if (bits == 2) { // GL_RGB4
-		u8 *_dest = dest, *_source = source;
-		int source_index = 0, dest_index = 0;
+	} else if (bits == 2) {
+		// GL_RGB4
+		// -------
+
+		// Cast to correct width
+		u8 *d = dest;
+		u8 *s = source;
+		int src_idx = 0;
+		int dst_idx = 0;
 
 		for (y = 0; y < height; y++) {
 			for (x = 0; x < newwidth; x++) {
 				if (x < width) {
-					if (dest_index == 0)
-						*_dest = 0;
+					if (dst_idx == 0)
+						*d = 0;
 
-					*_dest |=
-					    ((*_source >> (source_index << 1)) & 0x3) << (dest_index << 1);
+					*d |= ((*s >> (src_idx << 1)) & 0x3)
+						<< (dst_idx << 1);
 
-					if (source_index == 3)
-						_source++;
-					source_index = (source_index + 1) & 3;
+					if (src_idx == 3)
+						s++;
+					src_idx = (src_idx + 1) & 3;
 				}
 
-				if (dest_index == 3)
-					_dest++;
-				dest_index = (dest_index + 1) & 3;
+				if (dst_idx == 3)
+					d++;
+				dst_idx = (dst_idx + 1) & 3;
 			}
 		}
+
 		return 1;
 	}
 
@@ -225,9 +254,15 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
 }
 
 static const int __NE_TextureSizeShift[] = {
-	0 /* Nothing */ , 1 /* RGB32_A3 */ , 3 /* RGB4 */ , 2 /* RGB16 */ ,
-	1 /* RGB256 */ , 0 /* Compressed */ , 1 /* RGB8_A5 */ , 0 /* RGBA*/,
-	0 /* RGB*/
+	0, // Nothing
+	1, // RGB32_A3
+	3, // RGB4
+	2, // RGB16
+	1, // RGB256
+	0, // Compressed
+	1, // RGB8_A5
+	0, // RGBA
+	0, // RGB
 };
 
 //--------------------------------------------------------------
@@ -237,19 +272,19 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 {
 	NE_AssertPointer(tex, "NULL material pointer");
 
-	if (tex->texindex != NE_NO_TEXTURE) {	// texture exists
+	// Check if texture exists
+	if (tex->texindex != NE_NO_TEXTURE) {
 		NE_MaterialDelete(tex);
 		tex = NE_MaterialCreate();
 	}
 
-	int i = 0;		// Get new slot
+	// Get free slot
 	tex->texindex = NE_NO_TEXTURE;
-	while (i < NE_MAX_TEXTURES) {
+	for (int i = 0; i < NE_MAX_TEXTURES; i++) {
 		if (NE_Texture[i].adress == NULL) {
 			tex->texindex = i;
-			i = NE_MAX_TEXTURES;
+			break;
 		}
-		i++;
 	}
 
 	if (tex->texindex == NE_NO_TEXTURE) {
@@ -266,7 +301,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 
 	u32 size = 0;
 
-	// IF WIDTH IS NOT A POWER OF 2 -----------------------------
+	// If width is not a power of 2
 	bool invalidwidth = false;
 	if (__NE_GetValidSize(sizeX) != sizeX) {
 		invalidwidth = true;
@@ -282,8 +317,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 				 "Not enough memory for temporary buffer");
 
 		if (__NE_TextureResizeWidth(texture, newbuffer, type, sizeY,
-					    sizeX,
-					    __NE_GetValidSize(sizeX)) == 0) {
+					sizeX, __NE_GetValidSize(sizeX)) == 0) {
 			free(newbuffer);
 			return 0;
 		}
@@ -311,6 +345,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
 	}
 
 	NE_Texture[slot].adress = (void *)addr;
+	// Initially only this material is using this texture
 	NE_Texture[slot].uses = 1;
 
 	// unlock texture memory
@@ -350,6 +385,7 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
 	NE_AssertPointer(dest, "NULL dest pointer");
 	NE_Assert(source->texindex != NE_NO_TEXTURE,
 		  "No texture asigned to source material");
+	// Increase count of materials using this texture
 	NE_Texture[source->texindex].uses++;
 	dest->texindex = source->texindex;
 }
@@ -395,7 +431,7 @@ void NE_MaterialUse(NE_Material *tex)
 extern bool NE_Dual;
 
 void NE_TextureSystemReset(int texture_number, int palette_number,
-			   _NE_BANK_FLAGS_ bank_flags)
+			   NE_VRAMBankFlags bank_flags)
 {
 	if (ne_texture_system_inited)
 		NE_TextureSystemEnd();
@@ -409,13 +445,17 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 
 	NE_Assert((bank_flags & 0xF) != 0, "No VRAM banks selected");
 
-	if ((bank_flags & 0xF) == 0) // Prevent user from not selecting any bank
+	// Prevent user from not selecting any bank
+	if ((bank_flags & 0xF) == 0)
 		bank_flags = NE_VRAM_ABCD;
 
-	if (NE_Dual) // Can't use VRAM_C and VRAM_D in dual 3D mode
+	// VRAM_C and VRAM_D can't be used in dual 3D mode
+	if (NE_Dual)
 		bank_flags &= ~NE_VRAM_CD;
 
-	// Now, configure allocation system...
+	// Now, configure allocation system. The buffer size always sees the
+	// four banks of VRAM. It is needed to allocate one chunk for each and
+	// lock the ones that aren't allowed to be used by Nitro Engine.
 
 	NE_Alloc(NE_TexAllocList, 128 * 1024, 0);	// VRAM_A
 	NE_Alloc(NE_TexAllocList, 128 * 1024, 0);	// VRAM_B
@@ -450,12 +490,12 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 		NE_Lock(NE_TexAllocList, VRAM_D);
 	}
 
-	NE_Texture = malloc(NE_MAX_TEXTURES * sizeof(_NE_TEX_STRUCT_));
+	NE_Texture = malloc(NE_MAX_TEXTURES * sizeof(ne_textureinfo_t));
 	NE_AssertPointer(NE_Texture, "Not enough memory");
 	NE_UserMaterials = malloc(NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
 	NE_AssertPointer(NE_UserMaterials, "Not enough memory");
 
-	memset(NE_Texture, 0, NE_MAX_TEXTURES * sizeof(_NE_TEX_STRUCT_));
+	memset(NE_Texture, 0, NE_MAX_TEXTURES * sizeof(ne_textureinfo_t));
 	memset(NE_UserMaterials, 0, NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
 
 	NE_PaletteSystemReset(palette_number);
@@ -469,9 +509,12 @@ void NE_MaterialDelete(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 
-	if (tex->texindex != NE_NO_TEXTURE) { // If there is an asigned texture
+	// If there is an asigned texture
+	if (tex->texindex != NE_NO_TEXTURE) {
 		int slot = tex->texindex;
-		NE_Texture[slot].uses--; // If this is the only material to use it...
+		// A texture may be used by several materials
+		NE_Texture[slot].uses--;
+		// If this is the only material to use it, delete it
 		if (NE_Texture[slot].uses == 0) {
 			NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
 			NE_Texture[slot].adress = NULL;
@@ -480,13 +523,13 @@ void NE_MaterialDelete(NE_Material *tex)
 		}
 	}
 
-	int i;
-	for (i = 0; i < NE_MAX_TEXTURES; i++)
+	for (int i = 0; i < NE_MAX_TEXTURES; i++) {
 		if (NE_UserMaterials[i] == tex) {
 			NE_UserMaterials[i] = NULL;
 			free(tex);
 			return;
 		}
+	}
 
 	NE_DebugPrint("Object not found");
 }
@@ -563,10 +606,10 @@ void NE_TextureSystemEnd(void)
 
 	free(NE_Texture);
 
-	int i;
-	for (i = 0; i < NE_MAX_TEXTURES; i++)
+	for (int i = 0; i < NE_MAX_TEXTURES; i++) {
 		if (NE_UserMaterials[i])
 			free(NE_UserMaterials[i]);
+	}
 
 	free(NE_UserMaterials);
 
@@ -578,7 +621,9 @@ void NE_TextureSystemEnd(void)
 }
 
 //--------------------------------------------------------------
-//                 INTERNAL USE
+
+// Functions for internal use
+
 int __NE_TextureGetRawX(NE_Material *tex)
 {
 	NE_AssertPointer(tex, "NULL pointer");
@@ -630,8 +675,8 @@ int NE_TextureGetSizeY(NE_Material *tex)
 }
 
 void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
-				      u32 ambient, u32 specular, u32 emission,
-				      bool vtxcolor, bool useshininess)
+			       u32 ambient, u32 specular, u32 emission,
+			       bool vtxcolor, bool useshininess)
 {
 	NE_AssertPointer(tex, "NULL pointer");
 	tex->diffuse = diffuse;
@@ -643,8 +688,8 @@ void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
 }
 
 void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
-					     u32 specular, u32 emission,
-					     bool vtxcolor, bool useshininess)
+				      u32 specular, u32 emission,
+				      bool vtxcolor, bool useshininess)
 {
 	ne_defaultdiffuse = diffuse;
 	ne_defaultambient = ambient;
@@ -678,11 +723,12 @@ void *NE_TextureDrawingStart(NE_Material *tex)
 	drawingtexture_x = NE_TextureGetSizeX(tex);
 	drawingtexture_realx = NE_TextureGetRealSizeX(tex);
 	drawingtexture_y = NE_TextureGetSizeY(tex);
-	drawingtexture_adress =
-	    (u16 *) ((int)VRAM_A + ((NE_Texture[tex->texindex].param & 0xFFFF) << 3));
+	drawingtexture_adress = (u16 *) ((uintptr_t)VRAM_A
+			+ ((NE_Texture[tex->texindex].param & 0xFFFF) << 3));
 	drawingtexture_type = ((NE_Texture[tex->texindex].param >> 26) & 0x7);
 
-	ne_vram_saved = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD, VRAM_D_LCD);
+	ne_vram_saved = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
+					    VRAM_D_LCD);
 
 	return drawingtexture_adress;
 }

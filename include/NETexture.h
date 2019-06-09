@@ -108,7 +108,7 @@ void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal);
  */
 void NE_MaterialUse(NE_Material *tex);
 
-/*! \enum  _NE_BANK_FLAGS_
+/*! \enum  NE_VRAMBankFlags
  *  \brief Enum to choose what banks can use Nitro Engine to allocate textures.
  */
 typedef enum {
@@ -130,10 +130,10 @@ typedef enum {
 	NE_VRAM_BCD = NE_VRAM_B | NE_VRAM_C | NE_VRAM_D,	/*!< Use banks B, C and D. */
 
 	NE_VRAM_ABCD = NE_VRAM_A | NE_VRAM_B | NE_VRAM_C | NE_VRAM_D,	/*!< Use the 4 main banks. */
-} _NE_BANK_FLAGS_;
+} NE_VRAMBankFlags;
 
 /*! \fn    void NE_TextureSystemReset(int texture_number, int palette_number,
- *                                    _NE_BANK_FLAGS_ bank_flags);
+ *                                    NE_VRAMBankFlags bank_flags);
  *  \brief Resets texture and palette system.
  *  \param texture_number Max number of textures. If lower than 1, it will
  *         create space for NE_DEFAULT_TEXTURES.
@@ -146,7 +146,7 @@ typedef enum {
  *        ones.
  */
 void NE_TextureSystemReset(int texture_number, int palette_number,
-			   _NE_BANK_FLAGS_ bank_flags);
+			   NE_VRAMBankFlags bank_flags);
 
 /*! \fn    void NE_MaterialUse(NE_Material *tex);
  *  \brief Delete material.
