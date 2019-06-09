@@ -55,7 +55,7 @@ typedef struct {
  *  \brief  Holds information of keys and stylus input for internal use.
  */
 typedef struct {
-	u32 kdown, kheld, kup;
+	uint32 kdown, kheld, kup;
 	touchPosition touch;
 } _NE_input_;
 
