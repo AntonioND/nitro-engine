@@ -103,7 +103,7 @@ void NE_SpriteSetParams(NE_Sprite *sprite, u8 alpha, u8 id, u32 color)
 void NE_SpriteDelete(NE_Sprite *sprite)
 {
 	if (!ne_sprite_system_inited)
-		return NULL;
+		return;
 
 	NE_AssertPointer(sprite, "NULL pointer");
 
