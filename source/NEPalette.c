@@ -11,10 +11,10 @@
 
 typedef struct {
 	u16 *pointer;
-	u8 format;
-} _NE_PalInfo_;
+	int format;
+} ne_palinfo_t;
 
-static _NE_PalInfo_ *NE_PalInfo = NULL;
+static ne_palinfo_t *NE_PalInfo = NULL;
 static NE_Palette **NE_UserPalette = NULL;
 
 static NEChunk *NE_PalAllocList;	//See NEAlloc.h
@@ -28,8 +28,7 @@ NE_Palette *NE_PaletteCreate(void)
 	if (!ne_palette_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_MAX_PALETTES; i++) {
+	for (int i = 0; i < NE_MAX_PALETTES; i++) {
 		if (NE_UserPalette[i] != NULL)
 			continue;
 
@@ -45,7 +44,7 @@ NE_Palette *NE_PaletteCreate(void)
 	return NULL;
 }
 
-int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format)
+int NE_PaletteLoadFAT(NE_Palette *pal, char *path, int format)
 {
 	if (!ne_palette_system_inited)
 		return 0;
@@ -61,13 +60,13 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format)
 
 	char *ptr = NE_FATLoadData(path);
 	NE_AssertPointer(ptr, "Couldn't load file from FAT");
-	int i = NE_PaletteLoad(pal, (u16 *) ptr, size >> 1, format);
+	int ret = NE_PaletteLoad(pal, (u16 *) ptr, size >> 1, format);
 	free(ptr);
 
-	return i;
+	return ret;
 }
 
-int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
+int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
 {
 	if (!ne_palette_system_inited)
 		return 0;
@@ -81,8 +80,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 
 	int slot = NE_NO_PALETTE;
 
-	int i;
-	for (i = 0; i < NE_MAX_PALETTES; i++) {
+	for (int i = 0; i < NE_MAX_PALETTES; i++) {
 		if (NE_PalInfo[i].pointer == NULL) {
 			pal->index = i;
 			slot = i;
@@ -95,8 +93,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 		return 0;
 	}
 
-	NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList,
-					    numcolor << 1,
+	NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList, numcolor << 1,
 					    1 << (4 - (format == GL_RGB4)));
 	if (NE_PalInfo[slot].pointer == NULL) {
 		NE_DebugPrint("Not enough memory");
@@ -104,10 +101,13 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, u8 format)
 	}
 
 	NE_PalInfo[slot].format = format;
+
+	// Allow CPU writes to VRAM_E
 	vramSetBankE(VRAM_E_LCD);
 	swiCopy(pointer, NE_PalInfo[slot].pointer,
 		(numcolor >> 1) | COPY_MODE_WORD);
 	vramSetBankE(VRAM_E_TEX_PALETTE);
+
 	return 1;
 }
 
@@ -118,14 +118,14 @@ void NE_PaletteDelete(NE_Palette *pal)
 
 	NE_AssertPointer(pal, "NULL pointer");
 
-	//If there is an asigned palette...
+	// If there is an asigned palette...
 	if (pal->index != NE_NO_PALETTE) {
-		NE_Free(NE_PalAllocList, (void *)NE_PalInfo[pal->index].pointer);
+		NE_Free(NE_PalAllocList,
+			(void *)NE_PalInfo[pal->index].pointer);
 		NE_PalInfo[pal->index].pointer = NULL;
 	}
 
-	int i;
-	for (i = 0; i < NE_MAX_PALETTES; i++) {
+	for (int i = 0; i < NE_MAX_PALETTES; i++) {
 		if (NE_UserPalette[i] == pal) {
 			NE_UserPalette[i] = NULL;
 			free(pal);
@@ -140,8 +140,8 @@ void NE_PaletteUse(NE_Palette *pal)
 {
 	NE_AssertPointer(pal, "NULL pointer");
 	NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
-	GFX_PAL_FORMAT = (int)NE_PalInfo[pal->index].pointer
-			 >> (4 - (NE_PalInfo[pal->index].format == GL_RGB4));
+	unsigned int shift = 4 - (NE_PalInfo[pal->index].format == GL_RGB4);
+	GFX_PAL_FORMAT = (uintptr_t)NE_PalInfo[pal->index].pointer >> shift;
 }
 
 void NE_PaletteSystemReset(int palette_number)
@@ -154,14 +154,14 @@ void NE_PaletteSystemReset(int palette_number)
 	else
 		NE_MAX_PALETTES = palette_number;
 
-	NE_PalInfo = malloc(NE_MAX_PALETTES * sizeof(_NE_PalInfo_));
+	NE_PalInfo = malloc(NE_MAX_PALETTES * sizeof(ne_palinfo_t));
 	NE_AssertPointer(NE_PalInfo, "Not enough memory");
 	NE_UserPalette = malloc(NE_MAX_PALETTES * sizeof(NE_UserPalette));
 	NE_AssertPointer(NE_UserPalette, "Not enough memory");
 
 	NE_AllocInit(&NE_PalAllocList, (void *)VRAM_E, (void *)VRAM_F);
 
-	memset(NE_PalInfo, 0, NE_MAX_PALETTES * sizeof(_NE_PalInfo_));
+	memset(NE_PalInfo, 0, NE_MAX_PALETTES * sizeof(ne_palinfo_t));
 	memset(NE_UserPalette, 0, NE_MAX_PALETTES * sizeof(NE_UserPalette));
 
 	ne_palette_system_inited = true;
@@ -237,17 +237,17 @@ void NE_PaletteSystemEnd(void)
 
 	free(NE_PalInfo);
 
-	int i;
-	for (i = 0; i < NE_MAX_PALETTES; i++)
+	for (int i = 0; i < NE_MAX_PALETTES; i++) {
 		if (NE_UserPalette[i])
 			free(NE_UserPalette[i]);
+	}
 
 	free(NE_UserPalette);
 
 	ne_palette_system_inited = false;
 }
 
-//-----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 static u16 *palette_adress = NULL;
 static int palette_format;
@@ -261,6 +261,7 @@ void *NE_PaletteModificationStart(NE_Palette *pal)
 	palette_adress = NE_PalInfo[pal->index].pointer;
 	palette_format = NE_PalInfo[pal->index].format;
 
+	// Enable CPU accesses to VRAM_E
 	vramSetBankE(VRAM_E_LCD);
 
 	return palette_adress;
@@ -278,6 +279,7 @@ void NE_PaletteModificationEnd(void)
 {
 	NE_Assert(palette_adress != NULL, "No active palette");
 
+	// Disable CPU accesses to VRAM_E
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 
 	palette_adress = NULL;

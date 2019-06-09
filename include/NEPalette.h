@@ -34,24 +34,24 @@ typedef struct {
  */
 NE_Palette *NE_PaletteCreate(void);
 
-/*! \fn    int NE_PaletteLoadFAT(NE_Palette *pal, char * path, u8 format);
+/*! \fn    int NE_PaletteLoadFAT(NE_Palette *pal, char * path, int format);
  *  \brief Load a palette from FAT and assign it to a NE_TextPalette struct.
  *         Returns 1 if OK.
  *  \param pal Pointer to the palette.
  *  \param path Path of the palette.
  *  \param format Format of the palette.
  */
-int NE_PaletteLoadFAT(NE_Palette *pal, char *path, u8 format);
+int NE_PaletteLoadFAT(NE_Palette *pal, char *path, int format);
 
 /*! \fn    int NE_PaletteLoad(NE_Palette *pal, u16* pointer, u16 numcolor,
- *                            u8 format);
+ *                            int format);
  *  \brief Assign a palette in RAM to a NE_TextPalette struct. Returns 1 if OK.
  *  \param pal Pointer to the palette.
  *  \param pointer Pointer to the palette.
  *  \param numcolor Number of colors of the palette.
  *  \param format Format of the palette.
  */
-int NE_PaletteLoad(NE_Palette *pal, u16 * pointer, u16 numcolor, u8 format);
+int NE_PaletteLoad(NE_Palette *pal, u16 * pointer, u16 numcolor, int format);
 
 /*! \fn    void NE_PaletteDelete(NE_Palette *pal);
  *  \brief Delete a NE_Palette struct.
@@ -99,8 +99,8 @@ void NE_PaletteSystemEnd(void);
  *  \brief Enables modification of given palette. Returns a pointer to the data.
  *  \param pal Palette to modify.
  *
- * Use this DURING VBL. YOU MUST USE NE_PaletteModificationEnd() WHEN YOU
- * FINISH. IF YOU DON'T, GPU WON'T BE ABLE TO RENDER THE TEXTURES TO SCREEN.
+ * Use this during VBL. You must use NE_PaletteModificationEnd() when you
+ * finish. If you don't, the GPU won't be able to render textures to the screen.
  */
 void *NE_PaletteModificationStart(NE_Palette *pal);
 
@@ -109,14 +109,14 @@ void *NE_PaletteModificationStart(NE_Palette *pal);
  *  \param colorindex Index to change.
  *  \param color New color.
  *
- * Use this DURING VBL.
+ * Use this during VBL.
  */
 void NE_PaletteRGB256SetColor(u8 colorindex, u16 color);
 
 /*! \fn    void NE_PaletteModificationEnd(void);
  *  \brief Ends modification of palettes.
  *
- * Use this DURING VBL.
+ * Use this during VBL.
  */
 void NE_PaletteModificationEnd(void);
 
