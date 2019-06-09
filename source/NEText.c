@@ -11,9 +11,9 @@
 typedef struct {
 	int sizex, sizey;
 	NE_Material *material;
-} _NE_TextInfo_;
+} ne_textinfo_t;
 
-static _NE_TextInfo_ NE_TextInfo[NE_MAX_TEXT_FONTS];
+static ne_textinfo_t NE_TextInfo[NE_MAX_TEXT_FONTS];
 
 static int NE_TEXT_PRIORITY = 0;
 
@@ -48,8 +48,7 @@ void NE_TextEnd(int slot)
 
 void NE_TextResetSystem(void)
 {
-	int i;
-	for (i = 0; i < NE_MAX_TEXT_FONTS; i++) {
+	for (int i = 0; i < NE_MAX_TEXT_FONTS; i++) {
 		NE_TextInfo[i].sizex = 0;
 		NE_TextInfo[i].sizey = 0;
 		NE_TextInfo[i].material = NULL;
@@ -74,7 +73,7 @@ static void _ne_texturecuadprint(int xcrd1, int ycrd1, int xcrd2,
 	GFX_VERTEX_XY = (ycrd1 << 16) | (xcrd2 & 0xFFFF);
 }
 
-static void _ne_charprint(_NE_TextInfo_ * textinfo, int xcrd1, int ycrd1,
+static void _ne_charprint(ne_textinfo_t * textinfo, int xcrd1, int ycrd1,
 			  char character)
 {
 	// Texture coords
@@ -93,7 +92,7 @@ int NE_TextPrint(int slot, int x, int y, u32 color, const char *text)
 {
 	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
+	ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
 	if (textinfo->material == NULL)
 		return -1;
@@ -127,6 +126,7 @@ int NE_TextPrint(int slot, int x, int y, u32 color, const char *text)
 			x_ += textinfo->sizex;
 		}
 	}
+
 	return count;
 }
 
@@ -135,7 +135,7 @@ int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 {
 	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
+	ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
 	if (textinfo->material == NULL)
 		return -1;
@@ -176,6 +176,7 @@ int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 			x_ += textinfo->sizex;
 		}
 	}
+
 	return count;
 }
 
@@ -183,7 +184,7 @@ int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text)
 {
 	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
+	ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
 	if (textinfo->material == NULL)
 		return -1;
@@ -209,6 +210,7 @@ int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text)
 			x_ += textinfo->sizex;
 		}
 	}
+
 	return count;
 }
 
@@ -217,7 +219,7 @@ int NE_TextPrintBoxFree(int slot, int x, int y, int endx, int endy, u32 color,
 {
 	NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-	_NE_TextInfo_ *textinfo = &NE_TextInfo[slot];
+	ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
 	if (textinfo->material == NULL)
 		return -1;
@@ -258,5 +260,6 @@ int NE_TextPrintBoxFree(int slot, int x, int y, int endx, int endy, u32 color,
 			x_ += textinfo->sizex;
 		}
 	}
+
 	return count;
 }
