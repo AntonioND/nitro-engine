@@ -28,7 +28,7 @@ NE_Sprite *NE_SpriteCreate(void)
 			return NULL;
 		}
 		if (NE_spritepointers[i] == NULL) {
-			sprite = (NE_Sprite *) malloc(sizeof(NE_Sprite));
+			sprite = (NE_Sprite *) calloc(1, sizeof(NE_Sprite));
 			NE_AssertPointer(sprite, "Not enough memory");
 			NE_spritepointers[i] = sprite;
 			break;
@@ -36,14 +36,12 @@ NE_Sprite *NE_SpriteCreate(void)
 		i++;
 	}
 
-	sprite->x = sprite->y = sprite->sx = sprite->sy = sprite->priority = 0;
 	sprite->visible = true;
-	sprite->rot_angle = 0;
 	sprite->scale = inttof32(1);
 	sprite->color = NE_White;
 	sprite->mat = NULL;
 	sprite->alpha = 31;
-	sprite->id = 0;
+
 	return sprite;
 }
 
