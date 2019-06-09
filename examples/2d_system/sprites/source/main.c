@@ -58,7 +58,7 @@ int main()
 
 	while(1) {
 		scanKeys();
-		int keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		rot = (rot + 2) & 511;
 		NE_SpriteSetRot(Sprite[2], rot);

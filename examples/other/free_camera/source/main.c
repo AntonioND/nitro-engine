@@ -62,14 +62,14 @@ int main()
 	while (1) {
 		// Get keys information
 		scanKeys();
-		int keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		printf("\x1b[0;0HPad: Rotate.\nA/B: Move forward/back.");
 
 		if (keys & KEY_UP && angle < 92) {
 			angle += 3;
 			NE_CameraRotateFree(Camera, 3, 0, 0);
-		} else if(keys & KEY_DOWN && angle > -92) {
+		} else if (keys & KEY_DOWN && angle > -92) {
 			angle -= 3;
 			NE_CameraRotateFree(Camera, -3, 0, 0);
 		}

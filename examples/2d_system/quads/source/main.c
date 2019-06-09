@@ -17,7 +17,7 @@ typedef struct {
 
 quad_t Quad[NUM_QUADS];
 
-int kheld;
+uint32 kheld;
 
 void UpdateQuads(void)
 {

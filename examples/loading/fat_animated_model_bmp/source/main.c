@@ -75,8 +75,8 @@ int main(void)
 		       "A/B: Scale.\nStart: Screenshot.", maxframe);
 
 		scanKeys();
-		int keys = keysHeld();
-		int keysdown = keysDown();
+		uint32 keys = keysHeld();
+		uint32 keysdown = keysDown();
 
 		if (keys & KEY_START)
 			NE_ScreenshotBMP("NitroEngine/Screenshot.bmp");

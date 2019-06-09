@@ -67,8 +67,8 @@ int main(void)
 	while (1) {
 		// Get keys information
 		scanKeys();
-		int keys = keysHeld();
-		int kdown = keysDown();
+		uint32 keys = keysHeld();
+		uint32 kdown = keysDown();
 
 		printf("\x1b[0;0H"
 		       "Pad: Rotate.\nA: Sine effect.\nB: Noise effect.\n"

@@ -19,7 +19,6 @@ int main(void)
 
 	NE_Init3D();
 
-
 	while (1) {
 		scanKeys();
 

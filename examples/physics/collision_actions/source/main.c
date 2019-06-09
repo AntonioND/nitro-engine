@@ -81,9 +81,9 @@ int main(void)
 
 	// Set percent of energy kept after a bounce
 	// Default is 50, 100 = no energy lost.
-	NE_PhysicsSetBounceEnergy(Physics[0],100);
-	NE_PhysicsSetBounceEnergy(Physics[1],75);
-	NE_PhysicsSetBounceEnergy(Physics[2],50);
+	NE_PhysicsSetBounceEnergy(Physics[0], 100);
+	NE_PhysicsSetBounceEnergy(Physics[1], 75);
+	NE_PhysicsSetBounceEnergy(Physics[2], 50);
 
 	// Lights
 	NE_LightSet(0, NE_Green, -1, -1, 0);
@@ -92,7 +92,7 @@ int main(void)
 	// Background
 	NE_ClearColorSet(NE_Red, 31, 63);
 
-	while(1) {
+	while (1) {
 		NE_Process(Draw3DScene);
 		NE_WaitForVBL(NE_UPDATE_PHYSICS);
 	}

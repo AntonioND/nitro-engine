@@ -47,7 +47,7 @@ int main(void)
 		     0, 0, 0,
 		     0, 1, 0);
 
-	while(1) {
+	while (1) {
 		NE_Process(Draw3DScene);
 		NE_WaitForVBL(0);
 	}

@@ -52,7 +52,7 @@ int main(void)
 
 	while(1) {
 		scanKeys();
-		int keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		if (keys & KEY_A)
 			NE_ModelAnimInterpolate(Model, true);

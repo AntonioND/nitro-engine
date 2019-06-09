@@ -72,7 +72,7 @@ int main(void)
 
 	while (1) {
 		scanKeys(); //Get keys information...
-		int keys = keysDown();
+		uint32 keys = keysDown();
 
 		// Change material if pressed
 		if (keys & KEY_B)

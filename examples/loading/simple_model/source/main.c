@@ -69,7 +69,7 @@ int main(void)
 	while (1) {
 		// Get keys information
 		scanKeys();
-		int keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		printf("\x1b[0;0HPad: Rotate.");
 

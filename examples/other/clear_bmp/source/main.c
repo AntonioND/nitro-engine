@@ -13,8 +13,6 @@
 NE_Camera *Camera;
 NE_Model *Model;
 
-int keys;
-
 void Draw3DScene(void)
 {
 	NE_CameraUse(Camera);
@@ -66,7 +64,7 @@ int main()
 	u8 scrollx = 0, scrolly = 0;
 	while (1) {
 		scanKeys();
-		keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		NE_ModelRotate(Model, 0, 2, 1);
 

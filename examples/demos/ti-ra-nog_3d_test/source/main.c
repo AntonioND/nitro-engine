@@ -48,9 +48,9 @@ bool camera_swap = false;
 typedef struct {
 	float x, y, z;
 	float vx, vy, vz;
-} _BALL_;
+} ball_t;
 
-_BALL_ Ball[MAX_NUM_BALLS];
+ball_t Ball[MAX_NUM_BALLS];
 
 int posx = 0;
 int posy = 0;
@@ -268,8 +268,8 @@ void dual(void)
 		}
 
 		scanKeys();
-		int keysd = keysDown();
-		int keysh = keysHeld();
+		uint32 keysd = keysDown();
+		uint32 keysh = keysHeld();
 
 		// Set rotation for every sphere
 		for (int i = 0; i < NUM; i++)

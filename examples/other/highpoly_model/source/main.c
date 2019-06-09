@@ -13,13 +13,13 @@ NE_Camera *Camera;
 NE_Model *Model;
 NE_Material *Material;
 
+bool wireframe;
+
 void Draw3DScene(void)
 {
 	NE_CameraUse(Camera);
 
-	int keys = keysHeld();
-
-	if (keys & KEY_A)
+	if (wireframe)
 		NE_PolyFormat(0, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 	else
 		NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
@@ -75,7 +75,7 @@ int main(void)
 	while (1) {
 		// Get keys information
 		scanKeys();
-		int keys = keysHeld();
+		uint32 keys = keysHeld();
 
 		printf("\x1b[0;0HPad: Rotate.\nA: Set wireframe mode.");
 
@@ -88,6 +88,11 @@ int main(void)
 			NE_ModelRotate(Model, 0, 2, 0);
 		if (keys & KEY_LEFT)
 			NE_ModelRotate(Model, 0, -2, 0);
+
+		if (keys & KEY_A)
+			wireframe = true;
+		else
+			wireframe = false;
 
 		NE_Process(Draw3DScene);
 		NE_WaitForVBL(0);

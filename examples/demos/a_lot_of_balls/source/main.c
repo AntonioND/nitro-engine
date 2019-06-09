@@ -35,9 +35,9 @@ float mov;
 typedef struct {
 	float x,y,z;
 	float vx,vy,vz;
-} _BALL_;
+} ball_t;
 
-_BALL_ Ball[MAX_NUM_BALLS];
+ball_t Ball[MAX_NUM_BALLS];
 
 void Draw3DScene(void)
 {
@@ -161,8 +161,8 @@ int main(void)
 
 		// Get keys information
 		scanKeys();
-		int keys = keysHeld(); // Keys Continously pressed
-		int keysd = keysDown(); // Keys NOW pressed (only this frame)
+		uint32 keys = keysHeld(); // Keys Continously pressed
+		uint32 keysd = keysDown(); // Keys NOW pressed (only this frame)
 
 		// Set the model rotation for every Sphere
 		for (int i = 0; i < NUM; i++)

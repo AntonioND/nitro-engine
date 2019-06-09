@@ -85,7 +85,7 @@ int main(void)
 	while (1) {
 		// Get keys information
 		scanKeys();
-		int keys = keysDown();
+		uint32 keys = keysDown();
 
 		// Modify parameters
 		if (keys & KEY_UP)

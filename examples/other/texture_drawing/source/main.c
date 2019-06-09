@@ -39,7 +39,7 @@ void Draw3DScene(void)
 		NE_PolyTexCoord(64, 0);
 		NE_PolyVertex(1, 1, 0);
 
-	// Apparently this is useless
+	// Apparently this command is ignored by the GPU
 	NE_PolyEnd();
 }
 
@@ -62,7 +62,6 @@ int main(void)
 	NE_MaterialTexLoadBMPtoRGBA(Texture, (void *)bmp24bit_bin, 1);
 
 	while (1) {
-
 		NE_Process(Draw3DScene);
 		NE_WaitForVBL(0);
 	}
