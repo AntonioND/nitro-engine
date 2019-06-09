@@ -282,250 +282,257 @@ void NE_GUIUpdate(void)
 	}
 }
 
+static void NE_GUIDrawButton(NE_GUIObj *obj, int priority)
+{
+	_NE_Button_ *button = (void *)obj;
+	NE_Material *tex;
+	u32 color;
+
+	if (button->event > 0) {
+		// Pressed
+		GFX_POLY_FORMAT = POLY_ALPHA(button->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		tex = button->tex_2;
+		color = button->color2;
+	} else {
+		// Not-pressed
+		GFX_POLY_FORMAT = POLY_ALPHA(button->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		tex = button->tex_1;
+		color = button->color1;
+	}
+
+	if (tex == NULL) {
+		NE_2DDrawQuad(button->x1, button->y1, button->x2, button->y2,
+			      priority, color);
+	} else {
+		NE_2DDrawTexturedQuadColor(button->x1, button->y1, button->x2,
+					   button->y2, priority, tex, color);
+	}
+}
+
+static void NE_GUIDrawCheckBox(NE_GUIObj *obj, int priority)
+{
+	_NE_CheckBox_ *chbox = (void *)obj;
+	u32 color;
+
+	if (chbox->event > 0) {
+		GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = chbox->color2;
+	} else {
+		GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = chbox->color1;
+	}
+
+	NE_Material *tex = (chbox->checked) ? chbox->tex_2
+						: chbox->tex_1;
+
+	if (tex == NULL) {
+		NE_2DDrawQuad(chbox->x1, chbox->y1, chbox->x2, chbox->y2,
+			      priority, color);
+	} else {
+		NE_2DDrawTexturedQuadColor(chbox->x1, chbox->y1, chbox->x2,
+					   chbox->y2, priority, tex, color);
+	}
+}
+
+static void NE_GUIDrawRadioButton(NE_GUIObj *obj, int priority)
+{
+	_NE_RadioButton_ *rabtn = (void *)obj;
+	u32 color;
+
+	if (rabtn->event > 0) {
+		GFX_POLY_FORMAT = POLY_ALPHA(rabtn->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = rabtn->color2;
+	} else {
+		GFX_POLY_FORMAT = POLY_ALPHA(rabtn->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = rabtn->color1;
+	}
+
+	NE_Material *tex = (rabtn->checked) ?  rabtn->tex_2 : rabtn->tex_1;
+
+	if (tex == NULL) {
+		NE_2DDrawQuad(rabtn->x1, rabtn->y1, rabtn->x2, rabtn->y2,
+			      priority, color);
+	} else {
+		NE_2DDrawTexturedQuadColor(rabtn->x1, rabtn->y1, rabtn->x2,
+					   rabtn->y2, priority, tex, color);
+	}
+}
+
+static void NE_GUIDrawSlideBar(NE_GUIObj *obj, int priority)
+{
+	_NE_SlideBar_ *sldbar = (void *)obj;
+	u32 color;
+
+	// Helper variables
+
+	int x1 = sldbar->x1, x2 = sldbar->x2;
+	int y1 = sldbar->y1, y2 = sldbar->y2;
+	int tmp1, tmp2;	//auxiliary coordinates
+	if (sldbar->isvertical) {
+		tmp1 = y1 + (x2 - x1);
+		tmp2 = y2 - (x2 - x1);
+	} else {
+		tmp1 = x1 + (y2 - y1);
+		tmp2 = x2 - (y2 - y1);
+	}
+
+	// Set texture for the two buttons
+	NE_Material *tex = sldbar->texbtn;
+
+	// Plus button
+	// -----------
+
+	if (sldbar->event_plus > 0) {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color2;
+	} else {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color1;
+	}
+
+	if (sldbar->isvertical) {
+		if (tex == NULL) {
+			NE_2DDrawQuad(x1, tmp2, x2, y2, priority, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(x1, tmp2, x2, y2, priority,
+						   tex, color);
+		}
+	} else {
+		if (tex == NULL) {
+			NE_2DDrawQuad(tmp2, y1, x2, y2, priority, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(tmp2, y1, x2, y2, priority,
+						   tex, color);
+		}
+	}
+
+	// Minus button
+	// ------------
+
+	if (sldbar->event_minus > 0) {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color2;
+	} else {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color1;
+	}
+
+	if (sldbar->isvertical) {
+		if (tex == NULL) {
+			NE_2DDrawQuad(x1, y1, x2, tmp1, priority, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(x1, y1, x2, tmp1, priority,
+						   tex, color);
+		}
+	} else {
+		if (tex == NULL) {
+			NE_2DDrawQuad(x1, y1, tmp1, y2, priority, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(x1, y1, tmp1, y2, priority,
+						   tex, color);
+		}
+	}
+
+	// Bar button
+	// ----------
+
+	// Set texture for the bar button
+	tex = sldbar->texbar;
+
+	if (sldbar->event_bar > 0) {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color2;
+	} else {
+		GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
+				| POLY_ID(NE_GUI_POLY_ID) | NE_CULL_NONE;
+		color = sldbar->color1;
+	}
+
+	if (sldbar->isvertical) {
+		if (tex == NULL) {
+			NE_2DDrawQuad(x1, sldbar->coord, x2,
+				      sldbar->coord + sldbar->barsize, priority,
+				      color);
+		} else {
+			NE_2DDrawTexturedQuadColor(x1, sldbar->coord, x2,
+					sldbar->coord + sldbar->barsize,
+					priority, tex, color);
+		}
+	} else {
+		if (tex == NULL) {
+			NE_2DDrawQuad(sldbar->coord, y1,
+				      sldbar->coord + sldbar->barsize, y2,
+				      priority, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(sldbar->coord, y1,
+					sldbar->coord + sldbar->barsize,
+					y2, priority, tex, color);
+		}
+	}
+
+	// Slide bar
+	// ---------
+
+	// Set texture and color for the slide bar background
+	tex = sldbar->texlong;
+	color = sldbar->barcolor;
+	GFX_POLY_FORMAT = POLY_ALPHA(sldbar->baralpha)
+			| POLY_ID(NE_GUI_POLY_ID_ALT) | NE_CULL_NONE;
+
+	// Now we need to use `priority + 1` as priority. The bar button must
+	// be in front of bar. `priority + 1` is less priority than `priority`.
+
+	if (sldbar->isvertical) {
+		if (tex == NULL) {
+			NE_2DDrawQuad(x1, tmp1, x2, tmp2, priority + 1, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(x1, tmp1, x2, tmp2,
+						   priority + 1, tex, color);
+		}
+	} else {
+		if (tex == NULL) {
+			NE_2DDrawQuad(tmp1, y1, tmp2, y2, priority + 1, color);
+		} else {
+			NE_2DDrawTexturedQuadColor(tmp1, y1, tmp2, y2,
+						   priority + 1, tex, color);
+		}
+	}
+}
+
 void NE_GUIDraw(void)
 {
 	if (!ne_gui_system_inited)
 		return;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] == NULL)
 			continue;
 
-		int b = i + NE_GUI_MIN_PRIORITY;
-		if (NE_guipointers[i]->type == NE_Button) {
-			_NE_Button_ *button = NE_guipointers[i]->pointer;
-			NE_Material *tex = NULL;
-			u32 color = 0;
+		NE_GUIObj *obj = NE_guipointers[i]->pointer;
+		NE_GUITypes type = NE_guipointers[i]->type;
+		int priority = i + NE_GUI_MIN_PRIORITY;
 
-			if (button->event > 0) { //pressed
-				GFX_POLY_FORMAT = POLY_ALPHA(button->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				tex = button->tex_2;
-				color = button->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(button->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				tex = button->tex_1;
-				color = button->color1;
-			}
-
-			if (tex == NULL) {
-				NE_2DDrawQuad(button->x1, button->y1,
-					      button->x2, button->y2, b, color);
-			} else {
-				NE_2DDrawTexturedQuadColor(button->x1,
-							   button->y1,
-							   button->x2,
-							   button->y2, b, tex,
-							   color);
-			}
-		} else if (NE_guipointers[i]->type == NE_CheckBox) {
-			_NE_CheckBox_ *chbox = NE_guipointers[i]->pointer;
-			u32 color = 0;
-
-			if (chbox->event > 0) {
-				GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = chbox->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(chbox->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = chbox->color1;
-			}
-
-			NE_Material *tex = (chbox->checked) ? chbox->tex_2
-							    : chbox->tex_1;
-
-			if (tex == NULL) {
-				NE_2DDrawQuad(chbox->x1, chbox->y1, chbox->x2,
-					      chbox->y2, b, color);
-			} else {
-				NE_2DDrawTexturedQuadColor(chbox->x1, chbox->y1,
-							   chbox->x2, chbox->y2,
-							   b, tex, color);
-			}
-		} else if (NE_guipointers[i]->type == NE_RadioButton) {
-			_NE_RadioButton_ *rabtn = NE_guipointers[i]->pointer;
-			u32 color = 0;
-
-			if (rabtn->event > 0) {
-				GFX_POLY_FORMAT = POLY_ALPHA(rabtn->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = rabtn->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(rabtn->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = rabtn->color1;
-			}
-
-			NE_Material *tex = (rabtn->checked) ?
-					   rabtn->tex_2 : rabtn->tex_1;
-
-			if (tex == NULL) {
-				NE_2DDrawQuad(rabtn->x1, rabtn->y1,
-					      rabtn->x2, rabtn->y2, b,
-					      color);
-			} else {
-				NE_2DDrawTexturedQuadColor(rabtn->x1,
-							   rabtn->y1,
-							   rabtn->x2,
-							   rabtn->y2, b,
-							   tex, color);
-			}
-		} else if (NE_guipointers[i]->type == NE_SlideBar) {
-			_NE_SlideBar_ *sldbar = NE_guipointers[i]->pointer;
-
-			// -------   used to simplify code
-			int x1 = sldbar->x1, x2 = sldbar->x2;
-			int y1 = sldbar->y1, y2 = sldbar->y2;
-			int tmp1, tmp2;	//auxiliar coordinates
-			if (sldbar->isvertical) {
-				tmp1 = y1 + (x2 - x1);
-				tmp2 = y2 - (x2 - x1);
-			} else {
-				tmp1 = x1 + (y2 - y1);
-				tmp2 = x2 - (y2 - y1);
-			}
-			// ----------
-
-			u32 color = 0;
-			NE_Material *tex = sldbar->texbtn;
-			// ----------------      PLUS BUTTON  ---------------
-			if (sldbar->event_plus > 0) {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color1;
-			}
-
-			if (sldbar->isvertical) {
-				if (tex == NULL) {
-					NE_2DDrawQuad(x1, tmp2, x2, y2, b,
-						      color);
-				} else {
-					NE_2DDrawTexturedQuadColor(x1, tmp2, x2,
-								   y2, b, tex,
-								   color);
-				}
-			} else {
-				if (tex == NULL) {
-					NE_2DDrawQuad(tmp2, y1, x2, y2, b,
-						      color);
-				} else {
-					NE_2DDrawTexturedQuadColor(tmp2, y1, x2,
-								   y2, b, tex,
-								   color);
-				}
-			}
-
-			// ----------------      MINUS BUTTON  ---------------
-			if (sldbar->event_minus > 0) {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color1;
-			}
-
-			if (sldbar->isvertical) {
-				if (tex == NULL) {
-					NE_2DDrawQuad(x1, y1, x2, tmp1, b,
-						      color);
-				} else {
-					NE_2DDrawTexturedQuadColor(x1, y1, x2,
-								   tmp1, b, tex,
-								   color);
-				}
-			} else {
-				if (tex == NULL) {
-					NE_2DDrawQuad(x1, y1, tmp1, y2, b,
-						      color);
-				} else {
-					NE_2DDrawTexturedQuadColor(x1, y1, tmp1,
-								   y2, b, tex,
-								   color);
-				}
-			}
-
-			tex = sldbar->texbar;
-			// ----------------      BAR BUTTON  ---------------
-			if (sldbar->event_bar > 0) {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha2)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color2;
-			} else {
-				GFX_POLY_FORMAT = POLY_ALPHA(sldbar->alpha1)
-						| POLY_ID(NE_GUI_POLY_ID)
-						| NE_CULL_NONE;
-				color = sldbar->color1;
-			}
-
-			if (sldbar->isvertical) {
-				if (tex == NULL) {
-					NE_2DDrawQuad(x1, sldbar->coord, x2,
-						      sldbar->coord + sldbar->barsize,
-						      b, color);
-				} else {
-					NE_2DDrawTexturedQuadColor(x1, sldbar->coord,
-								   x2, sldbar->coord + sldbar->barsize,
-								   b, tex, color);
-				}
-			} else {
-				if (tex == NULL) {
-					NE_2DDrawQuad(sldbar->coord, y1,
-						      sldbar->coord + sldbar->barsize,
-						      y2, b, color);
-				} else {
-					NE_2DDrawTexturedQuadColor(sldbar->coord, y1,
-								   sldbar->coord + sldbar->barsize,
-								   y2, b, tex, color);
-				}
-			}
-
-			tex = sldbar->texlong;
-			color = sldbar->barcolor;
-			// ----------------      SLIDE BAR     ---------------
-			GFX_POLY_FORMAT = POLY_ALPHA(sldbar->baralpha)
-					| POLY_ID(NE_GUI_POLY_ID_ALT)
-					| NE_CULL_NONE;
-
-			// NOTE: b+1 -> Bar button must be in front of bar
-			// (b+1 is less priority than b).
-			if (sldbar->isvertical) {
-				if (tex == NULL) {
-					NE_2DDrawQuad(x1, tmp1, x2, tmp2, b + 1, color);
-				} else {
-					NE_2DDrawTexturedQuadColor(x1, tmp1, x2, tmp2,
-									b + 1, tex, color);
-				}
-			} else {
-				if (tex == NULL) {
-					NE_2DDrawQuad(tmp1, y1, tmp2, y2, b + 1,
-						      color);
-				} else {
-					NE_2DDrawTexturedQuadColor(tmp1, y1,
-								   tmp2, y2,
-								   b + 1, tex,
-								   color);
-				}
-			}
+		if (type == NE_Button) {
+			NE_GUIDrawButton(obj, priority);
+		} else if (type == NE_CheckBox) {
+			NE_GUIDrawCheckBox(obj, priority);
+		} else if (type == NE_RadioButton) {
+			NE_GUIDrawRadioButton(obj, priority);
+		} else if (type == NE_SlideBar) {
+			NE_GUIDrawSlideBar(obj, priority);
+		} else {
+			NE_DebugPrint("Unknown type %d", type);
 		}
 	}
 }
