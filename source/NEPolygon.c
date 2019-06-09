@@ -16,24 +16,25 @@ void NE_PolyColor(u32 color)
 void NE_LightOff(int num)
 {
 	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
-	num = (num & 3) << 30;
-	GFX_LIGHT_VECTOR = num;
-	GFX_LIGHT_COLOR = num;
+
+	GFX_LIGHT_VECTOR = (num & 3) << 30;
+	GFX_LIGHT_COLOR = (num & 3) << 30;
 }
 
 void NE_LightSetColor(int num, u32 color)
 {
 	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
-	GFX_LIGHT_COLOR = ((num & 3) << 30) | (vuint32) color;
+
+	GFX_LIGHT_COLOR = ((num & 3) << 30) | color;
 }
 
 void NE_LightSetI(int num, u32 color, int x, int y, int z)
 {
 	NE_AssertMinMax(0, num, 3, "Invalid light number %d", num);
-	num = (num & 3) << 30;
-	GFX_LIGHT_VECTOR = num | ((z & 0x3FF) << 20)
+
+	GFX_LIGHT_VECTOR = ((num & 3) << 30) | ((z & 0x3FF) << 20)
 			 | ((y & 0x3FF) << 10) | (x & 0x3FF);
-	GFX_LIGHT_COLOR = num | (vuint32) color;
+	GFX_LIGHT_COLOR = ((num & 3) << 30) | color;
 }
 
 void NE_PolyBegin(int mode)
@@ -131,6 +132,8 @@ void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass, int depth)
 	}
 }
 
+// The GFX_CLEAR_COLOR register is write-only. This holds a copy of its value in
+// order for the code to be able to modify individual fields.
 static u32 ne_clearcolor = 0;
 
 void NE_FogEnableBackground(bool value)
@@ -139,6 +142,7 @@ void NE_FogEnableBackground(bool value)
 		ne_clearcolor |= BIT(15);
 	else
 		ne_clearcolor &= ~BIT(15);
+
 	GFX_CLEAR_COLOR = ne_clearcolor;
 }
 
@@ -161,6 +165,7 @@ void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
 	GFX_CLEAR_COLOR = ne_clearcolor;
 }
 
+// From NE_General.c
 extern bool NE_Dual;
 
 void NE_ClearBMPEnable(bool value)
@@ -174,8 +179,8 @@ void NE_ClearBMPEnable(bool value)
 	REG_CLEARBMPOFFSET = 0;	//Scroll = 0
 
 	if (value) {
-		vramSetBankC(VRAM_C_TEXTURE_SLOT2);	//Slot 2 = clear color
-		vramSetBankD(VRAM_D_TEXTURE_SLOT3);	//Slot 3 = clear depth
+		vramSetBankC(VRAM_C_TEXTURE_SLOT2);	// Slot 2 = clear color
+		vramSetBankD(VRAM_D_TEXTURE_SLOT3);	// Slot 3 = clear depth
 		GFX_CONTROL |= GL_CLEAR_BMP;
 	} else {
 		GFX_CONTROL &= ~GL_CLEAR_BMP;
@@ -186,5 +191,5 @@ void NE_ClearBMPEnable(bool value)
 
 void NE_ClearBMPScroll(u8 x, u8 y)
 {
-	REG_CLEARBMPOFFSET = x | (((u16) y) << 8);
+	REG_CLEARBMPOFFSET = ((u16)x) | (((u16) y) << 8);
 }
