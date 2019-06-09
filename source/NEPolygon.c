@@ -176,7 +176,7 @@ void NE_ClearBMPEnable(bool value)
 		return;
 	}
 
-	REG_CLEARBMPOFFSET = 0;	//Scroll = 0
+	REG_CLRIMAGE_OFFSET = 0;	//Scroll = 0
 
 	if (value) {
 		vramSetBankC(VRAM_C_TEXTURE_SLOT2);	// Slot 2 = clear color
@@ -191,5 +191,5 @@ void NE_ClearBMPEnable(bool value)
 
 void NE_ClearBMPScroll(u8 x, u8 y)
 {
-	REG_CLEARBMPOFFSET = ((u16)x) | (((u16) y) << 8);
+	REG_CLRIMAGE_OFFSET = ((u16)x) | (((u16) y) << 8);
 }

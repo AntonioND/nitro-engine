@@ -245,10 +245,12 @@ void NE_ToonHighlightEnable(bool value);
  */
 void NE_ClearColorSet(u32 color, u8 alpha, u8 id);
 
-/*! \def   #define REG_CLEARBMPOFFSET (*(vu16*)0x4000356)
+/*! \def   #define REG_CLRIMAGE_OFFSET (*(vu16*)0x4000356)
  *  \brief Clear BMP scroll register. Taken from gbatek.
  */
-#define REG_CLEARBMPOFFSET (*(vu16*)0x4000356)
+#ifndef REG_CLRIMAGE_OFFSET
+#define REG_CLRIMAGE_OFFSET (*(vu16*)0x4000356)
+#endif
 
 /*! \fn    void NE_ClearBMPEnable(bool value);
  *  \brief Set clear bitmap on/off.
