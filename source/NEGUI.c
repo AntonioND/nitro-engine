@@ -21,7 +21,7 @@ typedef struct {
 	// Colors when button isn't pressed/ is pressed -- Default is white
 	u32 color1, color2;
 	u32 alpha1, alpha2;
-} _NE_Button_;
+} ne_button_t;
 
 typedef struct {
 	int x1, y1, x2, y2;
@@ -30,7 +30,7 @@ typedef struct {
 	NE_Material *tex_1, *tex_2;
 	u32 color1, color2;
 	u32 alpha1, alpha2;
-} _NE_CheckBox_;
+} ne_checkbox_t;
 
 typedef struct {
 	int x1, y1, x2, y2;
@@ -40,7 +40,7 @@ typedef struct {
 	NE_Material *tex_1, *tex_2;
 	u32 color1, color2;
 	u32 alpha1, alpha2;
-} _NE_RadioButton_;
+} ne_radiobutton_t;
 
 typedef struct {
 	int x1, y1, x2, y2;
@@ -54,7 +54,7 @@ typedef struct {
 	// 1,2 used for buttons, barcolor used for background of slidebar
 	u32 color1, color2, barcolor;
 	u32 alpha1, alpha2, baralpha;
-} _NE_SlideBar_;
+} ne_slidebar_t;
 
 // Internal use
 static void NE_ResetRadioButtonGroup(int group)
@@ -66,7 +66,7 @@ static void NE_ResetRadioButtonGroup(int group)
 		if (NE_guipointers[i]->type != NE_RadioButton)
 			continue;
 
-		_NE_RadioButton_ *rabtn = (void *)NE_guipointers[i]->pointer;
+		ne_radiobutton_t *rabtn = (void *)NE_guipointers[i]->pointer;
 
 		if (rabtn->group == group) {
 			rabtn->checked = false;
@@ -76,7 +76,7 @@ static void NE_ResetRadioButtonGroup(int group)
 
 static void NE_GUIUpdateButton(NE_GUIObj *obj)
 {
-	_NE_Button_ *button = (void *)obj;
+	ne_button_t *button = (void *)obj;
 
 	if (button->x1 < NE_Input.touch.px && button->x2 > NE_Input.touch.px
 	 && button->y1 < NE_Input.touch.py && button->y2 > NE_Input.touch.py) {
@@ -97,7 +97,7 @@ static void NE_GUIUpdateButton(NE_GUIObj *obj)
 
 static void NE_GUIUpdateCheckBox(NE_GUIObj *obj)
 {
-	_NE_CheckBox_ *chbox = (void *)obj;
+	ne_checkbox_t *chbox = (void *)obj;
 
 	if (chbox->x1 < NE_Input.touch.px && chbox->x2 > NE_Input.touch.px
 	 && chbox->y1 < NE_Input.touch.py && chbox->y2 > NE_Input.touch.py) {
@@ -119,7 +119,7 @@ static void NE_GUIUpdateCheckBox(NE_GUIObj *obj)
 
 static void NE_GUIUpdateRadioButton(NE_GUIObj *obj)
 {
-	_NE_RadioButton_ *rabtn = (void *)obj;
+	ne_radiobutton_t *rabtn = (void *)obj;
 
 	if (rabtn->x1 < NE_Input.touch.px && rabtn->x2 > NE_Input.touch.px
 	 && rabtn->y1 < NE_Input.touch.py && rabtn->y2 > NE_Input.touch.py) {
@@ -142,7 +142,7 @@ static void NE_GUIUpdateRadioButton(NE_GUIObj *obj)
 
 static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
 {
-	_NE_SlideBar_ *sldbar = (void *)obj;
+	ne_slidebar_t *sldbar = (void *)obj;
 
 	// Simplify code...
 	int x1 = sldbar->x1, x2 = sldbar->x2;
@@ -284,7 +284,7 @@ void NE_GUIUpdate(void)
 
 static void NE_GUIDrawButton(NE_GUIObj *obj, int priority)
 {
-	_NE_Button_ *button = (void *)obj;
+	ne_button_t *button = (void *)obj;
 	NE_Material *tex;
 	u32 color;
 
@@ -313,7 +313,7 @@ static void NE_GUIDrawButton(NE_GUIObj *obj, int priority)
 
 static void NE_GUIDrawCheckBox(NE_GUIObj *obj, int priority)
 {
-	_NE_CheckBox_ *chbox = (void *)obj;
+	ne_checkbox_t *chbox = (void *)obj;
 	u32 color;
 
 	if (chbox->event > 0) {
@@ -340,7 +340,7 @@ static void NE_GUIDrawCheckBox(NE_GUIObj *obj, int priority)
 
 static void NE_GUIDrawRadioButton(NE_GUIObj *obj, int priority)
 {
-	_NE_RadioButton_ *rabtn = (void *)obj;
+	ne_radiobutton_t *rabtn = (void *)obj;
 	u32 color;
 
 	if (rabtn->event > 0) {
@@ -366,7 +366,7 @@ static void NE_GUIDrawRadioButton(NE_GUIObj *obj, int priority)
 
 static void NE_GUIDrawSlideBar(NE_GUIObj *obj, int priority)
 {
-	_NE_SlideBar_ *sldbar = (void *)obj;
+	ne_slidebar_t *sldbar = (void *)obj;
 	u32 color;
 
 	// Helper variables
@@ -542,12 +542,11 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 	if (!ne_gui_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		_NE_Button_ *ptr = (_NE_Button_ *) malloc(sizeof(_NE_Button_));
+		ne_button_t *ptr = (ne_button_t *) malloc(sizeof(ne_button_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
@@ -578,12 +577,12 @@ NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
 	if (!ne_gui_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		_NE_CheckBox_ *ptr = (_NE_CheckBox_ *) malloc(sizeof(_NE_CheckBox_));
+		ne_checkbox_t *ptr =
+			(ne_checkbox_t *)malloc(sizeof(ne_checkbox_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
@@ -616,12 +615,12 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 	if (!ne_gui_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		_NE_RadioButton_ *ptr = (_NE_RadioButton_ *) malloc(sizeof(_NE_RadioButton_));
+		ne_radiobutton_t *ptr =
+			(ne_radiobutton_t *) malloc(sizeof(ne_radiobutton_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
@@ -658,12 +657,11 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 	if (!ne_gui_system_inited)
 		return NULL;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		_NE_SlideBar_ *ptr = (_NE_SlideBar_ *) malloc(sizeof(_NE_SlideBar_));
+		ne_slidebar_t *ptr = (ne_slidebar_t *) malloc(sizeof(ne_slidebar_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
 		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
@@ -692,8 +690,10 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 			ptr->totalsize = x2 - x1 - ((y2 - y1) << 1);
 
 		ptr->barsize = 100 - ptr->range;
-		ptr->barsize = (ptr->barsize < 20) ? (20 << 12) : (ptr->barsize << 12);
-		ptr->barsize = (divf32(ptr->barsize, 100 << 12) * ptr->totalsize) >> 12;
+		ptr->barsize = (ptr->barsize < 20) ?
+			       (20 << 12) : (ptr->barsize << 12);
+		ptr->barsize =
+		    (divf32(ptr->barsize, 100 << 12) * ptr->totalsize) >> 12;
 
 		ptr->coord = (ptr->totalsize - ptr->barsize) * ptr->value;
 		ptr->coord = divf32(ptr->coord << 12, ptr->range << 12) >> 12;
@@ -716,7 +716,7 @@ void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material, u32 color,
 	NE_AssertPointer(btn, "NULL pointer");
 	NE_Assert(btn->type == NE_Button, "Not a button");
 
-	_NE_Button_ *button = btn->pointer;
+	ne_button_t *button = btn->pointer;
 
 	button->tex_1 = material;
 	button->tex_2 = pressedmaterial;
@@ -733,7 +733,7 @@ void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
 	NE_AssertPointer(chbx, "NULL pointer");
 	NE_Assert(chbx->type == NE_CheckBox, "Not a check box");
 
-	_NE_CheckBox_ *checkbox = chbx->pointer;
+	ne_checkbox_t *checkbox = chbx->pointer;
 
 	checkbox->tex_1 = materialfalse;
 	checkbox->tex_2 = materialtrue;
@@ -750,7 +750,7 @@ void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn, NE_Material *materialtrue,
 	NE_AssertPointer(rdbtn, "NULL pointer");
 	NE_Assert(rdbtn->type == NE_RadioButton, "Not a radio button");
 
-	_NE_RadioButton_ *radiobutton = rdbtn->pointer;
+	ne_radiobutton_t *radiobutton = rdbtn->pointer;
 
 	radiobutton->tex_1 = materialfalse;
 	radiobutton->tex_2 = materialtrue;
@@ -768,7 +768,7 @@ void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
 	NE_AssertPointer(sldbar, "NULL pointer");
 	NE_Assert(sldbar->type == NE_SlideBar, "Not a slide bar");
 
-	_NE_SlideBar_ *slidebar = sldbar->pointer;
+	ne_slidebar_t *slidebar = sldbar->pointer;
 
 	slidebar->texbtn = matbtn;
 	slidebar->texbar = matbarbtn;
@@ -786,18 +786,23 @@ void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 	NE_AssertPointer(sldbr, "NULL pointer");
 	NE_Assert(sldbr->type == NE_SlideBar, "Not a slide bar");
 
-	_NE_SlideBar_ *slidebar = sldbr->pointer;
+	ne_slidebar_t *slidebar = sldbr->pointer;
 
 	slidebar->desp = min;
 	slidebar->range = max - min;
 
+	// Bar size
 	slidebar->barsize = 100 - slidebar->range;
 	slidebar->barsize = (slidebar->barsize < 20) ?
 			    (20 << 12) : (slidebar->barsize << 12);
-	slidebar->barsize = (divf32(slidebar->barsize, 100 << 12) * slidebar->totalsize) >> 12;
+	slidebar->barsize =
+	    (divf32(slidebar->barsize, 100 << 12) * slidebar->totalsize) >> 12;
 
-	slidebar->coord = (slidebar->totalsize - slidebar->barsize) * slidebar->value;
-	slidebar->coord = divf32(slidebar->coord << 12, slidebar->range << 12) >> 12;
+	// Current coordinate
+	slidebar->coord =
+	    (slidebar->totalsize - slidebar->barsize) * slidebar->value;
+	slidebar->coord =
+	     divf32(slidebar->coord << 12, slidebar->range << 12) >> 12;
 	slidebar->coord += (slidebar->isvertical) ?
 	    slidebar->y1 + (slidebar->x2 - slidebar->x1) :
 	    slidebar->x1 + (slidebar->y2 - slidebar->y1);
@@ -805,17 +810,17 @@ void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max)
 
 NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj)
 {
-	_NE_SlideBar_ *ptr;
+	ne_slidebar_t *ptr;
 
 	NE_AssertPointer(obj, "NULL pointer");
 
 	switch (obj->type) {
 	case NE_Button:
-		return ((_NE_Button_ *) (obj->pointer))->event;
+		return ((ne_button_t *) (obj->pointer))->event;
 	case NE_CheckBox:
-		return ((_NE_CheckBox_ *) (obj->pointer))->event;
+		return ((ne_checkbox_t *) (obj->pointer))->event;
 	case NE_RadioButton:
-		return ((_NE_RadioButton_ *) (obj->pointer))->event;
+		return ((ne_radiobutton_t *) (obj->pointer))->event;
 	case NE_SlideBar:
 		ptr = obj->pointer;
 		return ptr->event_plus | ptr->event_minus | ptr->event_bar;
@@ -829,21 +834,21 @@ bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx)
 {
 	NE_AssertPointer(chbx, "NULL pointer");
 	NE_Assert(chbx->type == NE_CheckBox, "Not a check box");
-	return ((_NE_CheckBox_ *) (chbx->pointer))->checked;
+	return ((ne_checkbox_t *) (chbx->pointer))->checked;
 }
 
 bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn)
 {
 	NE_AssertPointer(rdbtn, "NULL pointer");
 	NE_Assert(rdbtn->type == NE_RadioButton, "Not a radio button");
-	return ((_NE_RadioButton_ *) (rdbtn->pointer))->checked;
+	return ((ne_radiobutton_t *) (rdbtn->pointer))->checked;
 }
 
 int NE_GUISlideBarGetValue(NE_GUIObj *sldbr)
 {
 	NE_AssertPointer(sldbr, "NULL pointer");
 	NE_Assert(sldbr->type == NE_SlideBar, "Not a slide bar");
-	_NE_SlideBar_ *slidebar = sldbr->pointer;
+	ne_slidebar_t *slidebar = sldbr->pointer;
 	return slidebar->value + slidebar->desp;
 }
 
