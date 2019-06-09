@@ -74,171 +74,210 @@ static void NE_ResetRadioButtonGroup(int group)
 	}
 }
 
+static void NE_GUIUpdateButton(NE_GUIObj *obj)
+{
+	_NE_Button_ *button = (void *)obj;
+
+	if (button->x1 < NE_Input.touch.px && button->x2 > NE_Input.touch.px
+	 && button->y1 < NE_Input.touch.py && button->y2 > NE_Input.touch.py) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			button->event = 1;
+		} else if ((NE_Input.kheld & KEY_TOUCH)
+		        && (button->event == 1 || button->event == 2)) {
+			button->event = 2;
+		} else if (NE_Input.kup & KEY_TOUCH && button->event == 2) {
+			button->event = 4;
+		} else {
+			button->event = 0;
+		}
+	} else {
+		button->event = 0;
+	}
+}
+
+static void NE_GUIUpdateCheckBox(NE_GUIObj *obj)
+{
+	_NE_CheckBox_ *chbox = (void *)obj;
+
+	if (chbox->x1 < NE_Input.touch.px && chbox->x2 > NE_Input.touch.px
+	 && chbox->y1 < NE_Input.touch.py && chbox->y2 > NE_Input.touch.py) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			chbox->event = 1;
+		} else if ((NE_Input.kheld & KEY_TOUCH)
+			&& (chbox->event == 1 || chbox->event == 2)) {
+			chbox->event = 2;
+		} else if (NE_Input.kup & KEY_TOUCH && chbox->event == 2) {
+			chbox->event = 4;
+			chbox->checked = !chbox->checked;
+		} else {
+			chbox->event = 0;
+		}
+	} else {
+		chbox->event = 0;
+	}
+}
+
+static void NE_GUIUpdateRadioButton(NE_GUIObj *obj)
+{
+	_NE_RadioButton_ *rabtn = (void *)obj;
+
+	if (rabtn->x1 < NE_Input.touch.px && rabtn->x2 > NE_Input.touch.px
+	 && rabtn->y1 < NE_Input.touch.py && rabtn->y2 > NE_Input.touch.py) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			rabtn->event = 1;
+		} else if ((NE_Input.kheld & KEY_TOUCH)
+			&& (rabtn->event == 1 || rabtn->event == 2)) {
+			rabtn->event = 2;
+		} else if (NE_Input.kup & KEY_TOUCH && rabtn->event == 2) {
+			rabtn->event = 4;
+			NE_ResetRadioButtonGroup(rabtn->group);
+			rabtn->checked = true;
+		} else {
+			rabtn->event = 0;
+		}
+	} else {
+		rabtn->event = 0;
+	}
+}
+
+static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
+{
+	_NE_SlideBar_ *sldbar = (void *)obj;
+
+	// Simplify code...
+	int x1 = sldbar->x1, x2 = sldbar->x2;
+	int y1 = sldbar->y1, y2 = sldbar->y2;
+	int px = NE_Input.touch.px, py = NE_Input.touch.py;
+	bool vertical = sldbar->isvertical;
+	int coord = sldbar->coord, barsize = sldbar->barsize;
+	int tmp1, tmp2;	// auxiliary coordinates
+	if (sldbar->isvertical) {
+		tmp1 = y1 + (x2 - x1);
+		tmp2 = y2 - (x2 - x1);
+	} else {
+		tmp1 = x1 + (y2 - y1);
+		tmp2 = x2 - (y2 - y1);
+	}
+
+	// Plus button
+	// -----------
+
+	bool pluspressed;
+
+	if (vertical)
+		pluspressed = x1 < px && x2 > px && tmp2 < py && y2 > py;
+	else
+		pluspressed = tmp2 < px && x2 > px && y1 < py && y2 > py;
+
+	if (pluspressed) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			sldbar->event_plus = 1;
+		} else if ((NE_Input.kheld & KEY_TOUCH)
+		    && (sldbar->event_plus == 1 || sldbar->event_plus == 2)) {
+			sldbar->event_plus = 2;
+			sldbar->value++;
+		} else if (NE_Input.kup & KEY_TOUCH && sldbar->event_plus == 2) {
+			sldbar->event_plus = 4;
+		} else {
+			sldbar->event_plus = 0;
+		}
+	} else {
+		sldbar->event_plus = 0;
+	}
+
+	// Minus button
+	// ------------
+
+	bool minuspressed;
+
+	if (vertical)
+		minuspressed = x1 < px && x2 > px && y1 < py && tmp1 > py;
+	else
+		minuspressed = x1 < px && tmp1 > px && y1 < py && y2 > py;
+
+	if (minuspressed) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			sldbar->event_minus = 1;
+		} else if ((NE_Input.kheld & KEY_TOUCH)
+		    && (sldbar->event_minus == 1 || sldbar->event_minus == 2)) {
+			sldbar->event_minus = 2;
+			sldbar->value--;
+		} else if (NE_Input.kup & KEY_TOUCH
+				&& sldbar->event_minus == 2) {
+			sldbar->event_minus = 4;
+		} else {
+			sldbar->event_minus = 0;
+		}
+	} else {
+		sldbar->event_minus = 0;
+	}
+
+	// Bar button
+	// ----------
+
+	if (sldbar->event_bar == 2) {
+		int tmp = ((vertical) ? py : px) - tmp1 - (barsize >> 1);
+		tmp *= sldbar->range;
+		tmp = divf32(tmp << 12, (tmp2 - tmp1 - barsize) << 12) >> 12;
+		sldbar->value = tmp;
+	}
+
+	sldbar->value = (sldbar->value > sldbar->range) ? sldbar->range : sldbar->value;
+	sldbar->value = (sldbar->value < 0) ? 0 : sldbar->value;
+
+	sldbar->coord = (sldbar->totalsize - barsize) * sldbar->value;
+	sldbar->coord = divf32(sldbar->coord << 12, sldbar->range << 12) >> 12;
+	sldbar->coord += (vertical) ? y1 + (x2 - x1) : x1 + (y2 - y1);
+	coord = sldbar->coord;
+
+
+	bool barpressed;
+
+	if (vertical) {
+		barpressed = x1 < px && x2 > px
+			  && coord < py && (coord + barsize) > py;
+	} else {
+		barpressed = y1 < py && y2 > py
+			  && coord < px && (coord + barsize) > px;
+	}
+
+	if (barpressed) {
+		if (NE_Input.kdown & KEY_TOUCH) {
+			sldbar->event_bar = 1;
+		} else if (NE_Input.kheld & KEY_TOUCH
+		    && (sldbar->event_bar == 1 || sldbar->event_bar == 2)) {
+			sldbar->event_bar = 2;
+		} else if (NE_Input.kup & KEY_TOUCH && sldbar->event_bar == 2) {
+			sldbar->event_bar = 4;
+		} else {
+			sldbar->event_bar = 0;
+		}
+	} else {
+		sldbar->event_bar = 0;
+	}
+}
+
 void NE_GUIUpdate(void)
 {
 	if (!ne_gui_system_inited)
 		return;
 
-	int i;
-	for (i = 0; i < NE_GUI_OBJECTS; i++) {
+	for (int i = 0; i < NE_GUI_OBJECTS; i++) {
 		if (NE_guipointers[i] == NULL)
 			continue;
 
-		// -------------------    BUTTON    -------------------
+		NE_GUITypes type = NE_guipointers[i]->type;
 
-		if (NE_guipointers[i]->type == NE_Button) {
-			_NE_Button_ *button = NE_guipointers[i]->pointer;
-
-			if (button->x1 < NE_Input.touch.px && button->x2 > NE_Input.touch.px
-			 && button->y1 < NE_Input.touch.py && button->y2 > NE_Input.touch.py) {
-				if (NE_Input.kdown & KEY_TOUCH)
-					button->event = 1;
-				else if (NE_Input.kheld & KEY_TOUCH && (button->event == 1 || button->event == 2))
-					button->event = 2;
-				else if (NE_Input.kup & KEY_TOUCH && button->event == 2)
-					button->event = 4;
-				else
-					button->event = 0;
-			} else {
-				button->event = 0;
-			}
-		}
-		// -------------------    CHECK BOX    -------------------
-
-		else if (NE_guipointers[i]->type == NE_CheckBox) {
-			_NE_CheckBox_ *chbox = NE_guipointers[i]->pointer;
-
-			if (chbox->x1 < NE_Input.touch.px && chbox->x2 > NE_Input.touch.px
-			 && chbox->y1 < NE_Input.touch.py && chbox->y2 > NE_Input.touch.py) {
-				if (NE_Input.kdown & KEY_TOUCH) {
-					chbox->event = 1;
-				} else if (NE_Input.kheld & KEY_TOUCH && (chbox->event == 1 || chbox->event == 2)) {
-					chbox->event = 2;
-				} else if (NE_Input.kup & KEY_TOUCH && chbox->event == 2) {
-					chbox->event = 4;
-					chbox->checked = !chbox->checked;
-				} else {
-					chbox->event = 0;
-				}
-			} else {
-				chbox->event = 0;
-			}
-		}
-		// -------------------    RADIO BUTTON    -------------------
-
-		else if (NE_guipointers[i]->type == NE_RadioButton) {
-			_NE_RadioButton_ *rabutton = NE_guipointers[i]->pointer;
-
-			if (rabutton->x1 < NE_Input.touch.px
-				&& rabutton->x2 > NE_Input.touch.px
-				&& rabutton->y1 < NE_Input.touch.py
-				&& rabutton->y2 > NE_Input.touch.py) {
-				if (NE_Input.kdown & KEY_TOUCH) {
-					rabutton->event = 1;
-				} else if (NE_Input.kheld & KEY_TOUCH && (rabutton->event == 1 || rabutton->event == 2)) {
-					rabutton->event = 2;
-				} else if (NE_Input.kup & KEY_TOUCH && rabutton->event == 2) {
-					rabutton->event = 4;
-					NE_ResetRadioButtonGroup(rabutton->group);
-					rabutton->checked = true;
-				} else {
-					rabutton->event = 0;
-				}
-			} else {
-				rabutton->event = 0;
-			}
-		}
-		// -------------------    SLIDE BAR    -------------------
-
-		else if (NE_guipointers[i]->type == NE_SlideBar) {
-			_NE_SlideBar_ *sldbar = NE_guipointers[i]->pointer;
-
-			// Simplify code...
-			int x1 = sldbar->x1, x2 = sldbar->x2;
-			int y1 = sldbar->y1, y2 = sldbar->y2;
-			int px = NE_Input.touch.px, py = NE_Input.touch.py;
-			bool vertical = sldbar->isvertical;
-			int coord = sldbar->coord, barsize = sldbar->barsize;
-			int tmp1, tmp2;	// auxiliar coordinates
-			if (sldbar->isvertical) {
-				tmp1 = y1 + (x2 - x1);
-				tmp2 = y2 - (x2 - x1);
-			} else {
-				tmp1 = x1 + (y2 - y1);
-				tmp2 = x2 - (y2 - y1);
-			}
-
-			// ------------  PLUS BUTTON  ------------
-			if (((x1 < px && x2 > px && tmp2 < py && y2 > py) && vertical) ||
-				((tmp2 < px && x2 > px && y1 < py && y2 > py) && !vertical)) {
-				if (NE_Input.kdown & KEY_TOUCH) {
-					sldbar->event_plus = 1;
-				} else if (NE_Input.kheld & KEY_TOUCH
-						&& (sldbar->event_plus == 1
-						|| sldbar->event_plus == 2)) {
-					sldbar->event_plus = 2;
-					sldbar->value++;
-				} else if (NE_Input.kup & KEY_TOUCH
-						&& sldbar->event_plus == 2) {
-					sldbar->event_plus = 4;
-				} else {
-					sldbar->event_plus = 0;
-				}
-			} else {
-				sldbar->event_plus = 0;
-			}
-
-			// ------------  MINUS BUTTON  ------------
-			if ((vertical && (x1 < px && x2 > px && y1 < py && tmp1 > py)) ||
-				(!vertical && (x1 < px && tmp1 > px && y1 < py && y2 > py))) {
-				if (NE_Input.kdown & KEY_TOUCH) {
-					sldbar->event_minus = 1;
-				} else if (NE_Input.kheld & KEY_TOUCH
-						&& (sldbar->event_minus == 1
-						|| sldbar->event_minus == 2)) {
-					sldbar->event_minus = 2;
-					sldbar->value--;
-				} else if (NE_Input.kup & KEY_TOUCH
-						&& sldbar->event_minus == 2) {
-					sldbar->event_minus = 4;
-				} else {
-					sldbar->event_minus = 0;
-				}
-			} else {
-				sldbar->event_minus = 0;
-			}
-
-			// ------------  BAR BUTTON  ------------
-			if (sldbar->event_bar == 2) {
-				int tmp = ((vertical) ? py : px) - tmp1 - (barsize >> 1);
-				tmp *= sldbar->range;
-				tmp = divf32(tmp << 12, (tmp2 - tmp1 - barsize) << 12) >> 12;
-				sldbar->value = tmp;
-			}
-			sldbar->value = (sldbar->value > sldbar->range) ? sldbar->range : sldbar->value;
-			sldbar->value = (sldbar->value < 0) ? 0 : sldbar->value;
-
-			sldbar->coord = (sldbar->totalsize - barsize) * sldbar->value;
-			sldbar->coord = divf32(sldbar->coord << 12, sldbar->range << 12) >> 12;
-			sldbar->coord += (vertical) ? y1 + (x2 - x1) : x1 + (y2 - y1);
-			coord = sldbar->coord;
-
-			if (((x1 < px && x2 > px && coord < py && (coord + barsize) > py)
-				&& vertical) || ((coord < px && (coord + barsize) > px
-						&& y1 < py && y2 > py) && !vertical)) {
-				if (NE_Input.kdown & KEY_TOUCH)
-					sldbar->event_bar = 1;
-				else if (NE_Input.kheld & KEY_TOUCH
-						&& (sldbar->event_bar == 1
-						|| sldbar->event_bar == 2))
-					sldbar->event_bar = 2;
-				else if (NE_Input.kup & KEY_TOUCH && sldbar->event_bar == 2)
-					sldbar->event_bar = 4;
-				else
-					sldbar->event_bar = 0;
-			} else {
-				sldbar->event_bar = 0;
-			}
+		if (type == NE_Button) {
+			NE_GUIUpdateButton(NE_guipointers[i]->pointer);
+		} else if (type == NE_CheckBox) {
+			NE_GUIUpdateCheckBox(NE_guipointers[i]->pointer);
+		} else if (type == NE_RadioButton) {
+			NE_GUIUpdateRadioButton(NE_guipointers[i]->pointer);
+		} else if (type == NE_SlideBar) {
+			NE_GUIUpdateSlideBar(NE_guipointers[i]->pointer);
+		} else {
+			NE_DebugPrint("Unknown type %d", type);
 		}
 	}
 }
