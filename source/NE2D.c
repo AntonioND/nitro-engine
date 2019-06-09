@@ -16,11 +16,10 @@ static bool ne_sprite_system_inited = false;
 
 NE_Sprite *NE_SpriteCreate(void)
 {
+	NE_Sprite *sprite;
+
 	if (!ne_sprite_system_inited)
 		return NULL;
-
-	NE_Sprite *sprite = (NE_Sprite *) malloc(sizeof(NE_Sprite));
-	NE_AssertPointer(sprite, "Not enough memory");
 
 	int i = 0;
 	while (1) {
@@ -29,6 +28,8 @@ NE_Sprite *NE_SpriteCreate(void)
 			return NULL;
 		}
 		if (NE_spritepointers[i] == NULL) {
+			sprite = (NE_Sprite *) malloc(sizeof(NE_Sprite));
+			NE_AssertPointer(sprite, "Not enough memory");
 			NE_spritepointers[i] = sprite;
 			break;
 		}
