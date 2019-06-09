@@ -456,7 +456,7 @@ void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 
 	NEChunk *chunk_search = first_chunk;
 
-	while (1) {
+	for ( ; chunk_search != NULL; chunk_search = chunk_search->next) {
 		size_t size = (uintptr_t)chunk_search->end
 			    - (uintptr_t)chunk_search->start;
 
@@ -476,11 +476,6 @@ void NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 			NE_DebugPrint("Unknown chunk state");
 			break;
 		}
-
-		if (chunk_search->next == NULL)
-			break;
-
-		chunk_search = chunk_search->next;
 	}
 
 	info->FreePercent = (info->Free * 100) / info->Total;

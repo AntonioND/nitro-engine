@@ -30,8 +30,8 @@ typedef struct {
 
 typedef struct {
 	// Values in bytes. Total memory does not include locked memory
-	int Free, Used, Total, Locked;
-	int FreePercent; // Locked memory doesn't count
+	size_t Free, Used, Total, Locked;
+	unsigned int FreePercent; // Locked memory doesn't count
 } NEMemInfo;
 
 //------------------------------------------------------------------------------
