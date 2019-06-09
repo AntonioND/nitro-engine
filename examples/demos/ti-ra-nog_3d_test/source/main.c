@@ -198,22 +198,8 @@ void dual(void)
 
 	NE_SetConsoleColor(NE_Red);
 
-	printf("\x1b[0;0H"
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                "
-	       "                                ");
+	// Clear screen and move cursor to the top
+	printf("\x1b[2J");
 
 	printf("\x1b[1;1HTi-Ra-Nog 3D Test\n =================");
 	printf("\x1b[4;1HR: Save Video (So Sloooow).");
@@ -410,22 +396,10 @@ void dual(void)
 		if (keysd & KEY_Y) {
 			if (!hide_text) {
 				hide_text = true;
-				printf("\x1b[0;0H"
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                "
-				       "                                ");
+
+				// Clear screen and move cursor to the top
+				printf("\x1b[2J");
+
 				printf("\x1b[1;1H"
 				       "Ti-Ra-Nog 3D Test\n"
 				       " =================");
