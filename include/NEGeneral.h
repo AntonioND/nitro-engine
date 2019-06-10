@@ -164,14 +164,14 @@ int NE_GetPolygonCount(void);
  */
 int NE_GetVertexCount(void);
 
-/*! \enum  NE_SPECIAL_EFFECTS
+/*! \enum  NE_SpecialEffects
  *  \brief Enum with the possible effects of NE_SpecialEffectSet().
  */
 typedef enum {
 	NE_NONE = 0,		/*!< None. */
 	NE_NOISE = 1,		/*!< Noise. */
 	NE_SINE = 2		/*!< Waves. */
-} NE_SPECIAL_EFFECTS;
+} NE_SpecialEffects;
 
 // TODO: Fix workaround
 #ifdef REG_BGOFFSETS
@@ -195,11 +195,11 @@ void NE_SpecialEffectPause(bool pause);
  */
 void NE_HBLFunc(void);
 
-/*! \fn    void NE_SpecialEffectSet(NE_SPECIAL_EFFECTS effect);
+/*! \fn    void NE_SpecialEffectSet(NE_SpecialEffects effect);
  *  \brief Set special effect to 3D screen(s).
  *  \param effect NE_NOISE/NE_SINE. 0 = Disable.
  */
-void NE_SpecialEffectSet(NE_SPECIAL_EFFECTS effect);
+void NE_SpecialEffectSet(NE_SpecialEffects effect);
 
 /*! \fn    void NE_SpecialEffectNoiseConfig(int value);
  *  \brief Sets value for noise effect.

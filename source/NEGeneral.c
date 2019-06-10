@@ -485,7 +485,7 @@ void NE_SpecialEffectSineConfig(int mult, int shift)
 	ne_sine_shift = shift;
 }
 
-void NE_SpecialEffectSet(NE_SPECIAL_EFFECTS effect)
+void NE_SpecialEffectSet(NE_SpecialEffects effect)
 {
 	switch (effect) {
 	case 1:
