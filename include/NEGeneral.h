@@ -51,13 +51,13 @@ typedef struct {
 	int nextframetime;
 } NE_AnimData;
 
-/*! \struct _NE_input_
+/*! \struct NE_Input
  *  \brief  Holds information of keys and stylus input for internal use.
  */
 typedef struct {
 	uint32 kdown, kheld, kup;
 	touchPosition touch;
-} _NE_input_;
+} NE_Input;
 
 /*! \fn    void NE_UpdateInput();
  *  \brief Updates input data for internal use. Use this if you are using

@@ -19,7 +19,7 @@ static u8 NE_viewport[4];
 static u8 NE_Screen;
 bool NE_Dual;
 
-_NE_input_ NE_Input;
+NE_Input ne_input;
 
 static bool ne_inited = false;
 
@@ -171,12 +171,12 @@ void NE_SwapScreens(void)
 
 void NE_UpdateInput(void)
 {
-	NE_Input.kdown = keysDown();
-	NE_Input.kheld = keysHeld();
-	NE_Input.kup = keysUp();
+	ne_input.kdown = keysDown();
+	ne_input.kheld = keysHeld();
+	ne_input.kup = keysUp();
 
-	if (NE_Input.kheld & KEY_TOUCH) {
-		touchRead(&NE_Input.touch);
+	if (ne_input.kheld & KEY_TOUCH) {
+		touchRead(&ne_input.touch);
 	}
 }
 
@@ -585,7 +585,7 @@ void NE_TouchTestStart(void)
 	};
 
 	// Render only what is below the cursor
-	gluPickMatrix(NE_Input.touch.px, 191 - NE_Input.touch.py, 3, 3, temp);
+	gluPickMatrix(ne_input.touch.px, 191 - ne_input.touch.py, 3, 3, temp);
 	gluPerspectivef32(70 * DEGREES_IN_CIRCLE / 360, NE_screenratio,
 			  ne_znear, ne_zfar);
 

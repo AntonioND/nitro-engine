@@ -8,7 +8,7 @@
 
 /*! \file   NEGUI.c */
 
-extern _NE_input_ NE_Input;
+extern NE_Input ne_input;
 
 static NE_GUIObj **NE_guipointers;
 static int NE_GUI_OBJECTS;
@@ -78,14 +78,14 @@ static void NE_GUIUpdateButton(NE_GUIObj *obj)
 {
 	ne_button_t *button = (void *)obj;
 
-	if (button->x1 < NE_Input.touch.px && button->x2 > NE_Input.touch.px
-	 && button->y1 < NE_Input.touch.py && button->y2 > NE_Input.touch.py) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+	if (button->x1 < ne_input.touch.px && button->x2 > ne_input.touch.px
+	 && button->y1 < ne_input.touch.py && button->y2 > ne_input.touch.py) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			button->event = 1;
-		} else if ((NE_Input.kheld & KEY_TOUCH)
+		} else if ((ne_input.kheld & KEY_TOUCH)
 		        && (button->event == 1 || button->event == 2)) {
 			button->event = 2;
-		} else if (NE_Input.kup & KEY_TOUCH && button->event == 2) {
+		} else if (ne_input.kup & KEY_TOUCH && button->event == 2) {
 			button->event = 4;
 		} else {
 			button->event = 0;
@@ -99,14 +99,14 @@ static void NE_GUIUpdateCheckBox(NE_GUIObj *obj)
 {
 	ne_checkbox_t *chbox = (void *)obj;
 
-	if (chbox->x1 < NE_Input.touch.px && chbox->x2 > NE_Input.touch.px
-	 && chbox->y1 < NE_Input.touch.py && chbox->y2 > NE_Input.touch.py) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+	if (chbox->x1 < ne_input.touch.px && chbox->x2 > ne_input.touch.px
+	 && chbox->y1 < ne_input.touch.py && chbox->y2 > ne_input.touch.py) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			chbox->event = 1;
-		} else if ((NE_Input.kheld & KEY_TOUCH)
+		} else if ((ne_input.kheld & KEY_TOUCH)
 			&& (chbox->event == 1 || chbox->event == 2)) {
 			chbox->event = 2;
-		} else if (NE_Input.kup & KEY_TOUCH && chbox->event == 2) {
+		} else if (ne_input.kup & KEY_TOUCH && chbox->event == 2) {
 			chbox->event = 4;
 			chbox->checked = !chbox->checked;
 		} else {
@@ -121,14 +121,14 @@ static void NE_GUIUpdateRadioButton(NE_GUIObj *obj)
 {
 	ne_radiobutton_t *rabtn = (void *)obj;
 
-	if (rabtn->x1 < NE_Input.touch.px && rabtn->x2 > NE_Input.touch.px
-	 && rabtn->y1 < NE_Input.touch.py && rabtn->y2 > NE_Input.touch.py) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+	if (rabtn->x1 < ne_input.touch.px && rabtn->x2 > ne_input.touch.px
+	 && rabtn->y1 < ne_input.touch.py && rabtn->y2 > ne_input.touch.py) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			rabtn->event = 1;
-		} else if ((NE_Input.kheld & KEY_TOUCH)
+		} else if ((ne_input.kheld & KEY_TOUCH)
 			&& (rabtn->event == 1 || rabtn->event == 2)) {
 			rabtn->event = 2;
-		} else if (NE_Input.kup & KEY_TOUCH && rabtn->event == 2) {
+		} else if (ne_input.kup & KEY_TOUCH && rabtn->event == 2) {
 			rabtn->event = 4;
 			NE_ResetRadioButtonGroup(rabtn->group);
 			rabtn->checked = true;
@@ -147,7 +147,7 @@ static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
 	// Simplify code...
 	int x1 = sldbar->x1, x2 = sldbar->x2;
 	int y1 = sldbar->y1, y2 = sldbar->y2;
-	int px = NE_Input.touch.px, py = NE_Input.touch.py;
+	int px = ne_input.touch.px, py = ne_input.touch.py;
 	bool vertical = sldbar->isvertical;
 	int coord = sldbar->coord, barsize = sldbar->barsize;
 	int tmp1, tmp2;	// auxiliary coordinates
@@ -170,13 +170,13 @@ static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
 		pluspressed = tmp2 < px && x2 > px && y1 < py && y2 > py;
 
 	if (pluspressed) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			sldbar->event_plus = 1;
-		} else if ((NE_Input.kheld & KEY_TOUCH)
+		} else if ((ne_input.kheld & KEY_TOUCH)
 		    && (sldbar->event_plus == 1 || sldbar->event_plus == 2)) {
 			sldbar->event_plus = 2;
 			sldbar->value++;
-		} else if (NE_Input.kup & KEY_TOUCH && sldbar->event_plus == 2) {
+		} else if (ne_input.kup & KEY_TOUCH && sldbar->event_plus == 2) {
 			sldbar->event_plus = 4;
 		} else {
 			sldbar->event_plus = 0;
@@ -196,13 +196,13 @@ static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
 		minuspressed = x1 < px && tmp1 > px && y1 < py && y2 > py;
 
 	if (minuspressed) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			sldbar->event_minus = 1;
-		} else if ((NE_Input.kheld & KEY_TOUCH)
+		} else if ((ne_input.kheld & KEY_TOUCH)
 		    && (sldbar->event_minus == 1 || sldbar->event_minus == 2)) {
 			sldbar->event_minus = 2;
 			sldbar->value--;
-		} else if (NE_Input.kup & KEY_TOUCH
+		} else if (ne_input.kup & KEY_TOUCH
 				&& sldbar->event_minus == 2) {
 			sldbar->event_minus = 4;
 		} else {
@@ -242,12 +242,12 @@ static void NE_GUIUpdateSlideBar(NE_GUIObj *obj)
 	}
 
 	if (barpressed) {
-		if (NE_Input.kdown & KEY_TOUCH) {
+		if (ne_input.kdown & KEY_TOUCH) {
 			sldbar->event_bar = 1;
-		} else if (NE_Input.kheld & KEY_TOUCH
+		} else if (ne_input.kheld & KEY_TOUCH
 		    && (sldbar->event_bar == 1 || sldbar->event_bar == 2)) {
 			sldbar->event_bar = 2;
-		} else if (NE_Input.kup & KEY_TOUCH && sldbar->event_bar == 2) {
+		} else if (ne_input.kup & KEY_TOUCH && sldbar->event_bar == 2) {
 			sldbar->event_bar = 4;
 		} else {
 			sldbar->event_bar = 0;
