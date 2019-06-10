@@ -892,11 +892,8 @@ void NE_GUISystemReset(int number_of_objects)
 	else
 		NE_GUI_OBJECTS = number_of_objects;
 
-	NE_guipointers = malloc(NE_GUI_OBJECTS * sizeof(NE_guipointers));
+	NE_guipointers = calloc(NE_GUI_OBJECTS, sizeof(NE_guipointers));
 	NE_AssertPointer(NE_guipointers, "Not enough memory");
-
-	for (int i = 0; i < NE_GUI_OBJECTS; i++)
-		NE_guipointers[i] = NULL;
 
 	ne_gui_system_inited = true;
 }

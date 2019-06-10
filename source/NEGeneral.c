@@ -220,16 +220,13 @@ void NE_InitDual3D(void)
 	vramSetBankC(VRAM_C_SUB_BG);
 	vramSetBankD(VRAM_D_SUB_SPRITE);
 
-	NE_Sprites = malloc(sizeof(SpriteEntry) * 128);
+	NE_Sprites = calloc(128, sizeof(SpriteEntry));
 
 	int y = 0, x = 0;
 
 	// Reset sprites
-	for (int i = 0; i < 128; i++) {
+	for (int i = 0; i < 128; i++)
 		NE_Sprites[i].attribute[0] = ATTR0_DISABLED;
-		NE_Sprites[i].attribute[1] = 0;
-		NE_Sprites[i].attribute[2] = 0;
-	}
 
 	int i = 0;
 	for (y = 0; y < 3; y++) {

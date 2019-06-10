@@ -63,15 +63,11 @@ NE_Camera *NE_CameraCreate(void)
 		if (NE_UserCamera[i] != NULL)
 			continue;
 
-		NE_Camera *cam = malloc(sizeof(NE_Camera));
+		NE_Camera *cam = calloc(1, sizeof(NE_Camera));
 		NE_AssertPointer(cam, "Not enough memory");
 
-		cam->from[0] = cam->from[1] = cam->from[2] = 0;
-		cam->to[0] = cam->to[1] = 0;
 		cam->to[2] = inttof32(1);
-		cam->up[0] = 0;
 		cam->up[1] = inttof32(1);
-		cam->up[2] = 0;
 
 		cam->matrix_is_updated = false;
 		NE_UserCamera[i] = cam;
@@ -397,11 +393,8 @@ void NE_CameraSystemReset(int numcameras)
 	else
 		NE_MAX_CAMERAS = numcameras;
 
-	NE_UserCamera = malloc(NE_MAX_CAMERAS * sizeof(NE_UserCamera));
+	NE_UserCamera = calloc(NE_MAX_CAMERAS, sizeof(NE_UserCamera));
 	NE_AssertPointer(NE_UserCamera, "Not enough memory");
-
-	for (int i = 0; i < NE_MAX_CAMERAS; i++)
-		NE_UserCamera[i] = NULL;
 
 	ne_camera_system_inited = true;
 }

@@ -28,7 +28,7 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 		return NULL;
 	}
 
-	NE_Physics *temp = (NE_Physics *) malloc(sizeof(NE_Physics));
+	NE_Physics *temp = calloc(1, sizeof(NE_Physics));
 	NE_AssertPointer(temp, "Not enough memory");
 
 	int i = 0;
@@ -46,13 +46,9 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 	}
 
 	temp->type = type;
-	temp->xspeed = temp->yspeed = temp->zspeed = 0;
-	temp->xsize = temp->ysize = temp->zsize = 0;
-	temp->radius = temp->gravity = temp->friction = 0;
 	temp->keptpercent = 50;
 	temp->enabled = true;
 	temp->physicsgroup = 0;
-	temp->iscolliding = false;
 	temp->oncollision = NE_ColNothing;
 
 	return temp;
@@ -99,11 +95,8 @@ void NE_PhysicsSystemReset(int number_of_objects)
 	else
 		NE_MAX_PHYSICS = number_of_objects;
 
-	NE_PhysicsPointers = malloc(NE_MAX_PHYSICS * sizeof(NE_PhysicsPointers));
+	NE_PhysicsPointers = calloc(NE_MAX_PHYSICS, sizeof(NE_PhysicsPointers));
 	NE_AssertPointer(NE_PhysicsPointers, "Not enough memory");
-
-	for (int i = 0; i < NE_MAX_PHYSICS; i++)
-		NE_PhysicsPointers[i] = NULL;
 
 	ne_physics_system_inited = true;
 }

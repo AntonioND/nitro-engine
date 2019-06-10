@@ -19,7 +19,7 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 	if (!ne_model_system_inited)
 		return NULL;
 
-	NE_Model *model = malloc(sizeof(NE_Model));
+	NE_Model *model = calloc(1, sizeof(NE_Model));
 	NE_AssertPointer(model, "Not enough memory");
 
 	int i = 0;
@@ -36,32 +36,21 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 		}
 	}
 
-	model->x = model->y = model->z = 0;
-	model->rx = model->ry = model->rz = 0;
 	model->sx = model->sy = model->sz = inttof32(1);
 
 	if (type == NE_Animated) {
-		model->meshdata = malloc(sizeof(NE_AnimData));
+		model->meshdata = calloc(1, sizeof(NE_AnimData));
 		NE_AssertPointer(model->meshdata,
 				 "Couldn't allocate animation data.");
 		NE_AnimData *anim = (NE_AnimData *) model->meshdata;
-		for (i = 0; i < NE_MAX_FRAMES; i++)
-			anim->speed[i] = 0;
-		anim->animtype = 0;
-		anim->currframe = 0;
-		anim->startframe = 0;
-		anim->endframe = 0;
+
 		anim->direction = 1;
-		anim->nextframetime = 0;
 		model->anim_interpolate = true;
 	} else { /*if (type == NE_Static) */
 		model->meshdata = NULL;
 	}
 
 	model->modeltype = type;
-	model->texture = NULL;
-	model->meshfromfat = false;
-	model->iscloned = false;
 
 	return model;
 }

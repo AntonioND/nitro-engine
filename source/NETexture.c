@@ -76,7 +76,7 @@ NE_Material *NE_MaterialCreate(void)
 		if (NE_UserMaterials[i] != NULL)
 			continue;
 
-		NE_Material *mat = (NE_Material *) malloc(sizeof(NE_Material));
+		NE_Material *mat = calloc(1, sizeof(NE_Material));
 		NE_AssertPointer(mat, "Not enough memory");
 		NE_UserMaterials[i] = mat;
 		mat->texindex = NE_NO_TEXTURE;
@@ -490,13 +490,10 @@ void NE_TextureSystemReset(int texture_number, int palette_number,
 		NE_Lock(NE_TexAllocList, VRAM_D);
 	}
 
-	NE_Texture = malloc(NE_MAX_TEXTURES * sizeof(ne_textureinfo_t));
+	NE_Texture = calloc(NE_MAX_TEXTURES, sizeof(ne_textureinfo_t));
 	NE_AssertPointer(NE_Texture, "Not enough memory");
-	NE_UserMaterials = malloc(NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
+	NE_UserMaterials = calloc(NE_MAX_TEXTURES, sizeof(NE_UserMaterials));
 	NE_AssertPointer(NE_UserMaterials, "Not enough memory");
-
-	memset(NE_Texture, 0, NE_MAX_TEXTURES * sizeof(ne_textureinfo_t));
-	memset(NE_UserMaterials, 0, NE_MAX_TEXTURES * sizeof(NE_UserMaterials));
 
 	NE_PaletteSystemReset(palette_number);
 

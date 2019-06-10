@@ -141,11 +141,8 @@ void NE_SpriteSystemReset(int number_of_sprites)
 	else
 		NE_MAX_SPRITES = number_of_sprites;
 
-	NE_spritepointers = malloc(NE_MAX_SPRITES * sizeof(NE_spritepointers));
+	NE_spritepointers = calloc(NE_MAX_SPRITES, sizeof(NE_spritepointers));
 	NE_AssertPointer(NE_spritepointers, "Not enough memory");
-
-	for (int i = 0; i < NE_MAX_SPRITES; i++)
-		NE_spritepointers[i] = NULL;
 
 	ne_sprite_system_inited = true;
 }
