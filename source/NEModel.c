@@ -154,118 +154,6 @@ void NE_ModelSetMaterial(NE_Model *model, NE_Material *material)
 	model->texture = material;
 }
 
-// Internal use... see below
-extern bool NE_TestTouch;
-static void __ne_drawanimatedmodel_interpolate(NE_AnimData *anim);
-static void __ne_drawanimatedmodel_nointerpolate(NE_AnimData *anim);
-
-void NE_ModelDraw(NE_Model *model)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	if (model->meshdata == NULL)
-		return;
-	if (model->modeltype == NE_Animated)
-		if (((NE_AnimData *) model->meshdata)->fileptrtr == NULL)
-			return;
-
-	MATRIX_PUSH = 0;
-
-	MATRIX_TRANSLATE = model->x;
-	MATRIX_TRANSLATE = model->y;
-	MATRIX_TRANSLATE = model->z;
-
-	if (model->rx != 0)
-		glRotateXi(model->rx << 6);
-	if (model->ry != 0)
-		glRotateYi(model->ry << 6);
-	if (model->rz != 0)
-		glRotateZi(model->rz << 6);
-
-	MATRIX_SCALE = model->sx;
-	MATRIX_SCALE = model->sy;
-	MATRIX_SCALE = model->sz;
-
-	if (NE_TestTouch) {
-		PosTest_Asynch(0, 0, 0);
-	} else {
-		// If the texture pointer is NULL, this will set GFX_TEX_FORMAT
-		// to 0 and GFX_COLOR to white
-		NE_MaterialUse(model->texture);
-	}
-
-	if (model->modeltype == NE_Static) {
-		glCallList(model->meshdata);
-	} else { // if(model->modeltype == NE_Animated)
-		NE_AnimData *anim = (void *) model->meshdata;
-
-		if (model->anim_interpolate)
-			__ne_drawanimatedmodel_interpolate(anim);
-		else
-			__ne_drawanimatedmodel_nointerpolate(anim);
-	}
-
-	MATRIX_POP = 1;
-}
-
-void NE_ModelClone(NE_Model *dest, NE_Model *source)
-{
-	NE_AssertPointer(dest, "NULL dest pointer");
-	NE_AssertPointer(source, "NULL source pointer");
-	NE_Assert(dest->modeltype == source->modeltype,
-		  "Different model types");
-
-	if (dest->modeltype == NE_Animated) {
-		swiCopy(source->meshdata, dest->meshdata,
-			(sizeof(NE_AnimData) >> 2) | COPY_MODE_WORD);
-		dest->iscloned = true;
-		dest->texture = source->texture;
-	} else {
-		dest->iscloned = true;
-		dest->meshdata = source->meshdata;
-		dest->texture = source->texture;
-	}
-}
-
-void NE_ModelScaleI(NE_Model *model, int x, int y, int z)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	model->sx = x;
-	model->sy = y;
-	model->sz = z;
-}
-
-void NE_ModelTranslateI(NE_Model *model, int x, int y, int z)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	model->x += x;
-	model->y += y;
-	model->z += z;
-}
-
-void NE_ModelSetCoordI(NE_Model *model, int x, int y, int z)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	model->x = x;
-	model->y = y;
-	model->z = z;
-}
-
-void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	model->rx = (model->rx + rx + 512) & 0x1FF;
-	model->ry = (model->ry + ry + 512) & 0x1FF;
-	model->rz = (model->rz + rz + 512) & 0x1FF;
-}
-
-void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	model->rx = rx;
-	model->ry = ry;
-	model->rz = rz;
-}
-
 //------------------------------------------------------------------------------
 
 static void __ne_drawanimatedmodel_interpolate(NE_AnimData *anim)
@@ -415,6 +303,116 @@ static void __ne_drawanimatedmodel_nointerpolate(NE_AnimData *anim)
 }
 
 //---------------------------------------------------------
+
+// Internal use... see below
+extern bool NE_TestTouch;
+
+void NE_ModelDraw(NE_Model *model)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	if (model->meshdata == NULL)
+		return;
+	if (model->modeltype == NE_Animated)
+		if (((NE_AnimData *) model->meshdata)->fileptrtr == NULL)
+			return;
+
+	MATRIX_PUSH = 0;
+
+	MATRIX_TRANSLATE = model->x;
+	MATRIX_TRANSLATE = model->y;
+	MATRIX_TRANSLATE = model->z;
+
+	if (model->rx != 0)
+		glRotateXi(model->rx << 6);
+	if (model->ry != 0)
+		glRotateYi(model->ry << 6);
+	if (model->rz != 0)
+		glRotateZi(model->rz << 6);
+
+	MATRIX_SCALE = model->sx;
+	MATRIX_SCALE = model->sy;
+	MATRIX_SCALE = model->sz;
+
+	if (NE_TestTouch) {
+		PosTest_Asynch(0, 0, 0);
+	} else {
+		// If the texture pointer is NULL, this will set GFX_TEX_FORMAT
+		// to 0 and GFX_COLOR to white
+		NE_MaterialUse(model->texture);
+	}
+
+	if (model->modeltype == NE_Static) {
+		glCallList(model->meshdata);
+	} else { // if(model->modeltype == NE_Animated)
+		NE_AnimData *anim = (void *) model->meshdata;
+
+		if (model->anim_interpolate)
+			__ne_drawanimatedmodel_interpolate(anim);
+		else
+			__ne_drawanimatedmodel_nointerpolate(anim);
+	}
+
+	MATRIX_POP = 1;
+}
+
+void NE_ModelClone(NE_Model *dest, NE_Model *source)
+{
+	NE_AssertPointer(dest, "NULL dest pointer");
+	NE_AssertPointer(source, "NULL source pointer");
+	NE_Assert(dest->modeltype == source->modeltype,
+		  "Different model types");
+
+	if (dest->modeltype == NE_Animated) {
+		swiCopy(source->meshdata, dest->meshdata,
+			(sizeof(NE_AnimData) >> 2) | COPY_MODE_WORD);
+		dest->iscloned = true;
+		dest->texture = source->texture;
+	} else {
+		dest->iscloned = true;
+		dest->meshdata = source->meshdata;
+		dest->texture = source->texture;
+	}
+}
+
+void NE_ModelScaleI(NE_Model *model, int x, int y, int z)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	model->sx = x;
+	model->sy = y;
+	model->sz = z;
+}
+
+void NE_ModelTranslateI(NE_Model *model, int x, int y, int z)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	model->x += x;
+	model->y += y;
+	model->z += z;
+}
+
+void NE_ModelSetCoordI(NE_Model *model, int x, int y, int z)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	model->x = x;
+	model->y = y;
+	model->z = z;
+}
+
+void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	model->rx = (model->rx + rx + 512) & 0x1FF;
+	model->ry = (model->ry + ry + 512) & 0x1FF;
+	model->rz = (model->rz + rz + 512) & 0x1FF;
+}
+
+void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz)
+{
+	NE_AssertPointer(model, "NULL pointer");
+	model->rx = rx;
+	model->ry = ry;
+	model->rz = rz;
+}
 
 void NE_ModelAnimateAll(void)
 {
