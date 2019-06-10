@@ -164,27 +164,6 @@ static void NE_Init__(void)
 	videoSetMode(MODE_0_3D);
 }
 
-static inline void NE_SetRegCapture(bool enable, uint8 srcBlend,
-				    uint8 destBlend, uint8 bank,
-				    uint8 offset, uint8 size, uint8 source,
-				    uint8 srcOffset)
-{
-	uint32 value = 0;
-	if (enable)
-		value |= 1 << 31; // 31 is enable
-
-	value |= 3 << 29; // 29-30 seems to have something to do with the blending
-	value |= (srcOffset & 0x3) << 26; // capture source offset is 26-27
-	value |= (source & 0x3) << 24;	// capture source is 24-25
-	value |= (size & 0x3) << 20;	// capture data write size is 20-21
-	value |= (offset & 0x3) << 18;	// write offset is 18-19
-	value |= (bank & 0x3) << 16;	// vram bank select is 16-17
-	value |= (srcBlend & 0xFF) << 8; // graphics blend evb is 8..12
-	value |= (destBlend & 0xFF) << 0; // ram blend EVA is bits 0..4
-
-	REG_DISPCAPCNT = value;
-}
-
 void NE_SwapScreens(void)
 {
 	REG_POWERCNT ^= POWER_SWAP_LCDS;
@@ -339,7 +318,13 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
 		vramSetBankC(VRAM_C_SUB_BG);
 		vramSetBankD(VRAM_D_LCD);
-		NE_SetRegCapture(true, 0, 31, 3, 0, 3, 0, 0);
+
+		REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+			       | DCAP_BANK(DCAP_BANK_VRAM_D)
+			       | DCAP_MODE(DCAP_MODE_A)
+			       | DCAP_SRC_A(DCAP_SRC_A_COMPOSITED)
+			       | DCAP_ENABLE;
+
 	} else {
 		if (NE_UsingConsole) {
 			REG_BG1CNT = BG_PRIORITY(1);
@@ -348,7 +333,12 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
 		vramSetBankC(VRAM_C_LCD);
 		vramSetBankD(VRAM_D_SUB_SPRITE);
-		NE_SetRegCapture(true, 0, 31, 2, 0, 3, 1, 0);
+
+		REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+			       | DCAP_BANK(DCAP_BANK_VRAM_C)
+			       | DCAP_MODE(DCAP_MODE_A)
+			       | DCAP_SRC_A(DCAP_SRC_A_COMPOSITED)
+			       | DCAP_ENABLE;
 	}
 
 	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
