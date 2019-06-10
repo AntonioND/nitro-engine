@@ -85,8 +85,7 @@ void NE_PhysicsDeleteAll(void)
 	if (!ne_physics_system_inited)
 		return;
 
-	int i;
-	for (i = 0; i < NE_MAX_PHYSICS; i++)
+	for (int i = 0; i < NE_MAX_PHYSICS; i++)
 		NE_PhysicsDelete(NE_PhysicsPointers[i]);
 }
 
@@ -103,8 +102,7 @@ void NE_PhysicsSystemReset(int number_of_objects)
 	NE_PhysicsPointers = malloc(NE_MAX_PHYSICS * sizeof(NE_PhysicsPointers));
 	NE_AssertPointer(NE_PhysicsPointers, "Not enough memory");
 
-	int i;
-	for (i = 0; i < NE_MAX_PHYSICS; i++)
+	for (int i = 0; i < NE_MAX_PHYSICS; i++)
 		NE_PhysicsPointers[i] = NULL;
 
 	ne_physics_system_inited = true;
@@ -204,8 +202,7 @@ void NE_PhysicsUpdateAll(void)
 	if (!ne_physics_system_inited)
 		return;
 
-	int i;
-	for (i = 0; i < NE_MAX_PHYSICS; i++)
+	for (int i = 0; i < NE_MAX_PHYSICS; i++)
 		if (NE_PhysicsPointers[i] != NULL)
 			NE_PhysicsUpdate(NE_PhysicsPointers[i]);
 }
@@ -228,8 +225,11 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	pointer->yspeed -= pointer->gravity;
 
 	// Now, let's move the object
-	int posx = 0, posy = 0, posz = 0; // Will use this in collision checking (to simplify code).
-	int bposx = 0, bposy = 0, bposz = 0; // Position before movement
+
+	// Used in collision checking to simplify the code
+	int posx = 0, posy = 0, posz = 0;
+	// Position before movement
+	int bposx = 0, bposy = 0, bposz = 0;
 
 	NE_Model *model = pointer->model;
 	bposx = model->x;
@@ -240,7 +240,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	posz = model->z = model->z + pointer->zspeed;
 
 	// Gravity and movement have been applied, time to check collisions...
-	bool xenabled = true, yenabled = true, zenabled = true;	// To check some things
+	bool xenabled = true, yenabled = true, zenabled = true;
 	if (bposx == posx)
 		xenabled = false;
 	if (bposy == posy)
@@ -248,9 +248,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
 	if (bposz == posz)
 		zenabled = false;
 
-	//int xlastcol = 0, ylastcol = 0, zlastcol = 0;  //To fix other things...
-	int i;
-	for (i = 0; i < NE_MAX_PHYSICS; i++) {
+	for (int i = 0; i < NE_MAX_PHYSICS; i++) {
 		if (NE_PhysicsPointers[i] == NULL)
 			continue;
 

@@ -51,22 +51,32 @@ typedef enum {
  *  \brief  Holds information of a physics object.
  */
 typedef struct {
-	NE_Model *model;
+	// Every fixed point variable in this struct is f32
 
+	NE_Model *model;
 	u32 type;
-	int xspeed, yspeed, zspeed;	// Coordinates are taken from the model.
-	//EVERY FIXED POINT IS <f32>
-	int radius;			// for spheres
-	int xsize, ysize, zsize;	// for boxes
+	bool enabled;
+
+	// Speed of model. The coordinates are taken from the NE_Model struct
+	int xspeed, yspeed, zspeed;
+
+	// For spheres
+	int radius;
+	// For Axis-Aligned Bounding Boxes
+	int xsize, ysize, zsize;
 
 	int gravity, friction;
-	int keptpercent;		// Percent of energy in an object after bouncing
 
-	int oncollision;		// What to do when a collision is detected.
-	bool iscolliding;		// true if a  was detected last time.
+	// Percentage of energy in an object after bouncing
+	int keptpercent;
 
-	bool enabled;
-	int physicsgroup;		// to avoid useless checking
+	// What to do when a collision is detected
+	NE_OnCollision oncollision;
+	// true if a collision was detected during the last update of the model
+	bool iscolliding;
+
+	// Objects only collide with other objects in the same physicsgroup
+	int physicsgroup;
 } NE_Physics;
 
 /*! \fn    NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type);
