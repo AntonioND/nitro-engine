@@ -28,7 +28,8 @@
 typedef struct {
 	bool meshfromfat;
 	bool iscloned;
-	bool anim_interpolate;	// Use linear interpolation between frames or not (animated models).
+	// Use linear interpolation between frames or not (animated models)
+	bool anim_interpolate;
 	int modeltype;		// Animated or not
 	u32 *meshdata;		// Display list or NE_AnimData struct
 	NE_Material *texture;
@@ -45,7 +46,7 @@ typedef enum {
 	NE_Animated		/*!< Animated. */
 } NE_ModelType;
 
-/*! \fn    NE_Model * NE_ModelCreate(NE_ModelType type);
+/*! \fn    NE_Model *NE_ModelCreate(NE_ModelType type);
  *  \brief Returns a pointer to a NE_Model struct.
  */
 NE_Model *NE_ModelCreate(NE_ModelType type);
@@ -63,7 +64,7 @@ void NE_ModelDelete(NE_Model *model);
  */
 int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer);
 
-/*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, char * path);
+/*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path);
  *  \brief Loads a display list from FAT and assign it to a static model.
  *         It returns 1 on success.
  *  \param model Pointer to the model.
@@ -84,7 +85,7 @@ void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
  */
 void NE_ModelDraw(NE_Model *model);
 
-/*! \fn    void NE_ModelClone(NE_Model * dest, NE_Model * source);
+/*! \fn    void NE_ModelClone(NE_Model *dest, NE_Model *source);
  *  \brief Clone model.
  *  \param dest Pointer to the destiny model.
  *  \param source Pointer to the source model.
@@ -99,7 +100,7 @@ void NE_ModelDraw(NE_Model *model);
  * You should use this if you make a tiled floor, for example, or for making
  * lots of enemies.
  */
-void NE_ModelClone(NE_Model * dest, NE_Model * source);
+void NE_ModelClone(NE_Model *dest, NE_Model *source);
 
 /*! \fn    void NE_ModelSetCoordI(NE_Model *model, int x, int y, int z);
  *  \brief Set coordinates of a model.
@@ -244,7 +245,7 @@ void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate);
  */
 int NE_ModelLoadNEA(NE_Model *model, void *pointer);
 
-/*! \fn    int NE_ModelLoadNEAFAT(NE_Model *model, char * path);
+/*! \fn    int NE_ModelLoadNEAFAT(NE_Model *model, char *path);
  *  \brief Loads every frame of a NEA file in FAT to an animated model. Returns
  *         1 if no error happened.
  *  \param model Pointer to the model.
