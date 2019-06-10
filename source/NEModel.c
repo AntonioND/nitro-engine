@@ -122,7 +122,7 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path)
 	return 1;
 }
 
-int NE_ModelLoadStaticMesh(NE_Model *model, u32 *pointer)
+int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -573,7 +573,7 @@ int NE_ModelLoadNEAFAT(NE_Model *model, char *path)
 	return 1;
 }
 
-int NE_ModelLoadNEA(NE_Model *model, u32 *pointer)
+int NE_ModelLoadNEA(NE_Model *model, void *pointer)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -588,15 +588,17 @@ int NE_ModelLoadNEA(NE_Model *model, u32 *pointer)
 	model->iscloned = 0;
 	model->meshfromfat = false;
 
-	if (*pointer != 1296123214)	// 'NEAM' - Not a nea file
+	u32 *ptr = pointer;
+
+	if (*ptr != 1296123214)	// 'NEAM' - Not a nea file
 	{
 		NE_DebugPrint("Not a NEA file");
 		return 0;
 	}
-	if (*(pointer + 1) != 2)	// version 2
+	if (*(ptr + 1) != 2)	// version 2
 	{
 		NE_DebugPrint("NEA file version is %ld, should be 2",
-			      *(pointer + 1));
+			      *(ptr + 1));
 		return 0;
 	}
 	((NE_AnimData *) model->meshdata)->fileptrtr = pointer;

@@ -56,12 +56,12 @@ NE_Model *NE_ModelCreate(NE_ModelType type);
  */
 void NE_ModelDelete(NE_Model *model);
 
-/*! \fn    int NE_ModelLoadStaticMesh(NE_Model *model, u32 *pointer);
+/*! \fn    int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer);
  *  \brief Assign a display list in RAM to a static model.
  *  \param model Pointer to the model.
  *  \param pointer Pointer to the display list.
  */
-int NE_ModelLoadStaticMesh(NE_Model *model, u32 *pointer);
+int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer);
 
 /*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, char * path);
  *  \brief Loads a display list from FAT and assign it to a static model.
@@ -236,13 +236,13 @@ void NE_ModelAnimSetFrame(NE_Model *model, int frame);
  */
 void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate);
 
-/*! \fn    int NE_ModelLoadNEA(NE_Model *model, u32 *pointer);
+/*! \fn    int NE_ModelLoadNEA(NE_Model *model, void *pointer);
  *  \brief Loads every frame of a NEA file in RAM to an animated model. Returns
  *         1 if no error happened.
  *  \param model Pointer to the model.
  *  \param pointer Pointer to the file.
  */
-int NE_ModelLoadNEA(NE_Model *model, u32 *pointer);
+int NE_ModelLoadNEA(NE_Model *model, void *pointer);
 
 /*! \fn    int NE_ModelLoadNEAFAT(NE_Model *model, char * path);
  *  \brief Loads every frame of a NEA file in FAT to an animated model. Returns
