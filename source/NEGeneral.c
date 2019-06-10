@@ -12,7 +12,7 @@ const char NE_VERSION[] =
     "Nitro Engine - Version " NITRO_ENGINE_VERSION_STRING "\n"
     "(C) 2008-2011, 2019 Antonio Nino Diaz (AntonioND)";
 
-bool NE_UsingConsole;
+static bool NE_UsingConsole;
 bool NE_TestTouch;
 static int NE_screenratio;
 static u8 NE_viewport[4];
@@ -97,7 +97,8 @@ static void NE_Init__(void)
 
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 
-	while (GFX_STATUS & (1 << 27)) ;
+	// While 3D hardware is busy
+	while (GFX_BUSY) ;
 
 	// Clear the FIFO
 	GFX_STATUS |= (1 << 29);
@@ -141,15 +142,13 @@ static void NE_Init__(void)
 					 false, true);
 
 	// Turn off some things...
-	int i = 4;
-	while (i--)
+	for (int i = 0; i < 4; i++)
 		NE_LightOff(i);
 
 	GFX_COLOR = 0;
 	GFX_POLY_FORMAT = 0;
 
-	i = 8;
-	while (i--)
+	for (int i = 0; i < 8; i++)
 		NE_OutliningSetColor(i, 0);
 
 	ne_znear = floattof32(0.1);
@@ -225,14 +224,14 @@ void NE_InitDual3D(void)
 
 	int y = 0, x = 0;
 
-	int i;			//Reset sprites
-	for (i = 0; i < 128; i++) {
+	// Reset sprites
+	for (int i = 0; i < 128; i++) {
 		NE_Sprites[i].attribute[0] = ATTR0_DISABLED;
 		NE_Sprites[i].attribute[1] = 0;
 		NE_Sprites[i].attribute[2] = 0;
 	}
 
-	i = 0;
+	int i = 0;
 	for (y = 0; y < 3; y++) {
 		for (x = 0; x < 4; x++) {
 			NE_Sprites[i].attribute[0] = ATTR0_BMP | ATTR0_SQUARE
@@ -300,7 +299,7 @@ void NE_Process(NE_Voidfunc drawscene)
 	NE_AssertPointer(drawscene, "NULL function pointer");
 	drawscene();
 
-	GFX_FLUSH = (1 << 0) /* | (1<<1) */ ; //GL_TRANS_MANUALSORT | GL_WBUFFERING
+	GFX_FLUSH = GL_TRANS_MANUALSORT;
 }
 
 void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
@@ -367,7 +366,7 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 		downscreen();
 	}
 
-	GFX_FLUSH = (1 << 0) /*| (1<<1) */ ; //GL_TRANS_MANUALSORT | GL_WBUFFERING
+	GFX_FLUSH = GL_TRANS_MANUALSORT;
 
 	dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
 }
@@ -389,13 +388,15 @@ void NE_AntialiasEnable(bool value)
 
 int NE_GetPolygonCount(void)
 {
-	while (GFX_STATUS & (1 << 27)) ;
+	while (GFX_BUSY) ;
+
 	return GFX_POLYGON_RAM_USAGE;
 }
 
 int NE_GetVertexCount(void)
 {
-	while (GFX_STATUS & (1 << 27)) ;
+	while (GFX_BUSY) ;
+
 	return GFX_VERTEX_RAM_USAGE;
 }
 
@@ -426,8 +427,8 @@ void NE_SpecialEffectPause(bool pause)
 	NE_effectpause = pause;
 	if (pause) {
 		ne_noisepause = malloc(sizeof(int) * 512);
-		int i;
-		for (i = 0; i < 512; i++)
+
+		for (int i = 0; i < 512; i++)
 			ne_noisepause[i] = (rand() & ne_noise_value)
 					 - (ne_noise_value >> 1);
 	} else {
@@ -440,27 +441,32 @@ void NE_SpecialEffectPause(bool pause)
 
 void NE_HBLFunc(void)
 {
+	s16 angle;
+	int val;
+
 	if (!ne_inited)
 		return;
 
-	int i;
+	// This counter is used to estimate CPU usage
 	ne_cpucount++;
+
+	// Fix a problem with the first line when using effects
 	int vcount = REG_VCOUNT;
 	if (vcount == 262)
-		vcount = 0;	//Fixes a problem with first line
+		vcount = 0;
 
 	switch (NE_Effect) {
 	case NE_NOISE:
 		if (NE_effectpause && ne_noisepause)
-			i = ne_noisepause[vcount & LUT_MASK];
+			val = ne_noisepause[vcount & LUT_MASK];
 		else
-			i = (rand() & ne_noise_value) - (ne_noise_value >> 1);
-		REG_BGOFFSETS = i;
+			val = (rand() & ne_noise_value) - (ne_noise_value >> 1);
+		REG_BGOFFSETS = val;
 		break;
 
 	case NE_SINE:
-		REG_BGOFFSETS =
-			sinLerp((((vcount + NE_lastvbladd) * ne_sine_mult) & LUT_MASK) << 6) >> ne_sine_shift;
+		angle = ((vcount + NE_lastvbladd) * ne_sine_mult) & LUT_MASK;
+		REG_BGOFFSETS = sinLerp(angle << 6) >> ne_sine_shift;
 		break;
 
 	default:
@@ -496,7 +502,7 @@ void NE_SpecialEffectSet(NE_SPECIAL_EFFECTS effect)
 	}
 }
 
-int NE_CPUPercent;
+static int NE_CPUPercent;
 
 void NE_WaitForVBL(NE_UPDATE_FLAGS flags)
 {
@@ -530,13 +536,14 @@ bool NE_GPUIsRendering(void)
 {
 	if (REG_VCOUNT > 190 && REG_VCOUNT < 214)
 		return false;
+
 	return true;
 }
 
-#ifdef NE_DEBUG
 // -------------------------------------------------------------------------
 //                               DEBUG
-void (*ne_userdebugfn)(const char *) = NULL;
+#ifdef NE_DEBUG
+static void (*ne_userdebugfn)(const char *) = NULL;
 
 void __ne_debugoutputtoconsole(const char *text)
 {
@@ -561,9 +568,8 @@ void NE_DebugSetHandlerConsole(void)
 	NE_InitConsole();
 	ne_userdebugfn = __ne_debugoutputtoconsole;
 }
-
-//-------------------------------------------------------------------------
 #endif
+//-------------------------------------------------------------------------
 
 #include <nds/arm9/postest.h>
 
@@ -571,13 +577,16 @@ static int ne_vertexcount;
 
 void NE_TouchTestStart(void)
 {
-	glViewport(255, 255, 255, 255);	//Hide what we are going to draw
+	//Hide what we are going to draw
+	glViewport(255, 255, 255, 255);
 
-	glMatrixMode(GL_MODELVIEW);	//Save current state
+	//Save current state
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
+
+	// Setup temporary render environment
 	glLoadIdentity();
 
 	int temp[4] = {
@@ -636,7 +645,8 @@ void NE_TouchTestEnd(void)
 	glViewport(NE_viewport[0], NE_viewport[1],
 		   NE_viewport[2], NE_viewport[3]);
 
-	glMatrixMode(GL_PROJECTION);	//Get previous state
+	// Restore previous state
+	glMatrixMode(GL_PROJECTION);
 	glPopMatrix(1);
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix(1);
