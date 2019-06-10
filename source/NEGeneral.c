@@ -461,12 +461,12 @@ void NE_HBLFunc(void)
 			val = ne_noisepause[vcount & LUT_MASK];
 		else
 			val = (rand() & ne_noise_value) - (ne_noise_value >> 1);
-		REG_BGOFFSETS = val;
+		REG_BG0HOFS = val;
 		break;
 
 	case NE_SINE:
 		angle = ((vcount + NE_lastvbladd) * ne_sine_mult) & LUT_MASK;
-		REG_BGOFFSETS = sinLerp(angle << 6) >> ne_sine_shift;
+		REG_BG0HOFS = sinLerp(angle << 6) >> ne_sine_shift;
 		break;
 
 	default:
@@ -497,7 +497,7 @@ void NE_SpecialEffectSet(NE_SpecialEffects effect)
 	case 0:
 	default:
 		NE_Effect = 0;
-		REG_BGOFFSETS = 0;
+		REG_BG0HOFS = 0;
 		break;
 	}
 }

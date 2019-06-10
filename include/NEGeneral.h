@@ -173,12 +173,6 @@ typedef enum {
 	NE_SINE = 2		/*!< Waves. */
 } NE_SpecialEffects;
 
-// TODO: Fix workaround
-#ifdef REG_BGOFFSETS
-#undef REG_BGOFFSETS
-#endif
-#define REG_BGOFFSETS (*(vu16*)0x4000010)
-
 /*! \fn    void NE_VBLFunc(void)
  *  \brief Internal use, must be called every vblank.
  */
