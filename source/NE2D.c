@@ -25,7 +25,7 @@ NE_Sprite *NE_SpriteCreate(void)
 		if (NE_spritepointers[i] != NULL)
 			continue;
 
-		NE_Sprite *sprite = (NE_Sprite *) calloc(1, sizeof(NE_Sprite));
+		NE_Sprite *sprite = calloc(1, sizeof(NE_Sprite));
 
 		NE_AssertPointer(sprite, "Not enough memory");
 

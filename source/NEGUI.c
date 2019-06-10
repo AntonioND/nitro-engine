@@ -546,10 +546,10 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		ne_button_t *ptr = (ne_button_t *) malloc(sizeof(ne_button_t));
+		ne_button_t *ptr = malloc(sizeof(ne_button_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
-		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
 		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
@@ -581,11 +581,10 @@ NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		ne_checkbox_t *ptr =
-			(ne_checkbox_t *)malloc(sizeof(ne_checkbox_t));
+		ne_checkbox_t *ptr = malloc(sizeof(ne_checkbox_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
-		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
 		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
@@ -619,11 +618,10 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		ne_radiobutton_t *ptr =
-			(ne_radiobutton_t *) malloc(sizeof(ne_radiobutton_t));
+		ne_radiobutton_t *ptr = malloc(sizeof(ne_radiobutton_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
-		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
 		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
@@ -661,10 +659,10 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
 		if (NE_guipointers[i] != NULL)
 			continue;
 
-		ne_slidebar_t *ptr = (ne_slidebar_t *) malloc(sizeof(ne_slidebar_t));
+		ne_slidebar_t *ptr = malloc(sizeof(ne_slidebar_t));
 		NE_AssertPointer(ptr, "Not enough memory");
 
-		NE_guipointers[i] = (void *)malloc(sizeof(NE_GUIObj));
+		NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
 		NE_AssertPointer(NE_guipointers[i], "Not enough memory");
 
 		NE_guipointers[i]->pointer = (void *)ptr;
