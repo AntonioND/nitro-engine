@@ -40,13 +40,15 @@ typedef enum {
  *  \brief  Holds information of an animation.
  */
 typedef struct {
-	u32 *fileptrtr;		// Pointer to the file/data
+	// Pointer to the file/data
+	u32 *fileptrtr;
 
 	int animtype;
 	int currframe;
 	int startframe;
 	int endframe;
-	int speed[NE_MAX_FRAMES];	// Each frame can have different speed
+	// Each frame can have different speed
+	int speed[NE_MAX_FRAMES];
 	s8 direction;
 	int nextframetime;
 } NE_AnimData;
@@ -212,7 +214,7 @@ void NE_SpecialEffectNoiseConfig(int value);
  */
 void NE_SpecialEffectSineConfig(int mult, int shift);
 
-/*! \enum  NE_UPDATE_FLAGS
+/*! \enum  NE_UpdateFlags
  *  \brief Arguments for NE_WaitForVBL().
  */
 typedef enum {
@@ -220,11 +222,11 @@ typedef enum {
 	NE_UPDATE_ANIMATIONS = 1 << 1,	/*!< Updates animated models. */
 	NE_UPDATE_PHYSICS = 1 << 2,	/*!< Updates the physics engine. */
 	NE_CAN_SKIP_VBL = 1 << 3	/*!< Allows Nitro Engine to skip the VBL wait if CPU load is greater than 100. */
-} NE_UPDATE_FLAGS;
+} NE_UpdateFlags;
 
-/*! \fn    void NE_WaitForVBL(NE_UPDATE_FLAGS flags);
+/*! \fn    void NE_WaitForVBL(NE_UpdateFlags flags);
  *  \brief Updates selected systems and waits for vertical blank.
- *  \param flags Look at NE_UPDATE_FLAGS.
+ *  \param flags Look at NE_UpdateFlags.
  *
  * For example, NE_WaitForVBL(NE_UPDATE_GUI | NE_UPDATE_ANIMATIONS);
  *
@@ -233,7 +235,7 @@ typedef enum {
  * anything else during VBL. You have to set NE_HBLFunc() to HBL interrupt
  * function for this to work.
  */
-void NE_WaitForVBL(NE_UPDATE_FLAGS flags);
+void NE_WaitForVBL(NE_UpdateFlags flags);
 
 /*! \fn    int NE_GetCPUPercent(void);
  *  \brief Returns CPU usage percent.

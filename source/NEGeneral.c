@@ -8,8 +8,8 @@
 
 /*! \file   NEGeneral.c */
 
-const char NE_VERSION[] =
-    "Nitro Engine - Version " NITRO_ENGINE_VERSION_STRING "\n"
+const char NE_VersioString[] =
+    "Nitro Engine - Version " NITRO_ENGINE_VERSION_STRING " - "
     "(C) 2008-2011, 2019 Antonio Nino Diaz (AntonioND)";
 
 static bool NE_UsingConsole;
@@ -504,7 +504,7 @@ void NE_SpecialEffectSet(NE_SpecialEffects effect)
 
 static int NE_CPUPercent;
 
-void NE_WaitForVBL(NE_UPDATE_FLAGS flags)
+void NE_WaitForVBL(NE_UpdateFlags flags)
 {
 	if (flags & NE_UPDATE_GUI)
 		NE_GUIUpdate();
