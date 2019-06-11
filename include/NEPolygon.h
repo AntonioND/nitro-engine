@@ -282,16 +282,6 @@ void NE_ClearBMPEnable(bool value);
  */
 void NE_ClearBMPScroll(u32 x, u32 y);
 
-#ifndef GFX_FOG_COLOR
-#define GFX_FOG_COLOR   (*(vuint32*)0x04000358)
-#endif
-#ifndef GFX_FOG_OFFSET
-#define GFX_FOG_OFFSET  (*(vuint32*)0x0400035C)
-#endif
-#ifndef GFX_FOG_TABLE
-#define GFX_FOG_TABLE   ((vuint8*)0x04000360)
-#endif
-
 /*! \fn    void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass,
  *                           int depth);
  *  \brief Enables fog and sets its parameters.
