@@ -21,7 +21,7 @@
  * @{
 */
 
-/*! \enum  NE_COLOURS
+/*! \enum  NE_ColorEnum
  *  \brief Predefined colors.
  */
 typedef enum {
@@ -44,7 +44,7 @@ typedef enum {
 	NE_Gray		= RGB15(20, 20, 20),	/*!< Gray. */
 	NE_DarkGray	= RGB15(10, 10, 10),	/*!< Dark gray. */
 	NE_Black	= RGB15(0, 0, 0)	/*!< Black. */
-} NE_COLOURS;
+} NE_ColorEnum;
 
 /*! \fn    void NE_LightOff(int num);
  *  \brief Switch off a light.
@@ -143,7 +143,7 @@ void NE_PolyVertexI(int x, int y, int z);
  */
 void NE_PolyTexCoord(int u, int v);
 
-/*! \enum  NE_LIGHT_ENUM
+/*! \enum  NE_LightEnum
  *  \brief Used in NE_PolyFormat(). Tells what lights to use.
  */
 typedef enum {
@@ -167,40 +167,40 @@ typedef enum {
 	NE_LIGHT_0123 = NE_LIGHT_0 | NE_LIGHT_1 | NE_LIGHT_2 | NE_LIGHT_3,	/*!< Use all lights. */
 
 	NE_LIGHT_ALL = NE_LIGHT_0123	/*!< Use all lights. */
-} NE_LIGHT_ENUM;
+} NE_LightEnum;
 
-/*! \enum  NE_CULLING_ENUM
+/*! \enum  NE_CullingEnum
  *  \brief Used in NE_PolyFormat(). Tells what polygons to draw.
  */
 typedef enum {
 	NE_CULL_FRONT = (1 << 6),	/*!< Don't draw polygons looking at the camera. */
 	NE_CULL_BACK = (2 << 6),	/*!< Don't draw polygons not looking at the camera. */
 	NE_CULL_NONE = (3 << 6)	/*!< Draw all polygons polygon. */
-} NE_CULLING_ENUM;
+} NE_CullingEnum;
 
-/*! \enum  NE_OTHER_FORMAT_ENUM
+/*! \enum  NE_OtherFormatEnum
  *  \brief Used in NE_PolyFormat().
  */
 typedef enum {
 	NE_MODULATION = (0 << 4),	/*!< Normal shading. */
 	NE_TOON_SHADING = (2 << 4),	/*!< Toon shading. */
 	NE_USE_FOG = (1 << 15),	/*!< Use fog. */
-} NE_OTHER_FORMAT_ENUM;
+} NE_OtherFormatEnum;
 
-/*! \fn    void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
- *                            NE_CULLING_ENUM culling,
- *                            NE_OTHER_FORMAT_ENUM other);
+/*! \fn    void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
+ *                            NE_CullingEnum culling,
+ *                            NE_OtherFormatEnum other);
  *  \brief Enable/disable multiple options.
  *  \param alpha Alpha value. 0 = Wireframe, 31 = Opaque, 1-30 Transparent. You
  *         can only blend one polygon over another if they have different ID.
  *  \param id Polygon ID used for antialias, blending and outlining. (0 - 63)
- *  \param lights Lights used... Use NE_LIGHT_ENUM for this.
+ *  \param lights Lights used... Use NE_LightEnum for this.
  *  \param culling What polygons must not be drawn. Possible options in
- *         NE_CULLING_ENUM.
- *  \param other Other parameters. Possible flags in NE_OTHER_FORMAT_ENUM.
+ *         NE_CullingEnum.
+ *  \param other Other parameters. Possible flags in NE_OtherFormatEnum.
  */
-void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
-		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other);
+void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
+		   NE_CullingEnum culling, NE_OtherFormatEnum other);
 
 /*! \fn    void NE_OutliningEnable(bool value);
  *  \brief Enable/disable outlining.

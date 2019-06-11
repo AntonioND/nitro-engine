@@ -63,8 +63,8 @@ void NE_PolyTexCoord(int u, int v)
 	GFX_TEX_COORD = TEXTURE_PACK(inttot16(u), inttot16(v));
 }
 
-void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
-		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other)
+void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
+		   NE_CullingEnum culling, NE_OtherFormatEnum other)
 {
 	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %lu", alpha);
 	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %lu", id);
