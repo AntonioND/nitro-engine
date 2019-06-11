@@ -187,7 +187,7 @@ typedef enum {
 	NE_USE_FOG = (1 << 15),	/*!< Use fog. */
 } NE_OTHER_FORMAT_ENUM;
 
-/*! \fn    void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
+/*! \fn    void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
  *                            NE_CULLING_ENUM culling,
  *                            NE_OTHER_FORMAT_ENUM other);
  *  \brief Enable/disable multiple options.
@@ -199,7 +199,7 @@ typedef enum {
  *         NE_CULLING_ENUM.
  *  \param other Other parameters. Possible flags in NE_OTHER_FORMAT_ENUM.
  */
-void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
+void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
 		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other);
 
 /*! \fn    void NE_OutliningEnable(bool value);
@@ -212,12 +212,12 @@ void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
  */
 void NE_OutliningEnable(bool value);
 
-/*! \fn    void NE_OutliningSetColor(u8 num, u32 color);
+/*! \fn    void NE_OutliningSetColor(u32 num, u32 color);
  *  \brief Set outlining color.
  *  \param num Color number.
  *  \param color Color.
  */
-void NE_OutliningSetColor(u8 num, u32 color);
+void NE_OutliningSetColor(u32 num, u32 color);
 
 /*! \fn    void NE_ShadingEnable(bool value);
  *  \brief Set shading on/off.
@@ -237,13 +237,13 @@ void NE_ShadingEnable(bool value);
  */
 void NE_ToonHighlightEnable(bool value);
 
-/*! \fn    void NE_ClearColorSet(u32 color, u8 alpha, u8 id);
+/*! \fn    void NE_ClearColorSet(u32 color, u32 alpha, u32 id);
  *  \brief Set some data to rear plane.
  *  \param color Color.
  *  \param alpha Alpha value.
  *  \param id Rear plane polygon ID.
  */
-void NE_ClearColorSet(u32 color, u8 alpha, u8 id);
+void NE_ClearColorSet(u32 color, u32 alpha, u32 id);
 
 /*! \def   #define REG_CLRIMAGE_OFFSET (*(vu16*)0x4000356)
  *  \brief Clear BMP scroll register. Taken from gbatek.
@@ -275,12 +275,12 @@ void NE_ClearColorSet(u32 color, u8 alpha, u8 id);
  */
 void NE_ClearBMPEnable(bool value);
 
-/*! \fn    void NE_ClearBMPScroll(u8 x, u8 y);
+/*! \fn    void NE_ClearBMPScroll(u32 x, u32 y);
  *  \brief Sets scroll of clear BMP. (0 - 255)
  *  \param x Scroll on the X axis.
  *  \param y Scroll on the Y axis.
  */
-void NE_ClearBMPScroll(u8 x, u8 y);
+void NE_ClearBMPScroll(u32 x, u32 y);
 
 #ifndef GFX_FOG_COLOR
 #define GFX_FOG_COLOR   (*(vuint32*)0x04000358)
@@ -292,7 +292,7 @@ void NE_ClearBMPScroll(u8 x, u8 y);
 #define GFX_FOG_TABLE   ((vuint8*)0x04000360)
 #endif
 
-/*! \fn    void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass,
+/*! \fn    void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass,
  *                           int depth);
  *  \brief Enables fog and sets its parameters.
  *  \param shift Distance between fog bands. (1 - 15)
@@ -304,7 +304,7 @@ void NE_ClearBMPScroll(u8 x, u8 y);
  *
  * You should try different values until you find the configuration you like.
  */
-void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass, int depth);
+void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass, int depth);
 
 /*! \fn    void NE_FogEnableBackground(bool value);
  *  \brief Enable/disable background fog (doesn't affect polygons).

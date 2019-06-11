@@ -63,11 +63,11 @@ void NE_PolyTexCoord(int u, int v)
 	GFX_TEX_COORD = TEXTURE_PACK(inttot16(u), inttot16(v));
 }
 
-void NE_PolyFormat(u8 alpha, u8 id, NE_LIGHT_ENUM lights,
+void NE_PolyFormat(u32 alpha, u32 id, NE_LIGHT_ENUM lights,
 		   NE_CULLING_ENUM culling, NE_OTHER_FORMAT_ENUM other)
 {
-	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %d", alpha);
-	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %d", id);
+	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %lu", alpha);
+	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %lu", id);
 
 	GFX_POLY_FORMAT = POLY_ALPHA(alpha) | POLY_ID(id) | lights | culling
 			| other;
@@ -81,9 +81,9 @@ void NE_OutliningEnable(bool value)
 		GFX_CONTROL &= ~GL_OUTLINE;
 }
 
-void NE_OutliningSetColor(u8 num, u32 color)
+void NE_OutliningSetColor(u32 num, u32 color)
 {
-	NE_AssertMinMax(0, num, 7, "Invalaid outlining color index %d", num);
+	NE_AssertMinMax(0, num, 7, "Invalaid outlining color index %lu", num);
 
 	glSetOutlineColor(num, color);
 }
@@ -106,7 +106,7 @@ void NE_ToonHighlightEnable(bool value)
 		GFX_CONTROL &= ~GL_TOON_HIGHLIGHT;
 }
 
-void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass, int depth)
+void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass, int depth)
 {
 	NE_FogDisable();
 
@@ -115,16 +115,13 @@ void NE_FogEnable(u8 shift, u32 color, u8 alpha, int mass, int depth)
 	GFX_FOG_COLOR = color | ((alpha) << 16);
 	GFX_FOG_OFFSET = depth;
 
-	//int i;
-	//for (i = 0; i < 32; i++) {
+	//for (int i = 0; i < 32; i++)
 	//	GFX_FOG_TABLE[i] = i << 2;
-	//}
 
 	// We need a 0 in the first fog table entry!
 	int32 density = -(mass << 1);
 
-	u8 i;
-	for (i = 0; i < 32; i++) {
+	for (int i = 0; i < 32; i++) {
 		density += mass << 1;
 		// Entries are 7 bit, so cap the density to 127
 		density = ((density > 127) ? 127 : density);
@@ -151,10 +148,10 @@ void NE_FogDisable(void)
 	GFX_CONTROL &= ~(GL_FOG | (15 << 8));
 }
 
-void NE_ClearColorSet(u32 color, u8 alpha, u8 id)
+void NE_ClearColorSet(u32 color, u32 alpha, u32 id)
 {
-	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %d", alpha);
-	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %d", id);
+	NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %lu", alpha);
+	NE_AssertMinMax(0, id, 63, "Invalid polygon ID %lu", id);
 
 	ne_clearcolor &= BIT(15);
 
@@ -189,7 +186,7 @@ void NE_ClearBMPEnable(bool value)
 	}
 }
 
-void NE_ClearBMPScroll(u8 x, u8 y)
+void NE_ClearBMPScroll(u32 x, u32 y)
 {
-	REG_CLRIMAGE_OFFSET = ((u16)x) | (((u16) y) << 8);
+	REG_CLRIMAGE_OFFSET = x | (y << 8);
 }
