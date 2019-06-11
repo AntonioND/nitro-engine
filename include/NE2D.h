@@ -9,6 +9,8 @@
 
 #include <nds.h>
 
+#include "NETexture.h"
+
 /*! \file   NE2D.h
  *  \brief  2D over 3D system.
  */

@@ -29,18 +29,18 @@ extern "C" {
 
 //------------------------------------------------------------------------------
 
-#include "NEGeneral.h"
-#include "NEPolygon.h"
-#include "NEFormats.h"
-#include "NEFAT.h"
-#include "NECamera.h"
-#include "NEPalette.h"
-#include "NETexture.h"
-#include "NEModel.h"
 #include "NE2D.h"
-#include "NEPhysics.h"
+#include "NECamera.h"
+#include "NEFAT.h"
+#include "NEFormats.h"
+#include "NEGeneral.h"
 #include "NEGUI.h"
+#include "NEModel.h"
+#include "NEPalette.h"
+#include "NEPhysics.h"
+#include "NEPolygon.h"
 #include "NEText.h"
+#include "NETexture.h"
 
 //------------------------------------------------------------------------------
 
