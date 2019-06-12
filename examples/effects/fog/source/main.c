@@ -75,7 +75,7 @@ int main(void)
 	NE_ModelSetCoord(Model3, 7, 2, 7);
 
 	// Set initial fog color to black
-	u32 Color = NE_Black;
+	u32 color = NE_Black;
 
 	// Some parameters
 	u16 depth = 0x7800;
@@ -108,12 +108,12 @@ int main(void)
 
 		// Set fog color
 		if (keys & KEY_START)
-			Color = NE_Black;
+			color = NE_Black;
 		if (keys & KEY_SELECT)
-			Color = NE_White;
+			color = NE_White;
 
 		// Enable/update fog
-		NE_FogEnable(shift, Color, 31, mass, depth);
+		NE_FogEnable(shift, color, 31, mass, depth);
 
 		printf("\x1b[0;0H"
 		       "Up/Down - Shift: %d \nX/B - Mass: %d  \n"
