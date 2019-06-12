@@ -73,12 +73,11 @@ float anorms[162][3] = {
 #include "anorms.h"
 };
 
-void PrintUse(void)
+void PrintUsage(void)
 {
-	printf("\n\n");
-	printf("Instructions:\n");
-	printf("    md2_2_bin [input.md2] [output.bin] <[float scale]>\n");
-	printf("       <[float translate x] [float translate x] [float translate x]>\n\n");
+	printf("Usage:\n");
+	printf("    md2_to_bin [input.md2] [output.bin] <[float scale]>\n");
+	printf("       <[float translate x] [float translate x] [float translate x]>\n");
 }
 
 int floattovtx10(float n)
@@ -99,15 +98,10 @@ int IsValidSize(int size)
 
 int main(int argc, char *argv[])
 {
-	printf("\n\n");
-	printf("       ########################################\n");
-	printf("       #                                      #\n");
-	printf("       #   --    --    MD2 2 BIN    --   --   #\n");
-	printf("       #                               v2.0   #\n");
-	printf("       ########################################\n");
+	printf("md2_to_bin v2.1\n");
 	printf("\n");
 	printf("Copyright (c) 2008-2011, 2019 Antonio Nino Diaz\n");
-	printf("All rights reserved.\n\n");
+	printf("\n");
 
 	// Default values
 	float global_scale = 1;
@@ -118,7 +112,7 @@ int main(int argc, char *argv[])
 	case 1:
 	case 2:
 		// Not enough arguments
-		PrintUse();
+		PrintUsage();
 		return -1;
 	case 3:
 		// Use default modifications
@@ -131,7 +125,7 @@ int main(int argc, char *argv[])
 	case 6:
 		// Custom translation, not enough
 		printf("You must set 3 coordinates for translation, not less.");
-		PrintUse();
+		PrintUsage();
 		return -1;
 	case 7:
 		// Custom translation + scale
@@ -142,7 +136,7 @@ int main(int argc, char *argv[])
 		break;
 	default:
 		// Too many arguments
-		PrintUse();
+		PrintUsage();
 		return -1;
 	}
 
@@ -154,7 +148,7 @@ int main(int argc, char *argv[])
 
 	if (global_scale == 0) {
 		printf("\nScale can't be 0!!");
-		PrintUse();
+		PrintUsage();
 		return -1;
 	}
 
@@ -179,7 +173,7 @@ int main(int argc, char *argv[])
 	} else {
 		fclose(datafile);
 		printf("\n\nCouldn't open %s!!\n\n", inputfilepath);
-		PrintUse();
+		PrintUsage();
 		return -1;
 	}
 
@@ -247,7 +241,7 @@ int main(int argc, char *argv[])
 	int vtxcount = 0;
 
 	int t = 0, v = 0;
-	for (t = 0; t < num_tris; t++)
+	for (t = 0; t < num_tris; t++) {
 		for (v = 0; v < 3; v++) {
 			vtx = (md2_vertex_t *) ((uintptr_t) (&(frame->verts)));
 			vtx = &vtx[triangle[t].vertex[v]];
@@ -324,6 +318,7 @@ int main(int argc, char *argv[])
 				NewCommandDL(ID_VERTEX16);
 			}
 		}
+	}
 	FinishDL();
 
 	if (absf(bigvalue) > 0) {
