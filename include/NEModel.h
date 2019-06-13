@@ -20,7 +20,7 @@
 /*! \def    #define NE_NO_TEXTURE   -1 */
 #define NE_NO_TEXTURE   -1
 
-#define NE_DEFAULT_MODELS 1024	/*! \def #define NE_DEFAULT_MODELS 1024 */
+#define NE_DEFAULT_MODELS 512	/*! \def #define NE_DEFAULT_MODELS 512 */
 
 /*! \struct NE_Model
  *  \brief  Holds information of a model.

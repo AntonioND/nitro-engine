@@ -21,7 +21,7 @@
  */
 
 /*! \def    #define NE_DEFAULT_PHYSICS  128 */
-#define NE_DEFAULT_PHYSICS  128
+#define NE_DEFAULT_PHYSICS  64
 
 /*! \def    #define NE_MIN_BOUNCE_SPEED (floattof32(0.01))
  *  \brief  Minimun speed that an object has to have to bounce. If it has less

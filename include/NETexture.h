@@ -21,8 +21,8 @@
  * @{
 */
 
-/*! \def   #define NE_DEFAULT_TEXTURES 512 */
-#define NE_DEFAULT_TEXTURES 512
+/*! \def   #define NE_DEFAULT_TEXTURES 128 */
+#define NE_DEFAULT_TEXTURES 128
 
 /*! \def   #define NE_NO_PALETTE   -1 */
 #define NE_NO_PALETTE   -1

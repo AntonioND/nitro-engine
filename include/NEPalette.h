@@ -19,8 +19,8 @@
  * @{
  */
 
-/*! \def   #define NE_DEFAULT_PALETTES 512 */
-#define NE_DEFAULT_PALETTES 512
+/*! \def   #define NE_DEFAULT_PALETTES 64 */
+#define NE_DEFAULT_PALETTES 64
 
 /*! \struct NE_TextPalette
  *  \brief  Holds information for a palette.

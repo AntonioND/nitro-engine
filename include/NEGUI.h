@@ -19,7 +19,8 @@
  * @{
 */
 
-#define NE_GUI_DEFAULT_OBJECTS      128	/*! \def   #define NE_GUI_DEFAULT_OBJECTS    128 */
+/*! \def   #define NE_GUI_DEFAULT_OBJECTS    64 */
+#define NE_GUI_DEFAULT_OBJECTS      64
 
 #define NE_GUI_POLY_ID       62	/*! \def   #define NE_GUI_POLY_ID     62 */
 #define NE_GUI_POLY_ID_ALT   61	/*! \def   #define NE_GUI_POLY_ID_ALT 61 */
