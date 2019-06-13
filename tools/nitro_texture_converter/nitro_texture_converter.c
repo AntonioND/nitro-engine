@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NITRO_TEXTURE_CONVERTER_VERSION "1.0.0"
+#define NITRO_TEXTURE_CONVERTER_VERSION "1.1.0"
 
 #define FORMAT_TYPES   7
 

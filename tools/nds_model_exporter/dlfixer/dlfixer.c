@@ -107,6 +107,11 @@ int main(int argc, char *argv[])
 	unsigned int *Out_Pointer;
 	unsigned int *Output_File;
 
+	printf("dlfixer v1.0\n");
+	printf("\n");
+	printf("Copyright (c) 2008-2011, 2019 Antonio Nino Diaz\n");
+	printf("\n");
+
 	// Load file
 	ModelFile = fopen("model.bin", "rb+");
 	if (ModelFile == NULL) {
