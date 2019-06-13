@@ -24,8 +24,8 @@
 /*! \def   #define NE_DEFAULT_TEXTURES 512 */
 #define NE_DEFAULT_TEXTURES 512
 
-/*! \def   #define NE_NO_PALETTE   2048 */
-#define NE_NO_PALETTE   2048
+/*! \def   #define NE_NO_PALETTE   -1 */
+#define NE_NO_PALETTE   -1
 
 /*! \struct NE_Material
  *  \brief  Information of one material.

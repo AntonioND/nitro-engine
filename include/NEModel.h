@@ -17,8 +17,8 @@
  * @{
  */
 
-/*! \def    #define NE_NO_TEXTURE   9999 */
-#define NE_NO_TEXTURE   9999
+/*! \def    #define NE_NO_TEXTURE   -1 */
+#define NE_NO_TEXTURE   -1
 
 #define NE_DEFAULT_MODELS 1024	/*! \def #define NE_DEFAULT_MODELS 1024 */
 
