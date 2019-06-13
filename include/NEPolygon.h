@@ -246,7 +246,8 @@ void NE_ToonHighlightEnable(bool value);
 void NE_ClearColorSet(u32 color, u32 alpha, u32 id);
 
 /*! \def   #define REG_CLRIMAGE_OFFSET (*(vu16*)0x4000356)
- *  \brief Clear BMP scroll register. Taken from gbatek.
+ *  \brief Clear BMP scroll register. Taken from GBATEK. Defined in case it
+ *  isn't found in libnds.
  */
 #ifndef REG_CLRIMAGE_OFFSET
 #define REG_CLRIMAGE_OFFSET (*(vu16*)0x4000356)
