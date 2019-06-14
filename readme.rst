@@ -7,7 +7,7 @@ Introduction
 This is a 3D game engine, a lot of functions designed to simplify the process of
 making a 3D game. It isn't standalone, it needs libnds to work. However, if you
 are developing for the NDS it is likely that you already have it installed. If
-not, you need to install devkitPro with devkitARM and libnds.
+not, you need to install devkitARM and libnds.
 
 Setup
 -----
@@ -27,7 +27,8 @@ Setup
 
 4. By default, Nitro Engine is compiled with debug options enabled. Go to
    ``NEMain.h`` and comment the line ``#define NE_DEBUG`` to disable them and
-   save CPU usage and memory.
+   save CPU usage and memory. You'll need to recompile the library for the new
+   value to take effect.
 
 Contact
 -------
