@@ -15,10 +15,10 @@ RM		:= rm -rf
 
 all: $(NAME)$(EXT)
 
-OJBS := dlfixer.o
+OBJS := dlfixer.o
 
 $(NAME)$(EXT): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OJBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS)
 
 .c.o:
 	$(CC) $(CFLAGS) -c -o $@ $<
