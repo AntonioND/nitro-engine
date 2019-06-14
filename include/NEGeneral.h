@@ -344,7 +344,7 @@ void NE_DebugSetHandlerConsole(void);
 
 /*! @} */
 
-/*! @defgroup touch_test Touch test.
+/*! @defgroup touch_test Touch test
 
  * If you wanted to know if you are touching something, this is for you! These
  * functions perform tests to know if an object is under the stylus coordinates
