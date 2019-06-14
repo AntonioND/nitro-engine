@@ -64,18 +64,11 @@ int ConvertARGBintoDEPTHBMP(void *data, int size, char *texture_filename);
 
 int main(int argc, char *argv[])
 {
-	printf("\n\n");
-	printf("   +---------------------------------------+\n");
-	printf("   |                                       |\n");
-	printf("   |   Nitro Texture Converter - V "
-	       NITRO_TEXTURE_CONVERTER_VERSION "   |\n");
-	printf("   |                                       |\n");
-	printf("   |     (C) 2008-2009 Antonio Ni%co D%caz   |\n", 164, 161);
-	printf("   |                                       |\n");
-	printf("   +---------------------------------------+\n\n");
-
-	printf
-	    ("Visit http://antoniond.drunkencoders.com to get the latest version.\n\n");
+	printf("Nitro Texture Converter - v"
+	       NITRO_TEXTURE_CONVERTER_VERSION "\n");
+	printf("\n");
+	printf("Copyright (c) 2008-2011, 2019 Antonio Nino Diaz\n");
+	printf("\n");
 
 	if (argc != 3) {
 		PrintUsage();
