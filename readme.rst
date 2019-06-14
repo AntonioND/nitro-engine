@@ -30,6 +30,23 @@ Setup
    save CPU usage and memory. You'll need to recompile the library for the new
    value to take effect.
 
+Screenshots
+-----------
+
+Screenshots of some of the examples included with Nitro Engine:
+
+.. image:: screenshots/a_lot_of_balls.png
+
+.. image:: screenshots/box_tower.png
+
+.. image:: screenshots/fog.png
+
+.. image:: screenshots/multiple_models.png
+
+.. image:: screenshots/screen_effects.png
+
+.. image:: screenshots/sprites.png
+
 Contact
 -------
 
