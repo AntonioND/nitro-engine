@@ -411,7 +411,7 @@ int main(int argc, char *argv[])
 	}
 
 	printf("\nSize of a frame: %ld\n",
-	       GetFrameSize(0) * sizeof(unsigned short));
+	       (long int)(GetFrameSize(0) * sizeof(unsigned short)));
 
 	// Frames
 	for (i_ = 0; i_ < header->num_frames; i_++) {
