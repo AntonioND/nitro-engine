@@ -21,7 +21,7 @@
  * @{
  */
 
-/*! \struct NE_BMP_HEADER
+/*! \struct NE_BMPHeader
  *  \brief  Header struct for a BMP file.
  */
 typedef struct {
@@ -29,9 +29,9 @@ typedef struct {
 	u32 size;			/* File size in bytes          */
 	u16 reserved1, reserved2;
 	u32 offset;			/* Offset to image data, bytes */
-} PACKED NE_BMP_HEADER;
+} PACKED NE_BMPHeader;
 
-/*! \struct NE_INFO_BMP_HEADER
+/*! \struct NE_BMPInfoHeader
  *  \brief  Information struct of a BMP file. */
 typedef struct {
 	u32 size;			/* Header size in bytes      */
@@ -43,7 +43,7 @@ typedef struct {
 	u32 xresolution, yresolution;	/* Pixels per meter          */
 	u32 ncolors;			/* Number of colors         */
 	u32 importantcolors;		/* Important colors         */
-} PACKED NE_INFO_BMP_HEADER;
+} PACKED NE_BMPInfoHeader;
 
 /*! \fn    int NE_FATMaterialTexLoadBMPtoRGBA(NE_Material *tex, char *filename,
  *                                            bool transpcolor);

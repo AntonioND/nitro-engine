@@ -13,9 +13,10 @@ static u32 numcolors = 0;
 
 static void *NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 {
-	NE_BMP_HEADER *header = pointer;
-	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header + sizeof(NE_BMP_HEADER));
-	u8 *IMAGEDATA = (u8 *) infoheader + sizeof(NE_INFO_BMP_HEADER);
+	NE_BMPHeader *header = pointer;
+	NE_BMPInfoHeader *infoheader = (void *)(u8 *)header +
+						sizeof(NE_BMPHeader);
+	u8 *IMAGEDATA = (void *)((u8 *)infoheader + sizeof(NE_BMPInfoHeader));
 	if (header->type != 0x4D42) {
 		NE_DebugPrint("Not a BMP file");
 		return NULL;
@@ -130,9 +131,9 @@ static void *NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 
 static void *NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 {
-	NE_BMP_HEADER *header = (void *)pointer;
-	NE_INFO_BMP_HEADER *infoheader = (void *)((u8 *) header
-				       + sizeof(NE_BMP_HEADER));
+	NE_BMPHeader *header = pointer;
+	NE_BMPInfoHeader *infoheader = (void *)((u8 *)header +
+						sizeof(NE_BMPHeader));
 	if (header->type != 0x4D42) {
 		NE_DebugPrint("Not a BMP file");
 		return NULL;
@@ -158,7 +159,7 @@ static void *NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 
 	// Decode
 	int colornumber = (infoheader->bits == 8) ? 256 : 16;
-	u8 *PALETTEDATA = (u8 *)infoheader + sizeof(NE_INFO_BMP_HEADER);
+	u8 *PALETTEDATA = (u8 *)infoheader + sizeof(NE_BMPInfoHeader);
 	u8 *IMAGEDATA = (u8 *)header + header->offset;
 
 	// numcolors is used by the other functions (look at the start of this

@@ -112,23 +112,23 @@ int NE_ScreenshotBMP(char *filename)
 		ysize = 192;
 
 	u8 *temp = (u8 *)malloc(256 * ysize * 3
-				+ sizeof(NE_INFO_BMP_HEADER)
-				+ sizeof(NE_BMP_HEADER));
+				+ sizeof(NE_BMPInfoHeader)
+				+ sizeof(NE_BMPHeader));
 
-	NE_BMP_HEADER *header = (NE_BMP_HEADER *) temp;
-	NE_INFO_BMP_HEADER *infoheader =
-		(NE_INFO_BMP_HEADER *)(temp + sizeof(NE_BMP_HEADER));
+	NE_BMPHeader *header = (NE_BMPHeader *) temp;
+	NE_BMPInfoHeader *infoheader =
+		(NE_BMPInfoHeader *)(temp + sizeof(NE_BMPHeader));
 
 	NE_write16(&header->type, 0x4D42);
-	NE_write32(&header->size, 256 * ysize * 3 + sizeof(NE_INFO_BMP_HEADER)
-						  + sizeof(NE_BMP_HEADER));
+	NE_write32(&header->size, 256 * ysize * 3 + sizeof(NE_BMPInfoHeader)
+						  + sizeof(NE_BMPHeader));
 	NE_write32(&header->offset,
-		   sizeof(NE_INFO_BMP_HEADER) + sizeof(NE_BMP_HEADER));
+		   sizeof(NE_BMPInfoHeader) + sizeof(NE_BMPHeader));
 	NE_write16(&header->reserved1, 0);
 	NE_write16(&header->reserved2, 0);
 
 	NE_write16(&infoheader->bits, 24);
-	NE_write32(&infoheader->size, sizeof(NE_INFO_BMP_HEADER));
+	NE_write32(&infoheader->size, sizeof(NE_BMPInfoHeader));
 	NE_write32(&infoheader->compression, 0);
 	NE_write32(&infoheader->width, 256);
 	NE_write32(&infoheader->height, ysize);
@@ -164,12 +164,13 @@ int NE_ScreenshotBMP(char *filename)
 			u8 g = ((color >> 5) & 31) << 3;
 			u8 r = ((color >> 10) & 31) << 3;
 
-			temp[((y * 256) + x) * 3 + sizeof(NE_INFO_BMP_HEADER) +
-			     sizeof(NE_BMP_HEADER)] = r;
-			temp[((y * 256) + x) * 3 + 1 + sizeof(NE_INFO_BMP_HEADER) +
-			     sizeof(NE_BMP_HEADER)] = g;
-			temp[((y * 256) + x) * 3 + 2 + sizeof(NE_INFO_BMP_HEADER)
-						     + sizeof(NE_BMP_HEADER)] = b;
+			int index = ((y * 256) + x) * 3
+				  + sizeof(NE_BMPInfoHeader)
+				  + sizeof(NE_BMPHeader);
+
+			temp[index + 0] = r;
+			temp[index + 1] = g;
+			temp[index + 2] = b;
 		}
 	}
 
@@ -177,8 +178,8 @@ int NE_ScreenshotBMP(char *filename)
 		vramRestorePrimaryBanks(vramTemp);
 
 	DC_FlushAll();
-	fwrite(temp, 1, 256 * ysize * 3 + sizeof(NE_INFO_BMP_HEADER)
-					+ sizeof(NE_BMP_HEADER), f);
+	fwrite(temp, 1, 256 * ysize * 3 + sizeof(NE_BMPInfoHeader)
+					+ sizeof(NE_BMPHeader), f);
 	fclose(f);
 	free(temp);
 
