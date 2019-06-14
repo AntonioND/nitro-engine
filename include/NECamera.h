@@ -13,7 +13,7 @@
  *  \brief  Structs and functions used to move/rotate/etc the camera.
  */
 
-/*! @defgroup camera_system Camera System.
+/*! @defgroup camera_system Camera System
  *
  * Functions to manipulate cameras.
  *

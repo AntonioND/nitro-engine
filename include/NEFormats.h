@@ -13,7 +13,7 @@
  *  \brief  Used to convert common formats into DS formats.
  */
 
-/*! @defgroup formats Format covertion functions.
+/*! @defgroup formats Format coversion functions
  *
  * Right now, there are only functions to convert BMP images into DS textures.
  * They support BMP of 4, 8, 16 (X1RGB5) and 24 bits.

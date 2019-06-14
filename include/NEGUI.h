@@ -12,7 +12,7 @@
 /*! \file   NEGUI.h
  *  \brief  GUI functions. */
 
-/*! @defgroup gui_system GUI System.
+/*! @defgroup gui_system GUI system
  *
  * Functions to create buttons, check boxes, radio buttons and slidebars.
  *

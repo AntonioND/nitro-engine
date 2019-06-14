@@ -12,7 +12,7 @@
 /*! \file   NEPalette.h
  *  \brief  Functions for loading, using and deleting palettes. */
 
-/*! @defgroup palette_system Palette system.
+/*! @defgroup palette_system Palette system
  *
  * Functions to manipulate texture palettes.
  *

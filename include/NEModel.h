@@ -11,7 +11,7 @@
  *  \brief  Functions draw models, etc...
  */
 
-/*! @defgroup model_system Model system.
+/*! @defgroup model_system Model system
  *
  * System to create and manipulate animated or static models.
  * @{

@@ -8,7 +8,7 @@
 #define NE_ALLOC__
 
 /*! \file   NEAlloc.h
- *  \brief  VRAM handling.
+ *  \brief  VRAM memory allocator
  *
  * Internal use, used to handle VRAM when other function requests memory.
  */

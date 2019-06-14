@@ -8,7 +8,7 @@
 #define NITRO_ENGINE_H__
 
 /*! \file   NEMain.h
- *  \brief  Main file of Nitro Engine.  */
+ *  \brief  Main header of Nitro Engine.  */
 
 #include <nds.h>
 #include <stdio.h>

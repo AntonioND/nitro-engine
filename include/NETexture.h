@@ -14,7 +14,7 @@
  *  \brief  Texture and material functions.
  */
 
-/*! @defgroup texture_system Texture system.
+/*! @defgroup texture_system Texture system
  *
  * Texture manipulation functions. A material is just a texture with a color.
  *

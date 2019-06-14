@@ -13,7 +13,7 @@
 /*! \file   NEGeneral.h
  *  \brief  Init 3D mode and process functions. */
 
-/*! @defgroup general_ General.
+/*! @defgroup general_ General utilities
  *
  * Functions to control Nitro Engine.
  *

@@ -11,7 +11,7 @@
  *  \brief  Text system.
  */
 
-/*! @defgroup text_system Text system.
+/*! @defgroup text_system Text system
  *
  * Text drawing functions using the 3D hardware. Functions accept '\n', but not
  * '%d', '%s'... You'll need to use snprintf() or similar for that. Also, you

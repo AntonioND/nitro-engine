@@ -15,7 +15,7 @@
  *  \brief  2D over 3D system.
  */
 
-/*! @defgroup 2d_system 2D System.
+/*! @defgroup 2d_system 2D System
  *
  * Functions to draw in 2D using the 3D hardware. If you want to draw quads
  * but you don't want to save their coordinates, transparency, etc... use

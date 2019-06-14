@@ -13,7 +13,7 @@
  *  \brief  Functions to draw polygons and more...
  */
 
-/*! @defgroup other_ Other functions.
+/*! @defgroup other_ Other functions
  *
  * Some functions to set lights and its propierties, to draw polygons, configure
  * the rear plane, etc...

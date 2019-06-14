@@ -11,7 +11,7 @@
  *  \brief  Simple physics engine.
  */
 
-/*! @defgroup physics Physics engine.
+/*! @defgroup physics Physics engine
  *
  * A very simple physics engine. It only supports axis-aligned bounding boxes.
  *

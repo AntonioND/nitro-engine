@@ -13,7 +13,7 @@
  *  \brief  Used to load data from FAT.
  */
 
-/*! @defgroup fat FAT functions.
+/*! @defgroup fat FAT functions
  *
  * Functions to load data from FAT, and to take screenshots.
  *
