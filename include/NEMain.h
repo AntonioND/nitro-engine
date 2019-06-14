@@ -45,14 +45,14 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 #define NITRO_ENGINE_MAJOR (0)
-#define NITRO_ENGINE_MINOR (6)
-#define NITRO_ENGINE_PATCH (2)
+#define NITRO_ENGINE_MINOR (7)
+#define NITRO_ENGINE_PATCH (0)
 
 #define NITRO_ENGINE_VERSION ((NITRO_ENGINE_MAJOR << 16) |	\
 			      (NITRO_ENGINE_MINOR << 8) |	\
 			      (NITRO_ENGINE_PATCH))
 
-#define NITRO_ENGINE_VERSION_STRING "0.6.2"
+#define NITRO_ENGINE_VERSION_STRING "0.7.0"
 
 //------------------------------------------------------------------------------
 
