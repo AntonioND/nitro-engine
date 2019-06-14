@@ -352,7 +352,7 @@ int main(int argc, char *argv[])
 	fseek(test, 0, SEEK_END);
 	long int size = ftell(test);
 	fclose(test);
-	printf("\nBIN file size: %zd bytes\n", size);
+	printf("\nBIN file size: %ld bytes\n", size);
 
 	printf("\nReady!\n\n");
 
