@@ -35,17 +35,30 @@ Screenshots
 
 Screenshots of some of the examples included with Nitro Engine:
 
-.. image:: screenshots/a_lot_of_balls.png
+.. |a_lot_of_balls| image:: screenshots/a_lot_of_balls.png
+.. |box_tower| image:: screenshots/box_tower.png
+.. |fog| image:: screenshots/fog.png
+.. |multiple_models| image:: screenshots/multiple_models.png
+.. |screen_effects| image:: screenshots/screen_effects.png
+.. |sprites| image:: screenshots/sprites.png
 
-.. image:: screenshots/box_tower.png
++------------------+-------------------+
+| A lot of balls   | Box tower physics |
++------------------+-------------------+
+| |a_lot_of_balls| | |box_tower|       |
++------------------+-------------------+
 
-.. image:: screenshots/fog.png
++------------------+-------------------+
+| Hardware fog     | Multiple models   |
++------------------+-------------------+
+| |fog|            | |multiple_models| |
++------------------+-------------------+
 
-.. image:: screenshots/multiple_models.png
-
-.. image:: screenshots/screen_effects.png
-
-.. image:: screenshots/sprites.png
++------------------+-------------------+
+| Screen effects   | 2D sprites        |
++------------------+-------------------+
+| |screen_effects| | |sprites|         |
++------------------+-------------------+
 
 Contact
 -------
