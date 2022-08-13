@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "dynamic_list.h"
@@ -36,8 +37,7 @@ int DynamicListNewElement(DinamicList * list)
 	return DynamicListLenghtGet(list) - 1;
 }
 
-void DynamicListElementSet(DinamicList * list, int index,
-			   unsigned long long value)
+void DynamicListElementSet(DinamicList * list, int index, uint64_t value)
 {
 	unsigned int count = 0;
 	DinamicList *element_search = list;
@@ -52,7 +52,7 @@ void DynamicListElementSet(DinamicList * list, int index,
 	element_search->data = value;
 }
 
-unsigned long long DynamicListElementGet(DinamicList * list, int index)
+uint64_t DynamicListElementGet(DinamicList * list, int index)
 {
 	unsigned int count = 0;
 	DinamicList *element_search = list;
@@ -82,7 +82,7 @@ int DynamicListLenghtGet(DinamicList * list)
 	return count;
 }
 
-int DynamicListGetIndex(DinamicList * list, unsigned long long value)
+int DynamicListGetIndex(DinamicList * list, uint64_t value)
 {
 	int count = 0;
 	DinamicList *element_search = list;

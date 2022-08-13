@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022, Antonio Niño Díaz
 
 // I used the information in this web to make the converter:
 // http://tfc.duke.free.fr/coding/md2-specs-en.html
@@ -15,30 +15,23 @@
 
 #define MAX_PATHLEN	1024
 
-typedef signed int s32;
-typedef unsigned int u32;
-typedef signed short s16;
-typedef unsigned short u16;
-typedef signed char s8;
-typedef unsigned char u8;
-
-static inline s32 floattof32(float n)
+static inline int32_t floattof32(float n)
 {
-	return (s32) (n * (1 << 12));
+	return (int32_t) (n * (1 << 12));
 }
 
-static inline s16 floattov16(float n)
+static inline int16_t floattov16(float n)
 {
-	return (s16) (n * (1 << 12));
+	return (int16_t) (n * (1 << 12));
 }
 
-static inline s16 floattov10(float n)
+static inline int16_t floattov10(float n)
 {
 	if (n > 0.998)
 		return 0x7FFF;
 	if (n < -0.998)
 		return 0xFFFF;
-	return (s16) (n * (1 << 9));
+	return (int16_t) (n * (1 << 9));
 }
 
 #define absf(x) (((x) > 0) ? (x) : -(x))
@@ -50,39 +43,39 @@ static inline s16 floattov10(float n)
 typedef float vec3_t[3];
 
 typedef struct {
-	int ident;
-	int version;
+	int32_t ident;
+	int32_t version;
 
-	int skinwidth;
-	int skinheight;
-	int framesize;
-	int num_skins;
-	int num_vertices;
-	int num_st;
-	int num_tris;
-	int num_glcmds;
-	int num_frames;
-	int offset_skins;
-	int offset_st;
-	int offset_tris;
-	int offset_frames;
-	int offset_glcmds;
-	int offset_end;
+	int32_t skinwidth;
+	int32_t skinheight;
+	int32_t framesize;
+	int32_t num_skins;
+	int32_t num_vertices;
+	int32_t num_st;
+	int32_t num_tris;
+	int32_t num_glcmds;
+	int32_t num_frames;
+	int32_t offset_skins;
+	int32_t offset_st;
+	int32_t offset_tris;
+	int32_t offset_frames;
+	int32_t offset_glcmds;
+	int32_t offset_end;
 } md2_header_t;
 
 typedef struct {
-	short s;
-	short t;
+	int16_t s;
+	int16_t t;
 } md2_texCoord_t;
 
 typedef struct {
-	unsigned short vertex[3];
-	unsigned short st[3];
+	uint16_t vertex[3];
+	uint16_t st[3];
 } md2_triangle_t;
 
 typedef struct {
-	unsigned char v[3];
-	unsigned char normalIndex;
+	uint8_t v[3];
+	uint8_t normalIndex;
 } md2_vertex_t;
 
 typedef struct {
@@ -95,7 +88,7 @@ typedef struct {
 typedef struct {
 	float s;
 	float t;
-	int index;
+	int32_t index;
 } md2_glcmd_t;
 
 float anorms[162][3] = {
@@ -109,22 +102,22 @@ float anorms[162][3] = {
 //Frame data -> texture, normal, vertex, texture...
 
 typedef struct {
-	s32 magic;
-	s32 version;
+	int32_t magic;
+	int32_t version;
 
-	s32 num_frames;
-	s32 num_vertices;
+	int32_t num_frames;
+	int32_t num_vertices;
 
-	s32 offset_frames;
-	s32 offset_vtx;
-	s32 offset_norm;
-	s32 offset_st;
+	int32_t offset_frames;
+	int32_t offset_vtx;
+	int32_t offset_norm;
+	int32_t offset_st;
 
 } ds_header_t;
 
-typedef s16 ds_vec3_t[3];
+typedef int16_t ds_vec3_t[3];
 
-typedef s16 ds_st_t[2];
+typedef int16_t ds_st_t[2];
 
 //-----------------------------------------------------------
 
@@ -208,10 +201,10 @@ int main(int argc, char *argv[])
 	FILE *datafile = fopen(inputfilepath, "r");
 	if (datafile != NULL) {
 		fseek(datafile, 0, SEEK_END);
-		long int tamano = ftell(datafile);
+		long int size = ftell(datafile);
 		rewind(datafile);
-		md2data = (char *)malloc(sizeof(char) * tamano);
-		fread(md2data, 1, tamano, datafile);
+		md2data = (char *)malloc(sizeof(char) * size);
+		fread(md2data, 1, size, datafile);
 		fclose(datafile);
 	} else {
 		fclose(datafile);
@@ -227,7 +220,8 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	int t_w = header->skinwidth, t_h = header->skinheight;
+	int32_t t_w = header->skinwidth;
+    int32_t t_h = header->skinheight;
 
 	if (t_w > 1024 || t_h > 1024) {
 		printf("\n\nTexture too big!!\n\n");
@@ -236,8 +230,7 @@ int main(int argc, char *argv[])
 
 	if (!IsValidSize(t_w) || !IsValidSize(t_h)) {
 		printf("\nWrong texture size. Must be power of 2.\n");
-		printf
-		    ("\nAlthough the model uses an invalid texture size, it will be converted.\n");
+		printf("\nAlthough the model uses an invalid texture size, it will be converted.\n");
 		printf("\nResize the texture to nearest valid size.\n\n");
 	}
 
@@ -263,64 +256,52 @@ int main(int argc, char *argv[])
 	// Current vertex
 	md2_vertex_t *vtx;
 
-	printf
-	    ("\nMD2 Information:\n\n  Number of frames: %d\n  Texture size: %dx%d",
-	     header->num_frames, t_w, t_h);
+	printf("\nMD2 Information:\n\n  Number of frames: %d\n  Texture size: %dx%d",
+	    header->num_frames, t_w, t_h);
 
 	printf("\nCreating lists of commands...\n");
 
 	float bigvalue = 0;
-	int maxvtxnum = 0;
+	int32_t maxvtxnum = 0;
 
 	InitDynamicLists();
 
 	// Everything ready, let's "draw" all frames
 	int n;
 	for (n = 0; n < header->num_frames; n++) {
-		frame =
-		    (md2_frame_t *) ((uintptr_t)header->offset_frames + (uintptr_t)header +
-				     (header->framesize * n));
+		frame = (md2_frame_t *) ((uintptr_t)header->offset_frames +
+                                 (uintptr_t)header + (header->framesize * n));
 
 		NewFrame();
 
-		int vtxcount = 0;
+		int32_t vtxcount = 0;
 
-		int t = 0, v = 0;
-		for (t = 0; t < num_tris; t++) {
-			for (v = 0; v < 3; v++) {
+		for (int32_t t = 0; t < num_tris; t++) {
+			for (int32_t v = 0; v < 3; v++) {
 				vtx = (md2_vertex_t *) ((uintptr_t)(&(frame->verts)));
 				vtx = &vtx[triangle[t].vertex[v]];
 
 				// Texture
-				short s_ = texcoord[triangle[t].st[v]].s;
-				short t_ = texcoord[triangle[t].st[v]].t;
+				int16_t s_ = texcoord[triangle[t].st[v]].s;
+				int16_t t_ = texcoord[triangle[t].st[v]].t;
 
 				// This is used to change UVs if using a texture size unsupported by DS
-				s_ = (int)((float)(s_ * t_w) /
-					   (float)header->skinwidth);
-				t_ = (int)((float)(t_ * t_h) /
-					   (float)header->skinheight);
+				s_ = (int32_t)((float)(s_ * t_w) / (float)header->skinwidth);
+				t_ = (int32_t)((float)(t_ * t_h) / (float)header->skinheight);
 				NewFrameData(AddTexCoord(s_ << 4, t_ << 4));	// (t_h-t_)<<4));
 
 				// Normal
-				unsigned short norm[3];
-				int b;
-				for (b = 0; b < 3; b++)
-					norm[b] =
-					    floattov10(anorms[vtx->normalIndex]
-						       [b]);
-				NewFrameData(AddNormal
-					     (norm[0], norm[1], norm[2]));
+				uint16_t norm[3];
+				for (int32_t b = 0; b < 3; b++)
+					norm[b] = floattov10(anorms[vtx->normalIndex][b]);
+				NewFrameData(AddNormal(norm[0], norm[1], norm[2]));
 
 				// Vertex
 				vtxcount++;
 				float _v[3];
-				int a = 0;
-				for (a = 0; a < 3; a++) {
-					_v[a] =
-					    ((float)frame->scale[a] *
-					     (float)(vtx->v[a])) +
-					    (float)frame->translate[a];
+				for (int32_t a = 0; a < 3; a++) {
+					_v[a] = ((float)frame->scale[a] * (float)(vtx->v[a])) +
+					        (float)frame->translate[a];
 					_v[a] += general_trans[a];
 					_v[a] *= general_scale;
 
@@ -329,10 +310,8 @@ int main(int argc, char *argv[])
 						bigvalue = _v[a];
 				}
 
-				NewFrameData(AddVertex
-					     (floattov16(_v[0]),
-					      floattov16(_v[2]),
-					      floattov16(_v[1])));
+				NewFrameData(AddVertex(floattov16(_v[0]), floattov16(_v[2]),
+				                       floattov16(_v[1])));
 			}
 		}
 
@@ -342,15 +321,13 @@ int main(int argc, char *argv[])
 
 	if (absf(bigvalue) > 0) {
 		printf("\nModel too big for DS! Scale it down.\n");
-		printf
-		    ("\nDS max. allowed value: +/-7,9997\nModel max. detected value: %f\n",
+		printf("\nDS max. allowed value: +/-7,9997\nModel max. detected value: %f\n",
 		     bigvalue);
 	}
 
 	if (maxvtxnum > 6144) {
 		printf("\nModel has too many vertices!\n");
-		printf
-		    ("\nDS can only render 6144 vertices per frame.\nYour model has %d vertices.\n",
+		printf("\nDS can only render 6144 vertices per frame.\nYour model has %d vertices.\n",
 		     maxvtxnum);
 	}
 
@@ -385,38 +362,37 @@ int main(int argc, char *argv[])
 
 	// Normals...
 	ds_vec3_t temp_vector;
-	int number = GetNormalNumber();
-	int i_;
-	for (i_ = 0; i_ < number; i_++) {
-		GetNormal(i_, (u16 *) & temp_vector[0],
-			  (u16 *) & temp_vector[1], (u16 *) & temp_vector[2]);
+	int32_t number = GetNormalNumber();
+	for (int32_t i = 0; i < number; i++) {
+		GetNormal(i, (uint16_t *)&temp_vector[0], (uint16_t *)&temp_vector[1],
+                     (uint16_t *)&temp_vector[2]);
 		fwrite(&temp_vector, sizeof(ds_vec3_t), 1, file);
 	}
 
 	// Texcoords
 	ds_st_t temp_texcoord;
 	number = GetTexcoordsNumber();
-	for (i_ = 0; i_ < number; i_++) {
-		GetTexCoord(i_, (u16 *) & temp_texcoord[0],
-			    (u16 *) & temp_texcoord[1]);
+	for (int32_t i = 0; i < number; i++) {
+		GetTexCoord(i, (uint16_t *)&temp_texcoord[0],
+                       (uint16_t *)&temp_texcoord[1]);
 		fwrite(&temp_texcoord, sizeof(ds_st_t), 1, file);
 	}
 
 	// Vertices
 	number = GetVerticesNumber();
-	for (i_ = 0; i_ < number; i_++) {
-		GetVertex(i_, (u16 *) & temp_vector[0],
-			  (u16 *) & temp_vector[1], (u16 *) & temp_vector[2]);
+	for (int32_t i = 0; i < number; i++) {
+		GetVertex(i, (uint16_t *)&temp_vector[0], (uint16_t *)&temp_vector[1],
+                     (uint16_t *)&temp_vector[2]);
 		fwrite(&temp_vector, sizeof(ds_vec3_t), 1, file);
 	}
 
 	printf("\nSize of a frame: %ld\n",
-	       (long int)(GetFrameSize(0) * sizeof(unsigned short)));
+	       (long int)(GetFrameSize(0) * sizeof(uint16_t)));
 
 	// Frames
-	for (i_ = 0; i_ < header->num_frames; i_++) {
+	for (int32_t i_ = 0; i_ < header->num_frames; i_++) {
 		fwrite((int *)GetFramePointer(i_), 1,
-		       GetFrameSize(i_) * sizeof(unsigned short), file);
+		       GetFrameSize(i_) * sizeof(uint16_t), file);
 	}
 
 	fclose(file);
@@ -427,10 +403,6 @@ int main(int argc, char *argv[])
 	fclose(test);
 
 	printf("\nNEA file size: %ld bytes", size);
-
-	if (size > 1 * 1024 * 1024)
-		printf("  --  Quite big, isn't it?");
-
 	printf("\n\nReady!\n\n");
 
 	EndDynamicLists();

@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022, Antonio Niño Díaz
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,15 +13,15 @@ DinamicList *vertices_list;
 DinamicList *normal_list;
 DinamicList *texcoords_list;
 
-unsigned int FrameSize[1024];
-unsigned short *FramePointer[1024];
+uint32_t FrameSize[1024];
+uint16_t *FramePointer[1024];
 int framecount = -1; // ------.
 //                            |
 void NewFrame(void) //        |
 { //                          |
 	framecount++; // <----'  For first frame
 
-	FramePointer[framecount] = (unsigned short *)malloc(DEFAULT_FRAME_SIZE);
+	FramePointer[framecount] = (uint16_t *)malloc(DEFAULT_FRAME_SIZE);
 	if (FramePointer[framecount] == NULL) {
 		printf("\n\nCouldn't allocate memory.\n\n");
 		while (1) ;	//TODO: Exit in a better way.
@@ -28,7 +29,7 @@ void NewFrame(void) //        |
 	FrameSize[framecount] = 0;
 }
 
-void NewFrameData(unsigned short data)
+void NewFrameData(uint16_t data)
 {
 	(FramePointer[framecount])[FrameSize[framecount]] = data;
 	FrameSize[framecount]++;
@@ -39,12 +40,12 @@ void NewFrameData(unsigned short data)
 	}
 }
 
-unsigned int GetFrameSize(int num)
+uint32_t GetFrameSize(int num)
 {
 	return FrameSize[num];
 }
 
-unsigned short *GetFramePointer(int num)
+uint16_t *GetFramePointer(int num)
 {
 	return FramePointer[num];
 }
@@ -63,10 +64,9 @@ void EndDynamicLists(void)
 	DynamicListDelete(texcoords_list);
 }
 
-int AddVertex(unsigned short x, unsigned short y, unsigned short z)
+int AddVertex(uint16_t x, uint16_t y, uint16_t z)
 {
-	long long value =
-	    ((long long)x << 32) | ((long long)y << 16) | (long long)z;
+	int64_t value = ((int64_t)x << 32) | ((int64_t)y << 16) | (int64_t)z;
 
 	int result = DynamicListGetIndex(vertices_list, value);
 
@@ -80,19 +80,17 @@ int AddVertex(unsigned short x, unsigned short y, unsigned short z)
 	return index;
 }
 
-void GetVertex(int index, unsigned short *x, unsigned short *y,
-	       unsigned short *z)
+void GetVertex(int index, uint16_t *x, uint16_t *y, uint16_t *z)
 {
-	unsigned long long temp = DynamicListElementGet(vertices_list, index);
-	*x = (unsigned short)((temp >> 32) & 0xFFFF);
-	*y = (unsigned short)((temp >> 16) & 0xFFFF);
-	*z = (unsigned short)(temp & 0xFFFF);
+	uint64_t temp = DynamicListElementGet(vertices_list, index);
+	*x = (uint16_t)((temp >> 32) & 0xFFFF);
+	*y = (uint16_t)((temp >> 16) & 0xFFFF);
+	*z = (uint16_t)(temp & 0xFFFF);
 }
 
-int AddNormal(unsigned short x, unsigned short y, unsigned short z)
+int AddNormal(uint16_t x, uint16_t y, uint16_t z)
 {
-	long long value =
-	    ((long long)x << 32) | ((long long)y << 16) | (long long)z;
+	uint64_t value = ((uint64_t)x << 32) | ((uint64_t)y << 16) | (uint64_t)z;
 
 	int result = DynamicListGetIndex(normal_list, value);
 
@@ -106,18 +104,17 @@ int AddNormal(unsigned short x, unsigned short y, unsigned short z)
 	return index;
 }
 
-void GetNormal(int index, unsigned short *x, unsigned short *y,
-	       unsigned short *z)
+void GetNormal(int index, uint16_t *x, uint16_t *y, uint16_t *z)
 {
-	unsigned long long temp = DynamicListElementGet(normal_list, index);
-	*x = (unsigned short)((temp >> 32) & 0xFFFF);
-	*y = (unsigned short)((temp >> 16) & 0xFFFF);
-	*z = (unsigned short)(temp & 0xFFFF);
+	uint64_t temp = DynamicListElementGet(normal_list, index);
+	*x = (uint16_t)((temp >> 32) & 0xFFFF);
+	*y = (uint16_t)((temp >> 16) & 0xFFFF);
+	*z = (uint16_t)(temp & 0xFFFF);
 }
 
-int AddTexCoord(unsigned short u, unsigned short v)
+int AddTexCoord(uint16_t u, uint16_t v)
 {
-	long long value = ((long long)u << 16) | (long long)v;
+	int32_t value = ((int32_t)u << 16) | (int32_t)v;
 
 	int result = DynamicListGetIndex(texcoords_list, value);
 
@@ -131,11 +128,11 @@ int AddTexCoord(unsigned short u, unsigned short v)
 	return index;
 }
 
-void GetTexCoord(int index, unsigned short *u, unsigned short *v)
+void GetTexCoord(int index, uint16_t *u, uint16_t *v)
 {
-	unsigned long long temp = DynamicListElementGet(texcoords_list, index);
-	*u = (unsigned short)((temp >> 16) & 0xFFFF);
-	*v = (unsigned short)(temp & 0xFFFF);
+	uint32_t temp = DynamicListElementGet(texcoords_list, index);
+	*u = (uint16_t)((temp >> 16) & 0xFFFF);
+	*v = (uint16_t)(temp & 0xFFFF);
 }
 
 int GetVerticesNumber(void)
