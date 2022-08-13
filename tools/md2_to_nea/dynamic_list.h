@@ -6,17 +6,17 @@
 #define _DYNAMICLIST_H_
 
 typedef struct {
-	void *previous;
-	uint64_t data;
-	void *next;
-} DinamicList;
+    void *previous;
+    uint64_t data;
+    void *next;
+} DynamicList;
 
-void DynamicListNew(DinamicList ** list);
-int DynamicListNewElement(DinamicList * list);
-void DynamicListElementSet(DinamicList * list, int index, uint64_t value);
-uint64_t DynamicListElementGet(DinamicList * list, int index);
-int DynamicListLenghtGet(DinamicList * list);
-int DynamicListGetIndex(DinamicList * list, uint64_t value);
-void DynamicListDelete(DinamicList * list);
+void DynamicListNew(DynamicList **list);
+int DynamicListNewElement(DynamicList *list);
+void DynamicListElementSet(DynamicList *list, int index, uint64_t value);
+uint64_t DynamicListElementGet(DynamicList *list, int index);
+int DynamicListLenghtGet(DynamicList *list);
+int DynamicListGetIndex(DynamicList *list, uint64_t value);
+void DynamicListDelete(DynamicList *list);
 
 #endif

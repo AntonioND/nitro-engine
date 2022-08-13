@@ -7,109 +7,116 @@
 
 #include "dynamic_list.h"
 
-void DynamicListNew(DinamicList ** list)
+void DynamicListNew(DynamicList **list)
 {
-	*list = (DinamicList *) malloc(sizeof(DinamicList));
-	(*list)->previous = NULL;
-	(*list)->data = 0;
-	(*list)->next = NULL;
+    *list = (DynamicList *)malloc(sizeof(DynamicList));
+    (*list)->previous = NULL;
+    (*list)->data = 0;
+    (*list)->next = NULL;
 }
 
-int DynamicListNewElement(DinamicList * list)
+int DynamicListNewElement(DynamicList *list)
 {
-	DinamicList *element_search = list;
+    DynamicList *element_search = list;
 
-	while (1) {
-		if (element_search->next == NULL)
-			break;
+    while (1)
+    {
+        if (element_search->next == NULL)
+            break;
 
-		element_search = (DinamicList *) element_search->next;
-	}
+        element_search = (DynamicList *)element_search->next;
+    }
 
-	DinamicList *new_element;
-	new_element = (DinamicList *) malloc(sizeof(DinamicList));
-	element_search->next = new_element;
+    DynamicList *new_element;
+    new_element = (DynamicList *)malloc(sizeof(DynamicList));
+    element_search->next = new_element;
 
-	new_element->previous = element_search;
-	new_element->data = 0;
-	new_element->next = NULL;
+    new_element->previous = element_search;
+    new_element->data = 0;
+    new_element->next = NULL;
 
-	return DynamicListLenghtGet(list) - 1;
+    return DynamicListLenghtGet(list) - 1;
 }
 
-void DynamicListElementSet(DinamicList * list, int index, uint64_t value)
+void DynamicListElementSet(DynamicList *list, int index, uint64_t value)
 {
-	unsigned int count = 0;
-	DinamicList *element_search = list;
+    int count = 0;
+    DynamicList *element_search = list;
 
-	while (1) {
-		if (count == index)
-			break;
-		element_search = (DinamicList *) element_search->next;
-		count++;
-	}
+    while (1)
+    {
+        if (count == index)
+            break;
+        element_search = (DynamicList *)element_search->next;
+        count++;
+    }
 
-	element_search->data = value;
+    element_search->data = value;
 }
 
-uint64_t DynamicListElementGet(DinamicList * list, int index)
+uint64_t DynamicListElementGet(DynamicList *list, int index)
 {
-	unsigned int count = 0;
-	DinamicList *element_search = list;
+    int count = 0;
+    DynamicList *element_search = list;
 
-	while (1) {
-		if (count == index)
-			break;
-		element_search = (DinamicList *) element_search->next;
-		count++;
-	}
+    while (1)
+    {
+        if (count == index)
+            break;
+        element_search = (DynamicList *)element_search->next;
+        count++;
+    }
 
-	return element_search->data;
+    return element_search->data;
 }
 
-int DynamicListLenghtGet(DinamicList * list)
+int DynamicListLenghtGet(DynamicList *list)
 {
-	unsigned int count = 0;
-	DinamicList *element_search = list;
+    int count = 0;
+    DynamicList *element_search = list;
 
-	while (1) {
-		count++;
-		element_search = (DinamicList *) element_search->next;
-		if (element_search == NULL)
-			break;
-	}
+    while (1)
+    {
+        count++;
+        element_search = (DynamicList *)element_search->next;
+        if (element_search == NULL)
+            break;
+    }
 
-	return count;
+    return count;
 }
 
-int DynamicListGetIndex(DinamicList * list, uint64_t value)
+int DynamicListGetIndex(DynamicList *list, uint64_t value)
 {
-	int count = 0;
-	DinamicList *element_search = list;
+    int count = 0;
+    DynamicList *element_search = list;
 
-	while (1) {
-		if (element_search->data == value)
-			return count;
-		count++;
-		element_search = (DinamicList *) element_search->next;
-		if (element_search == NULL)
-			break;	//No luck...
-	}
+    while (1)
+    {
+        if (element_search->data == value)
+            return count;
+        count++;
+        element_search = (DynamicList *)element_search->next;
+        if (element_search == NULL)
+            break; //No luck...
+    }
 
-	return -1;
+    return -1;
 }
 
-void DynamicListDelete(DinamicList * list)
+void DynamicListDelete(DynamicList *list)
 {
-	DinamicList *element_search, *element_current = list;
+    DynamicList *element_search;
+    DynamicList *element_current = list;
 
-	while (1) {
-		element_search = (DinamicList *) element_current->next;
-		free(element_current);
-		if (element_search == NULL)
-			break;
-		element_current = element_search;
-	}
+    while (1)
+    {
+        element_search = (DynamicList *)element_current->next;
+        free(element_current);
+        if (element_search == NULL)
+            break;
+        element_current = element_search;
+    }
 
-	return;
+    return;
 }
