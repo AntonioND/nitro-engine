@@ -126,6 +126,7 @@ class DisplayList():
         self.vtx_last = None
         self.texcoord_last = None
         self.normal_last = None
+        self.begin_vtx_last = None
 
         self.display_list = []
 
@@ -271,9 +272,18 @@ class DisplayList():
 
     def begin_vtxs(self, poly_type):
         self.add_command(command_name_to_id("BEGIN_VTXS"), poly_type_to_id(poly_type))
+        self.begin_vtx_last = poly_type
 
     def end_vtxs(self):
         self.add_command(command_name_to_id("END_VTXS"))
+        self.begin_vtx_last = None
+
+    def switch_vtxs(self, poly_type):
+        """Sends a new BEGIN_VTXS if the polygon type has changed."""
+        if self.begin_vtx_last != poly_type:
+            if self.begin_vtx_last is not None:
+                self.end_vtxs()
+            self.begin_vtxs(poly_type)
 
 if __name__ == "__main__":
     dl = DisplayList()

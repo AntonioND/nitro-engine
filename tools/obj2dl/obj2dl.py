@@ -50,7 +50,7 @@ def convert_obj(input_file, output_file, texture_size,
                 normals.append(v)
 
             elif cmd == 'f': # Face
-                v = (tokens[0], tokens[1], tokens[2])
+                v = tokens
                 faces.append(v)
 
             elif cmd == 'l': # Polyline
@@ -66,9 +66,19 @@ def convert_obj(input_file, output_file, texture_size,
     print("")
 
     dl = DisplayList()
-    dl.begin_vtxs("triangles")
 
     for face in faces:
+
+        # Check the polygon type
+        faces_number = len(face)
+        if faces_number == 3:
+            dl.switch_vtxs("triangles")
+        elif faces_number == 4:
+            dl.switch_vtxs("quads")
+        else:
+            raise OBJFormatError(f"Unsupported polygons with {faces_number} faces")
+
+        # Read vertices
         for vertex in face:
             tokens = vertex.split('/')
 
