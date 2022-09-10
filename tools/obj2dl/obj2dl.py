@@ -53,17 +53,11 @@ def convert_obj(input_file, output_file, texture_size,
                 v = (tokens[0], tokens[1], tokens[2])
                 faces.append(v)
 
-            elif cmd == 'g': # Group
-                print(f"Ignored group command: {tokens}")
-
-            elif cmd == 'o': # Object
-                print(f"Ignored object command: {tokens}")
-
             elif cmd == 'l': # Polyline
-                raise OBJFormatError("Unsupported polyline command: {tokens}")
+                raise OBJFormatError(f"Unsupported polyline command: {tokens}")
 
             else:
-                print("Ignored unsupported command: {cmd} {tokens}")
+                print(f"Ignored unsupported command: {cmd} {tokens}")
 
     print("Vertices:  " + str(len(vertices)))
     print("Texcoords: " + str(len(texcoords)))
