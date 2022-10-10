@@ -1,3 +1,11 @@
-# Compiled library files
-build
-lib
+# Compiled files
+build/
+lib/
+*.o
+*.nds
+*.elf
+
+# Other
+__pycache__/
+*.zip
+*.swp
