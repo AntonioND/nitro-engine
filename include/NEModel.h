@@ -8,7 +8,7 @@
 #define NE_MODEL_H__
 
 /*! \file   NEModel.h
- *  \brief  Functions draw models, etc...
+ *  \brief  Functions to draw and handle models.
  */
 
 /*! @defgroup model_system Model system
@@ -87,13 +87,13 @@ void NE_ModelDraw(NE_Model *model);
 
 /*! \fn    void NE_ModelClone(NE_Model *dest, NE_Model *source);
  *  \brief Clone model.
- *  \param dest Pointer to the destiny model.
+ *  \param dest Pointer to the destination model.
  *  \param source Pointer to the source model.
  *
  * NOTE: Be careful with this, if you delete source model and try to draw
- * destiny model game will eventually crash.
+ * destination model game will eventually crash.
  *
- * You MUST delete destiny model if you delete source model.
+ * You MUST delete destination model if you delete source model.
  *
  * The two models MUST BE THE SAME TYPE!!! (Animated or static)
  *
