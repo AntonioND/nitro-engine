@@ -9,6 +9,20 @@ making a 3D game. It isn't standalone, it needs libnds to work. However, if you
 are developing for the NDS it is likely that you already have it installed. If
 not, you need to install devkitARM and libnds.
 
+Features:
+
+- Support for static models, converted from OBJ files.
+- Support for animated models, thanks to the `DSMA library
+  <https://github.com/AntonioND/dsma-library>`_, which converts MD5 models (with
+  skeletal animation) into a format that can be rendered with hardware
+  acceleration.
+- Support for all format of textures (except compressed textures).
+- Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
+- Functions to render 2D images accelerated by 3D hardware.
+- Basic text system.
+- Basic GUI elements like buttons and scrollbars.
+- Basic physic system: Axis-aligned bounding boxes (AABB) only.
+
 Setup
 -----
 
@@ -74,22 +88,22 @@ If you want to contact me (Antonio Niño Díaz) directly you can email me at:
 License
 -------
 
-Different parts of this repository are licensed under different licenses.
-
-All the source code of the library and examples are licensed under the MIT
-license.
-
-Some tools to convert data are licensed under the MIT license and others are
-licensed under the GPL. This shouldn't be a problem, as tools aren't linked with
-the source code of the resulting game.
+The code of this repository is under the MIT license.
 
 The full text of the licenses can be found under the ``licenses`` folder.
+
+Future work
+-----------
+
+- Asynchronous loading of assets.
+- Support for compressed textures.
 
 Credits
 -------
 
 - Michael Noland (joat), Jason Rogers (dovoto) and Dave Murphy (WinterMute) for
-  libnds
+  libnds.
+- The maintainers of devkitPro.
 - Chishm for libfat and DLDI
 - The guys of gbadev for their help
 - Martin Korth for no$gba and gbatek
