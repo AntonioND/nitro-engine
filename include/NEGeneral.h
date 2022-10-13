@@ -25,34 +25,6 @@
  */
 typedef void (*NE_Voidfunc)(void);
 
-/*! \enum  NE_AnimationTypes
- *  \brief Possible animation types.
- */
-typedef enum {
-	NE_ANIM_LOOP,		/*!< When the end is reached jumps to the start. */
-	NE_ANIM_ONESHOT,	/*!< When the end is reached stops. */
-	NE_ANIM_UPDOWN		/*!< When the end or start are reached, direction is reverted. */
-} NE_AnimationTypes;
-
-#define NE_MAX_FRAMES 128	/*! \def #define NE_MAX_FRAMES 128 */
-
-/*! \struct NE_AnimData
- *  \brief  Holds information of an animation.
- */
-typedef struct {
-	// Pointer to the file/data
-	u32 *fileptrtr;
-
-	int animtype;
-	int currframe;
-	int startframe;
-	int endframe;
-	// Each frame can have different speed
-	int speed[NE_MAX_FRAMES];
-	s8 direction;
-	int nextframetime;
-} NE_AnimData;
-
 /*! \struct NE_Input
  *  \brief  Holds information of keys and stylus input for internal use.
  */

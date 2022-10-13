@@ -10,7 +10,7 @@
 
 const char NE_VersioString[] =
     "Nitro Engine - Version " NITRO_ENGINE_VERSION_STRING " - "
-    "(C) 2008-2011, 2019 Antonio Nino Diaz (AntonioND)";
+    "(C) 2008-2011, 2019, 2022 Antonio Nino Diaz (AntonioND)";
 
 static bool NE_UsingConsole;
 bool NE_TestTouch;
@@ -56,6 +56,7 @@ void NE_End(void)
 	NE_SpriteSystemEnd();
 	NE_PhysicsSystemEnd();
 	NE_ModelSystemEnd();
+	NE_AnimationSystemEnd();
 	NE_TextResetSystem();
 	NE_TextureSystemEnd();
 	NE_CameraSystemEnd();
@@ -125,6 +126,7 @@ static void NE_Init__(void)
 	NE_SpriteSystemReset(0);
 	NE_GUISystemReset(0);
 	NE_ModelSystemReset(0);
+	NE_AnimationSystemReset(0);
 	NE_TextPriorityReset();
 
 	glMatrixMode(GL_TEXTURE);

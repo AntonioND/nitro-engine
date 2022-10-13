@@ -8,7 +8,7 @@
 
 /*! \file   NEFAT.c */
 
-char *NE_FATLoadData(char *filename)
+char *NE_FATLoadData(const char *filename)
 {
 	size_t size;
 	char *buffer;
@@ -34,7 +34,7 @@ char *NE_FATLoadData(char *filename)
 	return buffer;
 }
 
-size_t NE_FATFileSize(char *filename)
+size_t NE_FATFileSize(const char *filename)
 {
 	FILE *f;
 	size_t size;
@@ -79,7 +79,7 @@ static void NE_write32(u32 *address, u32 value)
 
 extern bool NE_Dual;
 
-int NE_ScreenshotBMP(char *filename)
+int NE_ScreenshotBMP(const char *filename)
 {
 	FILE *f = fopen(filename, "wb");
 

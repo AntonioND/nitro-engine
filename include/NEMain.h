@@ -30,6 +30,7 @@ extern "C" {
 //------------------------------------------------------------------------------
 
 #include "NE2D.h"
+#include "NEAnimation.h"
 #include "NECamera.h"
 #include "NEFAT.h"
 #include "NEFormats.h"

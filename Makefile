@@ -17,7 +17,7 @@ include $(DEVKITARM)/ds_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	NE
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/dsma
 DATA		:=	data
 INCLUDES	:=	include
 

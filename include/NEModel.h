@@ -22,16 +22,34 @@
 
 #define NE_DEFAULT_MODELS 512	/*! \def #define NE_DEFAULT_MODELS 512 */
 
+/*! \enum  NE_AnimationTypes
+ *  \brief Possible animation types.
+ */
+typedef enum {
+	NE_ANIM_LOOP,		/*!< When the end is reached it jumps to the start. */
+	NE_ANIM_ONESHOT,	/*!< When the end is reached it stops. */
+} NE_AnimationType;
+
+/*! \struct NE_AnimData
+ *  \brief  Holds information of the animation of a model.
+ */
+typedef struct {
+	NE_AnimationType type;
+	int32_t speed;
+	int32_t currframe; // f32
+	int32_t numframes; // int
+} NE_AnimData;
+
 /*! \struct NE_Model
  *  \brief  Holds information of a model.
  */
 typedef struct {
 	bool meshfromfat;
 	bool iscloned;
-	// Use linear interpolation between frames or not (animated models)
-	bool anim_interpolate;
 	int modeltype;		// Animated or not
-	u32 *meshdata;		// Display list or NE_AnimData struct
+	const u32 *meshdata; // Display list / DSM file
+	NE_Animation *animation;
+	NE_AnimData animdata;
 	NE_Material *texture;
 	int x, y, z;		// f32
 	int rx, ry, rz;
@@ -57,20 +75,20 @@ NE_Model *NE_ModelCreate(NE_ModelType type);
  */
 void NE_ModelDelete(NE_Model *model);
 
-/*! \fn    int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer);
+/*! \fn    int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer);
  *  \brief Assign a display list in RAM to a static model.
  *  \param model Pointer to the model.
  *  \param pointer Pointer to the display list.
  */
-int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer);
+int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer);
 
-/*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path);
+/*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path);
  *  \brief Loads a display list from FAT and assign it to a static model.
  *         It returns 1 on success.
  *  \param model Pointer to the model.
  *  \param path Path to the display list.
  */
-int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path);
+int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path);
 
 /*! \fn    void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
  *  \brief Assign a material to a model.
@@ -78,6 +96,13 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path);
  *  \param material Pointer to the material.
  */
 void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
+
+/*! \fn    void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim);
+ *  \brief Assign an animation to a model.
+ *  \param model Pointer to the model.
+ *  \param anim Pointer to the animation.
+ */
+void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim);
 
 /*! \fn    void NE_ModelDraw(NE_Model *model);
  *  \brief Draws a model.
@@ -182,76 +207,54 @@ void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz);
  */
 void NE_ModelAnimateAll(void);
 
-/*! \fn    void NE_ModelAnimStart(NE_Model *model, int min, int start, int max,
- *                                NE_AnimationTypes type, int speed);
+/*! \fn    void NE_ModelAnimStart(NE_Model *model, NE_AnimationTypes type,
+ *                                int32_t speed);
  *  \brief Starts the animation of an animated model.
  *  \param model Pointer to the model.
- *  \param min Lowest frame possible.
- *  \param start Start frame.
- *  \param max Highest frame.
- *  \param type Animation tipe. [ NE_ANIM_LOOP/NE_ANIM_ONESHOT/NE_ANIM_UPDOWN ]
- *  \param speed Animation speed. 0 = stop, 1 = slow, 64 = max speed; */
-void NE_ModelAnimStart(NE_Model *model, int min, int start, int max,
-		       NE_AnimationTypes type, int speed);
+ *  \param type Animation tipe. ( NE_ANIM_LOOP / NE_ANIM_ONESHOT )
+ *  \brief speed Animation speed in f32 fixed point. It can be positive or
+ *         negative. A speed of 0 stops the animation, a speed of 1 << 12 is the
+ *         normal speed.
+ */
+void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed);
 
-/*! \fn    void NE_ModelAnimSetSpeed(NE_Model *model, int speed);
- *  \brief Sets speed of an animated model. 0 = stop, 1 = slow, 60 = max speed;
+/*! \fn    void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed);
+ *  \brief speed Animation speed in f32 fixed point. It can be positive or
+ *         negative. A speed of 0 stops the animation, a speed of 1 << 12 is the
+ *         normal speed.
  *  \param model Pointer to the model.
  *  \param speed New speed.
  */
-void NE_ModelAnimSetSpeed(NE_Model *model, int speed);
+void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed);
 
-/*! \fn    void NE_ModelAnimSetFrameSpeed(NE_Model *model, int frame,
- *                                        int speed);
- *  \brief Sets speed of a single frame of an animated model. 0 = stop,
- *         1 = slow, 60 = max speed;
- *  \param model Pointer to the model.
- *  \param frame Frame.
- *  \param speed New speed.
- */
-void NE_ModelAnimSetFrameSpeed(NE_Model *model, int frame, int speed);
-
-/*! \fn    int NE_ModelAnimGetFrame(NE_Model *model);
- *  \brief Returns current frame of an animated model.
+/*! \fn    int32_t NE_ModelAnimGetFrame(NE_Model *model);
+ *  \brief Returns current frame of an animated model in f32 format.
  *  \param model Pointer to the model.
  */
-int NE_ModelAnimGetFrame(NE_Model *model);
+int32_t NE_ModelAnimGetFrame(NE_Model *model);
 
-/*! \fn    void NE_ModelAnimSetFrame(NE_Model *model, int frame);
- *  \brief Sets current frame of an animated model.
+/*! \fn    void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame);
+ *  \brief Sets current frame of an animated model in f32 format.
  *  \param model Pointer to the model.
  *  \param frame Frame to set.
  */
-void NE_ModelAnimSetFrame(NE_Model *model, int frame);
+void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame);
 
-/*! \fn    void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate);
- *  \brief Enables or disables linear interpolation for the drawing of this
- *         animated model.
- *  \param model Pointer to the model.
- *  \param interpolate [true/false] to enable or disable.
- *
- * If you enable linear interpolation, the animation will be smoother, but it
- * will need more CPU to be drawn. Disable it if your model has a lot of frames
- * and the animation is quite fast.  For example, if you change the model frame
- * each vbl this is useless. Default is true.
- */
-void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate);
-
-/*! \fn    int NE_ModelLoadNEA(NE_Model *model, void *pointer);
- *  \brief Loads every frame of a NEA file in RAM to an animated model. Returns
+/*! \fn    int NE_ModelLoadDSM(NE_Model *model, const void *pointer);
+ *  \brief Loads every frame of a DSM file in RAM to an animated model. Returns
  *         1 if no error happened.
  *  \param model Pointer to the model.
  *  \param pointer Pointer to the file.
  */
-int NE_ModelLoadNEA(NE_Model *model, void *pointer);
+int NE_ModelLoadDSM(NE_Model *model, const void *pointer);
 
-/*! \fn    int NE_ModelLoadNEAFAT(NE_Model *model, char *path);
- *  \brief Loads every frame of a NEA file in FAT to an animated model. Returns
+/*! \fn    int NE_ModelLoadDSMFAT(NE_Model *model, const char *path);
+ *  \brief Loads every frame of a DSM file in FAT to an animated model. Returns
  *         1 if no error happened.
  *  \param model Pointer to the model.
  *  \param path Path to the file.
  */
-int NE_ModelLoadNEAFAT(NE_Model *model, char *path);
+int NE_ModelLoadDSMFAT(NE_Model *model, const char *path);
 
 /*! \fn    void NE_ModelDeleteAll(void);
  *  \brief Deletes all models.

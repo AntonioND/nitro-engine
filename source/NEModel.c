@@ -6,6 +6,8 @@
 
 #include <nds/arm9/postest.h>
 
+#include "dsma/dsma.h"
+
 #include "NEMain.h"
 
 /*! \file   NEModel.c */
@@ -39,13 +41,7 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 	model->sx = model->sy = model->sz = inttof32(1);
 
 	if (type == NE_Animated) {
-		model->meshdata = calloc(1, sizeof(NE_AnimData));
-		NE_AssertPointer(model->meshdata,
-				 "Couldn't allocate animation data.");
-		NE_AnimData *anim = (NE_AnimData *) model->meshdata;
-
-		anim->direction = 1;
-		model->anim_interpolate = true;
+		model->meshdata = NULL;
 	} else { /*if (type == NE_Static) */
 		model->meshdata = NULL;
 	}
@@ -75,20 +71,13 @@ void NE_ModelDelete(NE_Model *model)
 		i++;
 	}
 
-	if (!model->iscloned && model->meshfromfat) {
-		if (model->modeltype == NE_Animated)
-			free(((NE_AnimData *) model->meshdata)->fileptrtr);
-		else /* if (model->modeltype == NE_Static) */
-			free(model->meshdata);
-	}
-
-	if (model->modeltype == NE_Animated)
-		free(model->meshdata);	//Free animation data
+	if (!model->iscloned && model->meshfromfat)
+		free((void *)model->meshdata);
 
 	free(model);
 }
 
-int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path)
+int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -100,7 +89,7 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path)
 
 	// Free previous data...
 	if (model->meshfromfat && model->meshdata != NULL) {
-		free(model->meshdata);
+		free((void *)model->meshdata);
 		model->meshdata = NULL;
 	}
 
@@ -115,7 +104,7 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, char *path)
 	return 1;
 }
 
-int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer)
+int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -127,7 +116,7 @@ int NE_ModelLoadStaticMesh(NE_Model *model, void *pointer)
 
 	// Free previous data...
 	if (model->meshfromfat && model->meshdata != NULL) {
-		free(model->meshdata);
+		free((void *)model->meshdata);
 		model->meshdata = NULL;
 	}
 
@@ -143,152 +132,13 @@ void NE_ModelSetMaterial(NE_Model *model, NE_Material *material)
 	model->texture = material;
 }
 
-//------------------------------------------------------------------------------
-
-static void __ne_drawanimatedmodel_interpolate(NE_AnimData *anim)
+void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim)
 {
-	int frame_one = anim->currframe;
-	int frame_two = anim->currframe + anim->direction;
-	u32 time = anim->nextframetime;
-
-	if (anim->direction < 0 && frame_two < anim->startframe) {
-		if (anim->animtype == NE_ANIM_LOOP)
-			frame_two = anim->endframe;
-		else if (anim->animtype == NE_ANIM_UPDOWN)
-			frame_two = anim->currframe + 1;
-		else if (anim->animtype == NE_ANIM_ONESHOT)
-			frame_two = frame_one;
-	} else if (anim->direction > 0 && frame_two > anim->endframe) {
-		if (anim->animtype == NE_ANIM_LOOP)
-			frame_two = anim->startframe;
-		else if (anim->animtype == NE_ANIM_UPDOWN)
-			frame_two = anim->currframe - 1;
-		else if (anim->animtype == NE_ANIM_ONESHOT)
-			frame_two = frame_one;
-	}
-
-	u32 *fileptr = anim->fileptrtr + 2;
-	NE_Assert(frame_one < *fileptr && frame_two < *fileptr,
-		  "Drawing nonexistent frame.");
-	fileptr++;
-	u32 vtxcount = *fileptr++;
-	u16 *framearrayptr = (u16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *vtxarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *normarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *texcoordsarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr);
-
-	u16 *frame_one_ptr = (u16 *) ((int)framearrayptr + (vtxcount * 6 * frame_one));
-	u16 *frame_two_ptr = (u16 *) ((int)framearrayptr + (vtxcount * 6 * frame_two));
-
-	GFX_BEGIN = GL_TRIANGLES;
-
-	for (u32 i = 0; i < vtxcount; i++) {
-		s32 vector[3];
-		s16 *frame_one_anim, *frame_two_anim;
-
-		// Texture coordinates
-		// -------------------
-
-		frame_one_anim = &texcoordsarrayptr[*frame_one_ptr * 2];
-		GFX_TEX_COORD = ((s32) * frame_one_anim) |
-				(((s32) * (frame_one_anim + 1)) << 16);
-		frame_one_ptr++;
-		frame_two_ptr++;
-
-		// Normal
-		// ------
-
-		frame_one_anim = &normarrayptr[*frame_one_ptr * 3];
-		frame_two_anim = &normarrayptr[*frame_two_ptr * 3];
-		for (int j = 0; j < 3; j++) {
-			vector[j] = (s32) *frame_one_anim;
-			vector[j] += (((s32) *frame_two_anim -
-				       (s32) *frame_one_anim) * time) >> 6;
-			vector[j] &= 0x3FF;
-			frame_one_anim++;
-			frame_two_anim++;
-		}
-		GFX_NORMAL = (vector[0] << 20) | (vector[1] << 10) | vector[2];
-		frame_one_ptr++;
-		frame_two_ptr++;
-
-		// Vertex
-		// ------
-
-		frame_one_anim = &vtxarrayptr[*frame_one_ptr * 3];
-		frame_two_anim = &vtxarrayptr[*frame_two_ptr * 3];
-		for (int j = 0; j < 3; j++) {
-			vector[j] = (s32) *frame_one_anim;
-			vector[j] += (((s32) *frame_two_anim -
-				       (s32) *frame_one_anim) * time) >> 6;
-			vector[j] &= 0xFFFF;
-			frame_one_anim++;
-			frame_two_anim++;
-		}
-		GFX_VERTEX16 = vector[0] | (vector[1] << 16);
-		GFX_VERTEX16 = vector[2];
-		frame_one_ptr++;
-		frame_two_ptr++;
-	}
-
-	// GFX_END = 0;
-}
-
-static void __ne_drawanimatedmodel_nointerpolate(NE_AnimData *anim)
-{
-	int frame = anim->currframe;
-
-	u32 *fileptr = anim->fileptrtr + 2;
-	NE_Assert(frame < *fileptr, "Drawing nonexistent frame");
-	fileptr++;
-
-	u32 vtxcount = *fileptr++;
-	u16 *framearrayptr = (u16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *vtxarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *normarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr++);
-	s16 *texcoordsarrayptr = (s16 *) ((int)anim->fileptrtr + (int)*fileptr);
-
-	u16 *frame_ptr = (u16 *) ((int)framearrayptr + (vtxcount * 6 * frame));
-
-	GFX_BEGIN = GL_TRIANGLES;
-
-	for (u32 i = 0; i < vtxcount; i++) {
-		s32 vector[3];
-		s16 *frame_anim;
-
-		// Texture coordinates
-		// -------------------
-
-		frame_anim = &texcoordsarrayptr[*frame_ptr * 2];
-		GFX_TEX_COORD = ((s32) *frame_anim) |
-				(((s32) *(frame_anim + 1)) << 16);
-		frame_ptr++;
-
-		// Normal
-		// ------
-
-		frame_anim = &normarrayptr[*frame_ptr * 3];
-		for (int j = 0; j < 3; j++) {
-			vector[j] = ((s32) *frame_anim) & 0x3FF;
-			frame_anim++;
-		}
-		GFX_NORMAL = (vector[0] << 20) | (vector[1] << 10) | vector[2];
-		frame_ptr++;
-
-		// Vertex
-		// ------
-
-		frame_anim = &vtxarrayptr[*frame_ptr * 3];
-		for (int j = 0; j < 3; j++) {
-			vector[j] = ((s32) *frame_anim) & 0xFFFF;
-			frame_anim++;
-		}
-		GFX_VERTEX16 = vector[0] | (vector[1] << 16);
-		GFX_VERTEX16 = vector[2];
-		frame_ptr++;
-	}
-
-	// GFX_END = 0;
+	NE_AssertPointer(model, "NULL model pointer");
+	NE_AssertPointer(anim, "NULL animation pointer");
+	model->animation = anim;
+    uint32_t frames = DSMA_GetNumFrames(anim->data);
+	model->animdata.numframes = frames;
 }
 
 //---------------------------------------------------------
@@ -301,9 +151,10 @@ void NE_ModelDraw(NE_Model *model)
 	NE_AssertPointer(model, "NULL pointer");
 	if (model->meshdata == NULL)
 		return;
-	if (model->modeltype == NE_Animated)
-		if (((NE_AnimData *) model->meshdata)->fileptrtr == NULL)
+	if (model->modeltype == NE_Animated) {
+		if (model->animation == NULL)
 			return;
+	}
 
 	MATRIX_PUSH = 0;
 
@@ -333,12 +184,8 @@ void NE_ModelDraw(NE_Model *model)
 	if (model->modeltype == NE_Static) {
 		glCallList(model->meshdata);
 	} else { // if(model->modeltype == NE_Animated)
-		NE_AnimData *anim = (void *) model->meshdata;
-
-		if (model->anim_interpolate)
-			__ne_drawanimatedmodel_interpolate(anim);
-		else
-			__ne_drawanimatedmodel_nointerpolate(anim);
+		DSMA_DrawModel(model->meshdata, model->animation->data,
+		               model->animdata.currframe);
 	}
 
 	MATRIX_POP = 1;
@@ -352,8 +199,7 @@ void NE_ModelClone(NE_Model *dest, NE_Model *source)
 		  "Different model types");
 
 	if (dest->modeltype == NE_Animated) {
-		swiCopy(source->meshdata, dest->meshdata,
-			(sizeof(NE_AnimData) >> 2) | COPY_MODE_WORD);
+		memcpy(&(dest->animdata), &(source->animdata), sizeof(NE_AnimData));
 		dest->iscloned = true;
 		dest->texture = source->texture;
 	} else {
@@ -415,134 +261,61 @@ void NE_ModelAnimateAll(void)
 		if (NE_ModelPointers[i]->modeltype != NE_Animated)
 			continue;
 
-		NE_AnimData *anim =
-		    (NE_AnimData *) (NE_ModelPointers[i]->meshdata);
+		NE_AnimData *animdata = &(NE_ModelPointers[i]->animdata);
 
-		anim->nextframetime += anim->speed[anim->currframe];
+		animdata->currframe += animdata->speed;
 
-		if (abs(anim->nextframetime) <= 64)
-			continue;
-
-		anim->nextframetime = 0;
-
-		switch (anim->animtype) {
-		case NE_ANIM_LOOP:
-			if (anim->currframe == anim->startframe
-				&& anim->direction < 0) {
-				anim->currframe = anim->endframe;
-			} else if (anim->currframe == anim->endframe
-					&& anim->direction > 0) {
-				anim->currframe = anim->startframe;
-			} else {
-				if (anim->direction > 0)
-					anim->currframe++;
-				else
-					anim->currframe--;
+		if (animdata->type ==  NE_ANIM_LOOP) {
+		    int32_t endval = inttof32(animdata->numframes);
+			if (animdata->currframe >= endval)
+				animdata->currframe -= endval;
+			else if (animdata->currframe < 0)
+				animdata->currframe += endval;
+		} else if (animdata->type ==  NE_ANIM_ONESHOT) {
+		    int32_t endval = inttof32(animdata->numframes - 1);
+			if (animdata->currframe > endval) {
+				animdata->currframe = endval;
+				animdata->speed = 0;
+			} else if (animdata->currframe < 0) {
+				animdata->currframe = 0;
+				animdata->speed = 0;
 			}
-			break;
-
-		case NE_ANIM_ONESHOT:
-			if (anim->currframe == anim->startframe
-				&& anim->direction < 0) {
-				NE_ModelAnimSetSpeed(NE_ModelPointers[i], 0);
-			} else if (anim->currframe == anim->endframe
-					&& anim->direction > 0) {
-				NE_ModelAnimSetSpeed(NE_ModelPointers[i], 0);
-			} else {
-				if (anim->direction > 0)
-					anim->currframe++;
-				else
-					anim->currframe--;
-			}
-			break;
-
-		case NE_ANIM_UPDOWN:
-			if (anim->currframe == anim->startframe
-				&& anim->direction < 0) {
-				anim->direction *= -1;
-				anim->currframe++;
-			} else if (anim->currframe == anim->endframe
-					&& anim->direction > 0) {
-				anim->direction *= -1;
-				anim->currframe--;
-			} else {
-				if (anim->direction > 0)
-					anim->currframe++;
-				else
-					anim->currframe--;
-			}
-			break;
 		}
 	}
 }
 
-void NE_ModelAnimStart(NE_Model *model, int min, int start, int max,
-		       NE_AnimationTypes type, int speed)
+void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed)
 {
 	NE_AssertPointer(model, "NULL pointer");
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-
-	NE_AnimData *anim = (void *)model->meshdata;
-
-	anim->animtype = type;
-	anim->currframe = start;
-	anim->startframe = min;
-	anim->endframe = max;
-	anim->nextframetime = 0;
-	anim->direction = ((speed >= 0) ? 1 : -1);
-
-	for (int i = 0; i < NE_MAX_FRAMES; i++)
-		anim->speed[i] = abs(speed);
+	model->animdata.type = type;
+	model->animdata.speed = speed;
+	model->animdata.currframe = 0;
 }
 
-void NE_ModelAnimSetSpeed(NE_Model *model, int speed)
+void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed)
 {
 	NE_AssertPointer(model, "NULL pointer");
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-
-	NE_AnimData *anim = (void *)model->meshdata;
-
-	for (int i = 0; i < NE_MAX_FRAMES; i++)
-		anim->speed[i] = abs(speed);
-
-	anim->direction = ((speed >= 0) ? 1 : -1);
+	model->animdata.speed = speed;
 }
 
-void NE_ModelAnimSetFrameSpeed(NE_Model *model, int frame, int speed)
+int32_t NE_ModelAnimGetFrame(NE_Model *model)
 {
 	NE_AssertPointer(model, "NULL pointer");
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-
-	NE_AnimData *anim = (void *)model->meshdata;
-	anim->speed[frame] = speed;
+	return model->animdata.currframe;
 }
 
-int NE_ModelAnimGetFrame(NE_Model *model)
+void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame)
 {
 	NE_AssertPointer(model, "NULL pointer");
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-	NE_AnimData *anim = (void *)model->meshdata;
-	return anim->currframe;
+    // TODO: Check if off bounds
+	model->animdata.currframe = frame;
 }
 
-void NE_ModelAnimSetFrame(NE_Model *model, int frame)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-
-	NE_AnimData *anim = (void *)model->meshdata;
-	anim->currframe = frame;
-	anim->nextframetime = 0;
-}
-
-void NE_ModelAnimInterpolate(NE_Model *model, bool interpolate)
-{
-	NE_AssertPointer(model, "NULL pointer");
-	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-	model->anim_interpolate = interpolate;
-}
-
-int NE_ModelLoadNEAFAT(NE_Model *model, char *path)
+int NE_ModelLoadDSMFAT(NE_Model *model, const char *path)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -552,35 +325,20 @@ int NE_ModelLoadNEAFAT(NE_Model *model, char *path)
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	if (model->meshfromfat)
-		free(((NE_AnimData *) model->meshdata)->fileptrtr);
+		free((void *)model->meshdata);
 
 	model->iscloned = 0;
 	model->meshfromfat = true;
 
-	u32 *pointer = (u32 *) NE_FATLoadData(path);
+	void *pointer = (void *)NE_FATLoadData(path);
 	NE_AssertPointer(pointer, "Couldn't load file from FAT");
 
-	// Check file type ('NEAM') - NEA file
-	if (*pointer != 1296123214) {
-		NE_DebugPrint("Not a NEA file");
-		free(pointer);
-		return 0;
-	}
-
-	// Check version
-	if (pointer[1] != 2) {
-		NE_DebugPrint("NEA file version is %ld, should be 2",
-			      pointer[1]);
-		free(pointer);
-		return 0;
-	}
-
-	((NE_AnimData *) model->meshdata)->fileptrtr = (void *)pointer;
+	model->meshdata = (void *)pointer;
 
 	return 1;
 }
 
-int NE_ModelLoadNEA(NE_Model *model, void *pointer)
+int NE_ModelLoadDSM(NE_Model *model, const void *pointer)
 {
 	if (!ne_model_system_inited)
 		return 0;
@@ -590,27 +348,11 @@ int NE_ModelLoadNEA(NE_Model *model, void *pointer)
 	NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
 	if (model->meshfromfat)
-		free(((NE_AnimData *) model->meshdata)->fileptrtr);
+		free((void *)model->meshdata);
 
 	model->iscloned = 0;
 	model->meshfromfat = false;
-
-	u32 *ptr = pointer;
-
-	// Check file type ('NEAM') - NEA file
-	if (*ptr != 1296123214) {
-		NE_DebugPrint("Not a NEA file");
-		return 0;
-	}
-
-	ptr++;
-
-	// Check version
-	if (*ptr != 2) {
-		NE_DebugPrint("NEA file version is %ld, should be 2", *ptr);
-		return 0;
-	}
-	((NE_AnimData *) model->meshdata)->fileptrtr = pointer;
+	model->meshdata = pointer;
 
 	return 1;
 }
