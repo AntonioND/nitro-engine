@@ -29,7 +29,7 @@ ARCH	:=	-mthumb -mthumb-interwork
 CFLAGS	:=	-g -Wall -O2\
 		-march=armv5te -mtune=arm946e-s \
 		-fomit-frame-pointer -ffast-math \
-		$(ARCH)
+		$(ARCH) -Wno-address-of-packed-member
 
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
