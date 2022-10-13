@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
-#include <fat.h>
+#include <stdbool.h>
+
+#include <filesystem.h>
 
 #include <NEMain.h>
 
@@ -31,13 +33,21 @@ int main(void)
 	irqSet(IRQ_VBLANK, NE_VBLFunc);
 	irqSet(IRQ_HBLANK, NE_HBLFunc);
 
-	// Init FAT, Nitro Engine and console
-	fatInitDefault();
 	NE_Init3D();
 	// libnds uses VRAM_C for the text console, reserve A and B only
 	NE_TextureSystemReset(0, 0, NE_VRAM_AB);
 	// Init console in non-3D screen
 	consoleDemoInit();
+
+	if (!nitroFSInit(NULL)) {
+		iprintf("nitroFSInit failed.\nPress START to exit");
+		while(1) {
+			swiWaitForVBlank();
+			scanKeys();
+			if (keysHeld() & KEY_START)
+				return 0;
+		}
+	}
 
 	// Allocate space for objects...
 	Model = NE_ModelCreate(NE_Static);
@@ -52,11 +62,9 @@ int main(void)
 		     0, 1, 0);
 
 	// Load things from FAT...
-	NE_ModelLoadStaticMeshFAT(Model, "nitro-engine/cube.bin");
-	NE_FATMaterialTexLoadBMPtoRGBA(TransparentMaterial,
-				       "nitro-engine/bmp16bit_x1rgb5.bmp", 1);
-	NE_FATMaterialTexLoadBMPtoRGBA(OpaqueMaterial,
-				       "nitro-engine/bmp24bit.bmp", 0);
+	NE_ModelLoadStaticMeshFAT(Model, "cube.bin");
+	NE_FATMaterialTexLoadBMPtoRGBA(TransparentMaterial, "bmp16bit_x1rgb5.bmp", 1);
+	NE_FATMaterialTexLoadBMPtoRGBA(OpaqueMaterial, "bmp24bit.bmp", 0);
 
 	// Assign material to model
 	NE_ModelSetMaterial(Model, TransparentMaterial);
@@ -74,17 +82,16 @@ int main(void)
 		scanKeys(); //Get keys information...
 		uint32 keys = keysDown();
 
+		if (keys & KEY_START)
+			return 0;
+
 		// Change material if pressed
 		if (keys & KEY_B)
 			NE_ModelSetMaterial(Model, OpaqueMaterial);
 		if (keys & KEY_A)
 			NE_ModelSetMaterial(Model, TransparentMaterial);
 
-		// Take screenshot of 3D screen
-		if (keys & KEY_START)
-			NE_ScreenshotBMP("NitroEngine/Screenshot.bmp");
-
-		printf("\x1b[0;0HA/B: Change material.\n\nStart: Screenshot.");
+		printf("\x1b[0;0HA/B: Change material.\n\nSTART: Exit.");
 
 		// Increase rotation, you can't get the rotation angle after
 		// this. If you want to know always the angle, you should use
