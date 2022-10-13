@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
-#include <fat.h>
+#include <stdbool.h>
+
+#include <filesystem.h>
 
 #include <NEMain.h>
 
 NE_Camera *Camera;
 NE_Model *Model;
+NE_Animation *Animation;
 NE_Material *Material;
 
 void Draw3DScene(void)
@@ -20,66 +23,84 @@ void Draw3DScene(void)
 	NE_ModelDraw(Model);
 }
 
+void WaitLoop(void)
+{
+	while(1) {
+		swiWaitForVBlank();
+		scanKeys();
+		if (keysHeld() & KEY_START)
+			return;
+	}
+}
+
 int main(void)
 {
 	irqEnable(IRQ_HBLANK);
 	irqSet(IRQ_VBLANK, NE_VBLFunc);
 	irqSet(IRQ_HBLANK, NE_HBLFunc);
 
-	// Init FAT, Nitro Engine and console
-	fatInitDefault();
 	NE_Init3D();
 	// libnds uses VRAM_C for the text console, reserve A and B only
 	NE_TextureSystemReset(0, 0, NE_VRAM_AB);
 	// Init console in non-3D screen
 	consoleDemoInit();
 
+	if (!nitroFSInit(NULL)) {
+		iprintf("nitroFSInit failed.\nPress START to exit");
+		WaitLoop();
+		return 0;
+	}
+
 	// Allocate space for objects...
 	Model = NE_ModelCreate(NE_Animated);
 	Camera = NE_CameraCreate();
 	Material = NE_MaterialCreate();
+	Animation = NE_AnimationCreate();
 
 	// Setup camera
 	NE_CameraSet(Camera,
-		     -8, -8, -8,
-		     0, 0, 0,
+		     6, 3, -4,
+		     0, 3, 0,
 		     0, 1, 0);
 
-	if (NE_ModelLoadNEAFAT(Model, "nitro-engine/model.nea") == 0) {
+	if (NE_ModelLoadDSMFAT(Model, "robot.dsm") == 0) {
 		printf("Couldn't load model...");
-		while(1) swiWaitForVBlank();
+		WaitLoop();
+		return 0;
 	}
 
-	if (NE_FATMaterialTexLoadBMPtoRGBA(Material,
-					   "nitro-engine/texture.bmp",
-					   true) == 0) {
+	if (NE_AnimationLoadFAT(Animation, "robot_wave.dsa") == 0) {
+		printf("Couldn't load animation...");
+		WaitLoop();
+		return 0;
+	}
+
+	if (NE_FATMaterialTexLoadBMPtoRGBA(Material, "texture.bmp", true) == 0) {
 		printf("Couldn't load texture...");
-		while(1) swiWaitForVBlank();
+		WaitLoop();
+		return 0;
 	}
 
 	// Assign material to the model
 	NE_ModelSetMaterial(Model, Material);
 
+	NE_ModelSetAnimation(Model, Animation);
+	NE_ModelAnimStart(Model, NE_ANIM_LOOP, floattof32(0.1));
+
 	NE_LightSet(0, NE_White, 0, -1, -1);
 
 	NE_ClearColorSet(NE_Black, 31, 63);
 
-	int maxframe = 0;
-	NE_ModelAnimStart(Model, 0, 0, maxframe, NE_ANIM_LOOP, 32);
-
 	float scale = 1;
 
 	while (1) {
-		printf("\x1b[0;0H"
-		       "Pad: Rotate.\nR/L: Change max frame: %d  \n"
-		       "A/B: Scale.\nStart: Screenshot.", maxframe);
+		printf("\x1b[0;0HPad: Rotate\nA/B: Scale\nSTART: Exit");
 
 		scanKeys();
 		uint32 keys = keysHeld();
-		uint32 keysdown = keysDown();
 
 		if (keys & KEY_START)
-			NE_ScreenshotBMP("NitroEngine/Screenshot.bmp");
+			break;
 
 		if (keys & KEY_A)
 			scale += 0.1;
@@ -87,13 +108,6 @@ int main(void)
 			scale -= 0.1;
 
 		NE_ModelScale(Model, scale, scale, scale);
-
-		if (keysdown & KEY_R)
-			NE_ModelAnimStart(Model, 0, 0, ++maxframe,
-					  NE_ANIM_LOOP, 32);
-		if (keysdown & KEY_L)
-			NE_ModelAnimStart(Model, 0, 0, --maxframe,
-					  NE_ANIM_LOOP, 32);
 
 		if (keys & KEY_RIGHT)
 			NE_ModelRotate(Model, 0, 2, 0);
