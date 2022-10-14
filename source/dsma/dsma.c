@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>
 
-// DS Model Animation Library v0.1.1
+// DS Model Animation Library v0.2.0
 
 #include <nds.h>
 
@@ -101,6 +101,19 @@ void q_nlerp(const int32_t *q1, const int32_t *q2, int32_t pos, int32_t *qdest)
     // animations look bad. Maybe it can be optional.
 }
 
+// Interpolate between two positions and two orientations.
+ITCM_CODE ARM_CODE static inline
+void dsa_interpolate_frames(const int32_t *v_pos_1, const int32_t *q_orient_1,
+                            const int32_t *v_pos_2, const int32_t *q_orient_2,
+                            uint32_t interp, int32_t *v_pos, int32_t *q_orient)
+{
+    v_pos[0] = lerp(v_pos_1[0], v_pos_2[0], interp);
+    v_pos[1] = lerp(v_pos_1[1], v_pos_2[1], interp);
+    v_pos[2] = lerp(v_pos_1[2], v_pos_2[2], interp);
+
+    q_nlerp(q_orient_1, q_orient_2, interp, q_orient);
+}
+
 // Public functions
 // ================
 
@@ -155,22 +168,16 @@ int DSMA_DrawModel(const void *dsm_file, const void *dsa_file, uint32_t frame_in
 
         for (uint32_t i = 0; i < num_joints; i++)
         {
-            // Interpolate transformations
-            const int32_t *v_pos_1 = frame_ptr_1->pos;
-            const int32_t *q_orient_1 = frame_ptr_1->orient;
-            frame_ptr_1++;
-
-            const int32_t *v_pos_2 = frame_ptr_2->pos;
-            const int32_t *q_orient_2 = frame_ptr_2->orient;
-            frame_ptr_2++;
-
             int32_t v_pos[3];
-            v_pos[0] = lerp(v_pos_1[0], v_pos_2[0], interp);
-            v_pos[1] = lerp(v_pos_1[1], v_pos_2[1], interp);
-            v_pos[2] = lerp(v_pos_1[2], v_pos_2[2], interp);
-
             int32_t q_orient[4];
-            q_nlerp(q_orient_1, q_orient_2, interp, &q_orient[0]);
+
+            dsa_interpolate_frames(&frame_ptr_1->pos[0],
+                                   &frame_ptr_1->orient[0],
+                                   &frame_ptr_2->pos[0],
+                                   &frame_ptr_2->orient[0],
+                                   interp, &v_pos[0], &q_orient[0]);
+            frame_ptr_1++;
+            frame_ptr_2++;
 
             // Generate new matrix
             MATRIX_RESTORE = curr_stack_level;
@@ -198,6 +205,124 @@ int DSMA_DrawModel(const void *dsm_file, const void *dsa_file, uint32_t frame_in
             // Store it in the right position in the stack
             MATRIX_STORE = base_matrix + i;
         }
+    }
+
+    // Draw model
+    // ----------
+
+    glCallList((uint32_t *)dsm_file);
+
+    MATRIX_POP = 1;
+
+    return DSMA_SUCCESS;
+}
+
+ITCM_CODE ARM_CODE
+int DSMA_DrawModelBlendAnimation(const void *dsm_file,
+        const void *dsa_file_1, uint32_t frame_interp_1,
+        const void *dsa_file_2, uint32_t frame_interp_2,
+        uint32_t blend)
+{
+    const dsa_t *dsa_1 = dsa_file_1;
+    const dsa_t *dsa_2 = dsa_file_2;
+
+    if (dsa_1->version != DSA_VERSION_NUMBER)
+        return DSMA_INVALID_VERSION;
+
+    if (dsa_2->version != DSA_VERSION_NUMBER)
+        return DSMA_INVALID_VERSION;
+
+    uint32_t num_joints = dsa_1->num_joints;
+
+    if (num_joints != dsa_2->num_joints)
+        return DSMA_INCOMPATIBLE_ANIMATIONS;
+
+    uint32_t num_frames_1 = dsa_1->num_frames;
+    uint32_t num_frames_2 = dsa_2->num_frames;
+
+    uint32_t frame_1 = frame_interp_1 >> 12;
+    uint32_t interp_1 = frame_interp_1 & 0xFFF;
+
+    if (frame_1 >= num_frames_1)
+        return DSMA_INVALID_FRAME;
+
+    uint32_t frame_2 = frame_interp_2 >> 12;
+    uint32_t interp_2 = frame_interp_2 & 0xFFF;
+
+    if (frame_2 >= num_frames_2)
+        return DSMA_INVALID_FRAME;
+
+    if (blend > inttof32(1))
+        return DSMA_INVALID_BLENDING;
+
+    // Make sure that there is enough space in the matrix stack
+    // --------------------------------------------------------
+
+    uint32_t base_matrix = 30 - num_joints + 1;
+
+    // Wait for matrix push/pop operations to end
+    while (GFX_STATUS & BIT(14));
+
+    uint32_t curr_stack_level = (GFX_STATUS >> 8) & 0x1F;
+    if (curr_stack_level >= base_matrix)
+        return DSMA_MATRIX_STACK_FULL;
+
+    MATRIX_PUSH = 0;
+
+    // Generate matrices with bone transformations
+    // -------------------------------------------
+
+    uint32_t next_frame_1 = frame_1 + 1;
+    if (next_frame_1 == num_frames_1)
+        next_frame_1 = 0;
+
+    uint32_t next_frame_2 = frame_2 + 1;
+    if (next_frame_2 == num_frames_2)
+        next_frame_2 = 0;
+
+    const dsa_joint_t *frame_1_ptr_1 = dsa_get_frame(dsa_1, frame_1);
+    const dsa_joint_t *frame_1_ptr_2 = dsa_get_frame(dsa_1, next_frame_1);
+
+    const dsa_joint_t *frame_2_ptr_1 = dsa_get_frame(dsa_2, frame_2);
+    const dsa_joint_t *frame_2_ptr_2 = dsa_get_frame(dsa_2, next_frame_2);
+
+    for (uint32_t i = 0; i < num_joints; i++)
+    {
+        int32_t v_pos_1[3];
+        int32_t q_orient_1[4];
+
+        dsa_interpolate_frames(&frame_1_ptr_1->pos[0],
+                               &frame_1_ptr_1->orient[0],
+                               &frame_1_ptr_2->pos[0],
+                               &frame_1_ptr_2->orient[0],
+                               interp_1, &v_pos_1[0], &q_orient_1[0]);
+        frame_1_ptr_1++;
+        frame_1_ptr_2++;
+
+        int32_t v_pos_2[3];
+        int32_t q_orient_2[4];
+
+        dsa_interpolate_frames(&frame_2_ptr_1->pos[0],
+                               &frame_2_ptr_1->orient[0],
+                               &frame_2_ptr_2->pos[0],
+                               &frame_2_ptr_2->orient[0],
+                               interp_2, &v_pos_2[0], &q_orient_2[0]);
+        frame_2_ptr_1++;
+        frame_2_ptr_2++;
+
+        int32_t v_pos[3];
+        int32_t q_orient[4];
+
+        dsa_interpolate_frames(&v_pos_1[0], &q_orient_1[0],
+                               &v_pos_2[0], &q_orient_2[0],
+                               blend, &v_pos[0], &q_orient[0]);
+
+        // Generate new matrix
+        MATRIX_RESTORE = curr_stack_level;
+        matrix_mult_by_joint(v_pos, q_orient);
+
+        // Store it in the right position in the stack
+        MATRIX_STORE = base_matrix + i;
     }
 
     // Draw model
