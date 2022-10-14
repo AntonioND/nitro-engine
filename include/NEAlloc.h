@@ -7,8 +7,8 @@
 #ifndef NE_ALLOC_H__
 #define NE_ALLOC_H__
 
-/// \file   NEAlloc.h
-/// \brief  VRAM memory allocator
+/// @file   NEAlloc.h
+/// @brief  VRAM memory allocator
 ///
 /// Internal use, used to handle VRAM when other function requests memory.
 

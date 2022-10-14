@@ -7,8 +7,8 @@
 #ifndef NE_ANIMATION_H__
 #define NE_ANIMATION_H__
 
-/// \file   NEAnimation.h
-/// \brief  Functions to load animations.
+/// @file   NEAnimation.h
+/// @brief  Functions to load animations.
 
 /// @defgroup animation_system Animation system
 ///

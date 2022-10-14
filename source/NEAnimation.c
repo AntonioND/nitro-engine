@@ -8,7 +8,7 @@
 
 #include "NEMain.h"
 
-/// \file NEAnimation.c
+/// @file NEAnimation.c
 
 static NE_Animation **NE_AnimationPointers;
 static int NE_MAX_ANIMATIONS;
