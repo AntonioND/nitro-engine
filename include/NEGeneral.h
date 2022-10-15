@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -8,297 +8,273 @@
 #define NE_GENERAL_H__
 
 #include <nds.h>
+
 #include "NEMain.h"
 
-/*! \file   NEGeneral.h
- *  \brief  Init 3D mode and process functions. */
+/// @file   NEGeneral.h
+/// @brief  Init 3D mode and process functions.
 
-/*! @defgroup general_ General utilities
- *
- * Functions to control Nitro Engine.
- *
- * @{
- */
+/// @defgroup general_utils General utilities
+///
+/// General functions to control Nitro Engine, setup screens, print debug
+/// messages, etc.
+///
+/// @{
 
-/*! \typedef   typedef void (*NE_Voidfunc)(void);
- *  \brief     Void function pointer used in NE_Process and NE_ProcessDual.
- */
+/// Void function pointer used in NE_Process and NE_ProcessDual.
 typedef void (*NE_Voidfunc)(void);
 
-/*! \struct NE_Input
- *  \brief  Holds information of keys and stylus input for internal use.
- */
+/// Holds information of keys and stylus input for internal use.
 typedef struct {
-	uint32 kdown, kheld, kup;
-	touchPosition touch;
+    uint32 kdown, kheld, kup;
+    touchPosition touch;
 } NE_Input;
 
-/*! \fn    void NE_UpdateInput();
- *  \brief Updates input data for internal use. Use this if you are using
- *         NE_GUI or window system. You have to call scanKeys() each frame for
- *         this to work.
- */
+/// Updates input data for internal use.
+///
+/// Use this if you are using NE_GUI or window system. You have to call
+/// scanKeys() each frame for this to work.
 void NE_UpdateInput(void);
 
-/*! \fn    void NE_End(void);
- *  \brief Ends Nitro Engine and frees all memory used by it.
- */
+/// Ends Nitro Engine and frees all memory used by it.
 void NE_End(void);
 
-/*! \fn    void NE_Init3D(void);
- *  \brief Inits Nitro Engine and 3D mode in one screen.
- */
+/// Inits Nitro Engine and 3D mode in one screen.
 void NE_Init3D(void);
 
-/*! \fn    void NE_Process(NE_Voidfunc drawscene);
- *  \brief Draws a 3D scene.
- *  \param drawscene Pointer to a void function with the 3D scene.
- */
+/// Draws a 3D scene.
+///
+/// @param drawscene Function that draws the screen.
 void NE_Process(NE_Voidfunc drawscene);
 
-/*! \fn    void NE_InitDual3D(void);
- *  \brief Inits Nitro Engine and 3D mode both screens.
- */
+/// Inits Nitro Engine and 3D mode both screens.
+///
+/// VRAM banks C and D are used as framebuffers, which means there is only 50%
+/// of the normally available VRAM for textures.
 void NE_InitDual3D(void);
 
-/*! \fn    void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen);
- *  \brief Draws a 3D scene in each screen.
- *  \param topscreen Pointer to a void function with the 3D scene of top screen.
- *  \param downscreen Pointer to a void function with the 3D scene of lower
- *         screen.
- */
+/// Draws a 3D scene in each screen.
+///
+/// @param topscreen Function that draws the top screen.
+/// @param downscreen Function that draws the bottom screen.
 void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen);
 
-/*! \fn    void NE_InitConsole(void);
- *  \brief Inits libnds' console in  main screen. Works in dual 3D mode. It uses
- *         VRAM_F.
- */
+/// Inits the console of libnds in the main screen.
+///
+/// It works in dual 3D mode as well, and it uses VRAM_F for the background
+/// layer that contains the text.
 void NE_InitConsole(void);
 
-/*! \fn    void NE_SetConsoleColor(u32 color);
- *  \brief Changes console text color.
- *  \param color New color.
- */
+/// Changes the color of the text of the console.
+///
+/// @param color New color.
 void NE_SetConsoleColor(u32 color);
 
-/*! \fn    void NE_SwapScreens(void);
- *  \brief Swap screens.
- */
+/// Swap top and bottom screen.
 void NE_SwapScreens(void);
 
-/*! \fn    void NE_Viewport(int x1, int y1, int x2, int y2);
- *  \brief Sets the part of screen which displays the 3D image and sets a new
- *         projection.
- *  \param x1 (x1, y1) Down-left pixel.
- *  \param y1 (x1, y1) Down-left pixel.
- *  \param x2 (x2, y2) Up-right pixel.
- *  \param y2 (x2, y2) Up-right pixel.
- *
- * In dual 3D mode it is reseted in NE_ProcessDual(), so you have to call it
- * inside your drawing function.
- *
- * After NE_2DViewInit() viewport is set to (0,0,255,191) for a while, in the
- * next NE_Process() it will go back to what you set (in Dual 3D it goes to
- * default values).
- *
- * You can't set another viewport for 2D objects with this function as it
- * changes the projection matrix, use glViewport(). This isn't saved anywhere,
- * you will have to use it after NE_2DViewInit() every frame.
- */
+/// Setup the viewport.
+///
+/// The viewport is the part of the screen where the 3D scene is drawn.
+///
+/// NE_ProcessDual() sets the viewport is set to the full screen.
+///
+/// After NE_2DViewInit() the viewport is set to (0, 0, 255, 191).
+///
+/// NE_Process() sets the viewport back to the viewport set by NE_Viewport().
+///
+/// @param x1 (x1, y1) Bottom left pixel.
+/// @param y1 (x1, y1) Bottom left pixel.
+/// @param x2 (x2, y2) Top right pixel.
+/// @param y2 (x2, y2) Top right pixel.
 void NE_Viewport(int x1, int y1, int x2, int y2);
 
-/*! \fn    void NE_ClippingPlanesSetI(int znear, int zfar);
- *  \brief Set near and far clipping planes.
- *  \param znear Near plane.
- *  \param zfar Far plane.
- */
+/// Set near and far clipping planes.
+///
+/// @param znear Near plane (f32).
+/// @param zfar Far plane (f32).
 void NE_ClippingPlanesSetI(int znear, int zfar);
 
-/*! \def   NE_ClippingPlanesSet(n,f);
- *  \brief Set near and far clipping planes.
- *  \param n Near plane.
- *  \param f Far plane.
- */
+/// Set near and far clipping planes.
+///
+/// @param n Near plane (float).
+/// @param f Far plane (float).
 #define NE_ClippingPlanesSet(n, f) \
-	NE_ClippingPlanesSetI(floattof32(n), floattof32(f))
+    NE_ClippingPlanesSetI(floattof32(n), floattof32(f))
 
-/*! \fn    void NE_AntialiasEnable(bool value);
- *  \brief Set antialias on/off.
- *  \param value True/false for on/off.
- */
+/// Enable or disable antialiasing.
+///
+/// @param value true enables antialiasing, false disables it.
 void NE_AntialiasEnable(bool value);
 
-/*! \fn    int NE_GetPolygonCount(void);
- *  \brief Returns polygon RAM count (0 - 2048).
- */
+/// Returns the number of polygons drawn since the last glFlush().
+///
+/// @return Returns the number of polygons (0 - 2048).
 int NE_GetPolygonCount(void);
 
-/*! \fn    int NE_GetVertexCount(void);
- *  \brief Returns vertex RAM count (0 - 6144).
- */
+/// Returns the number of vertices drawn since the last glFlush().
+///
+/// @return Returns the number of vertices (0 - 6144).
 int NE_GetVertexCount(void);
 
-/*! \enum  NE_SpecialEffects
- *  \brief Enum with the possible effects of NE_SpecialEffectSet().
- */
+/// Effects supported by NE_SpecialEffectSet().
 typedef enum {
-	NE_NONE = 0,		/*!< None. */
-	NE_NOISE = 1,		/*!< Noise. */
-	NE_SINE = 2		/*!< Waves. */
+    /// Disable effects
+    NE_NONE,
+    /// Horizontal noise
+    NE_NOISE,
+    /// Horizontal sine waves
+    NE_SINE
 } NE_SpecialEffects;
 
-/*! \fn    void NE_VBLFunc(void)
- *  \brief Internal use, must be called every vblank.
- */
+/// Vertical blank interrupt handler.
+///
+/// Internal use, must be called every vertical blank.
 void NE_VBLFunc(void);
 
-/*! \fn    void NE_SpecialEffectPause(bool pause);
- *  \brief Pause/unpause special effect.
- *  \param pause true/false for pause/unpause.
- */
+/// Pause or unpause special effects.
+///
+/// @param pause true pauses the effect, false unpauses it.
 void NE_SpecialEffectPause(bool pause);
 
-/*! \fn    void NE_HBLFunc(void);
- *  \brief Internal use special. Controls screen effects.
- */
+/// Vertical blank interrupt handler.
+///
+/// Internal use, must be called every horizontal blank. It's only needed to
+/// enable CPU usage measuring and things like special effects enabled by
+/// NE_SpecialEffectSet().
 void NE_HBLFunc(void);
 
-/*! \fn    void NE_SpecialEffectSet(NE_SpecialEffects effect);
- *  \brief Set special effect to 3D screen(s).
- *  \param effect NE_NOISE/NE_SINE. 0 = Disable.
- */
+/// Specify which special effect to display in the 3D screens.
+///
+/// @param effect One effect out of NE_NOISE, NE_SINE or NE_NONE.
 void NE_SpecialEffectSet(NE_SpecialEffects effect);
 
-/*! \fn    void NE_SpecialEffectNoiseConfig(int value);
- *  \brief Sets value for noise effect.
- *  \param value Must be ((power of 2) - 1). Default is 15 (0xF).
- *
- * Don't use it if the noise effect is paused, the effect won't be updated until
- * it is unpaused.
- */
+/// Configures the special effect NE_NOISE.
+///
+/// If the effect is paused, the values won't be refreshed until it is unpaused.
+///
+/// @param value The value must be a power of two minus one. The default is 15.
 void NE_SpecialEffectNoiseConfig(int value);
 
-/*! \fn    void NE_SpecialEffectSineConfig(int mult, int shift);
- *  \brief Sets values for sine effect.
- *  \param mult Frecuency. Default is 10.
- *  \param shift Amplitude. Default is 9. If you want a bigger wave, use lower
- *         numbers.
- */
+/// Configures the special effect NE_SINE.
+///
+/// @param mult Frecuency of the wave. The default value is 10.
+/// @param shift Amplitude of the wave. The default value is 9. Bigger values
+///              result in smaller waves.
 void NE_SpecialEffectSineConfig(int mult, int shift);
 
-/*! \enum  NE_UpdateFlags
- *  \brief Arguments for NE_WaitForVBL().
- */
+/// Arguments for NE_WaitForVBL().
 typedef enum {
-	NE_UPDATE_GUI = 1,		/*!< Updates NE_GUI. */
-	NE_UPDATE_ANIMATIONS = 1 << 1,	/*!< Updates animated models. */
-	NE_UPDATE_PHYSICS = 1 << 2,	/*!< Updates the physics engine. */
-	NE_CAN_SKIP_VBL = 1 << 3	/*!< Allows Nitro Engine to skip the VBL wait if CPU load is greater than 100. */
+    /// Update the GUI implemented by Nitro Engine.
+    NE_UPDATE_GUI = BIT(0),
+    /// Update all animated models.
+    NE_UPDATE_ANIMATIONS = BIT(1),
+    /// Updates the physics engine.
+    NE_UPDATE_PHYSICS = BIT(2),
+    /// Allows Nitro Engine to skip the wait to the vertical blank if CPU load
+    /// is greater than 100%. You can use this if you don't need to load
+    /// textures or do anything else during the VBL. It is needed to set
+    /// NE_HBLFunc() as a HBL interrupt handler for this flag to work.
+    NE_CAN_SKIP_VBL = BIT(3)
 } NE_UpdateFlags;
 
-/*! \fn    void NE_WaitForVBL(NE_UpdateFlags flags);
- *  \brief Updates selected systems and waits for vertical blank.
- *  \param flags Look at NE_UpdateFlags.
- *
- * For example, NE_WaitForVBL(NE_UPDATE_GUI | NE_UPDATE_ANIMATIONS);
- *
- * NE_CAN_SKIP_VBL allows the function skip the VBL wait if CPU load is greater
- * than 100. You should use this if you don't need to load textures or do
- * anything else during VBL. You have to set NE_HBLFunc() to HBL interrupt
- * function for this to work.
- */
+/// Waits for the vertical blank and updates the selected systems.
+///
+/// You should OR all the flags that you need. For example, you can call this
+/// function like NE_WaitForVBL(NE_UPDATE_GUI | NE_UPDATE_ANIMATIONS);
+///
+/// @param flags Look at NE_UpdateFlags.
 void NE_WaitForVBL(NE_UpdateFlags flags);
 
-/*! \fn    int NE_GetCPUPercent(void);
- *  \brief Returns CPU usage percent.
- *
- * You need to use NE_WaitForVBL() and set NE_HBLFunc() to HBL interrupt
- * function for this to work.
- */
+/// Returns the approximate CPU usage in the previous frame.
+///
+/// You need to set NE_WaitForVBL() as a VBL interrupt handler and NE_HBLFunc()
+/// as a HBL interrupt handler for the CPU meter to work.
+///
+/// @return CPU usage (0 - 100).
 int NE_GetCPUPercent(void);
 
-/*! \fn    bool NE_GPUIsRendering(void);
- *  \brief Returns false if VCOUNT is between 192 and 213. If not, true.
- *
- * If true, you should't load textures (during the game). If you try to load
- * textures, there is a moment when the GPU can't access that data, so there
- * will be glitches.
- */
+/// Returns true if the GPU is in a rendering period.
+///
+/// The period when the GPU isn't drawing is when VCOUNT is between 192 and 213.
+///
+/// During the drawing period you should't load textures. If you try to load
+/// textures, there is a moment when the GPU can't access that data, so there
+/// will be glitches in the 3D output.
+///
+/// @return Returns true if the GPU is in the rendering period.
 bool NE_GPUIsRendering(void);
-
-//------------------------------------------------------------------------------
 
 #ifdef NE_DEBUG
 
 // TODO: Replace sprintf by snprintf
 
-#define NE_AssertMinMax(min, value, max, format...)		\
-	do {							\
-		if (((min) > (value)) || ((max) < (value))) {	\
-			char string[256];			\
-			sprintf(string, "%s:%d:",		\
-				__func__, __LINE__);		\
-			__NE_debugprint(string);		\
-			sprintf(string, ##format);		\
-			__NE_debugprint(string);		\
-			__NE_debugprint("\n");			\
-		}						\
-	} while (0)
+#define NE_AssertMinMax(min, value, max, format...)         \
+    do                                                      \
+    {                                                       \
+        if (((min) > (value)) || ((max) < (value)))         \
+        {                                                   \
+            char string[256];                               \
+            sprintf(string, "%s:%d:", __func__, __LINE__);  \
+            __NE_debugprint(string);                        \
+            sprintf(string, ##format);                      \
+            __NE_debugprint(string);                        \
+            __NE_debugprint("\n");                          \
+        }                                                   \
+    } while (0)
 
-#define NE_AssertPointer(ptr, format...)			\
-	do {							\
-		if (!(ptr)) {					\
-			char string[256];			\
-			sprintf(string, "%s:%d:",		\
-				__func__, __LINE__);		\
-			__NE_debugprint(string);		\
-			sprintf(string, ##format);		\
-			__NE_debugprint(string);		\
-			__NE_debugprint("\n");			\
-		}						\
-	} while (0)
+#define NE_AssertPointer(ptr, format...)                    \
+    do                                                      \
+    {                                                       \
+        if (!(ptr))                                         \
+        {                                                   \
+            char string[256];                               \
+            sprintf(string, "%s:%d:",  __func__, __LINE__); \
+            __NE_debugprint(string);                        \
+            sprintf(string, ##format);                      \
+            __NE_debugprint(string);                        \
+            __NE_debugprint("\n");                          \
+        }                                                   \
+    } while (0)
 
-#define NE_Assert(cond, format...)				\
-	do {							\
-		if (!(cond)) {					\
-			char string[256];			\
-			sprintf(string, "%s:%d:",		\
-				__func__, __LINE__);		\
-			__NE_debugprint(string);		\
-			sprintf(string, ##format);		\
-			__NE_debugprint(string);		\
-			__NE_debugprint("\n");			\
-		}						\
-	} while (0)
+#define NE_Assert(cond, format...)                          \
+    do                                                      \
+    {                                                       \
+        if (!(cond))                                        \
+        {                                                   \
+            char string[256];                               \
+            sprintf(string, "%s:%d:", __func__, __LINE__);  \
+            __NE_debugprint(string);                        \
+            sprintf(string, ##format);                      \
+            __NE_debugprint(string);                        \
+            __NE_debugprint("\n");                          \
+        }                                                   \
+    } while (0)
 
-#define NE_DebugPrint(format...)				\
-	do {							\
-		char string[256];				\
-		sprintf(string, "%s:%d:", __func__, __LINE__);	\
-		__NE_debugprint(string);			\
-		sprintf(string, ##format);			\
-		__NE_debugprint(string);			\
-		__NE_debugprint("\n");				\
-	} while (0)
+#define NE_DebugPrint(format...)                            \
+    do                                                      \
+    {                                                       \
+        char string[256];                                   \
+        sprintf(string, "%s:%d:", __func__, __LINE__);      \
+        __NE_debugprint(string);                            \
+        sprintf(string, ##format);                          \
+        __NE_debugprint(string);                            \
+        __NE_debugprint("\n");                              \
+    } while (0)
 
-/*! \fn    void __NE_debugprint(const char * text);
- *  \brief Function used internally by Nitro Engine to report error messages
- *         when NE_DEBUG is defined.
- *  \param text Text to output.
- */
+/// Function used internally by Nitro Engine to report error messages.
+///
+/// It is only used when NE_DEBUG is defined.
+///
+/// @param text Text to print.
 void __NE_debugprint(const char *text);
 
-/*! \fn    void NE_DebugSetHandler(void (*fn)(const char*));
- *  \brief Sets the debug handler where Nitro Engine will send debug
- *         information.
- *  \param fn Handler function.
- */
+/// Sets a debug handler where Nitro Engine will send debug information.
+///
+/// @param fn Handler where Nitro Engine will send debug information.
 void NE_DebugSetHandler(void (*fn)(const char *));
 
-/*! \fn    void NE_DebugSetHandlerConsole(void);
- *  \brief Sets libnds's console as debug handler where Nitro Engine will send
- *         debug information.
- */
+/// Sets the console of libnds as destination of the debug information.
 void NE_DebugSetHandlerConsole(void);
 
 #else // #ifndef NE_DEBUG
@@ -312,83 +288,75 @@ void NE_DebugSetHandlerConsole(void);
 
 #endif
 
-//------------------------------------------------------------------------------
+/// @}
 
-/*! @} */
+/// @defgroup touch_test Touch test
+///
+/// Functions to detect if an object is being pressed by the stylus.
+///
+/// If you want to know if you are touching something in the touch screen you
+/// can use the functions of this group. They perform tests to know if an object
+/// is under the coordinates of the stylus, and they return its distance from
+/// the camera.
+///
+/// TODO: There is a bug in gluPickMatrix() when first two coordinates of
+/// viewport are different from (0,0).
+///
+/// Note: This uses last stylus coordinates even if it has been released. You
+/// will have to check by yourself if the stylus is really in contact with the
+/// screen.
+///
+/// Note: It two objects overlap, the test may fail to diferenciate which of
+/// them is closer to the camera.
+///
+/// Note: If you want to draw something without using NE_ModelDraw(), you will
+/// have to move the view to the center of your model and use
+/// PosTest_Asynch(0, 0, 0).
+///
+/// This doesn't work in most emulators, but it works in melonDS.
+///
+/// How to use this test:
+///
+/// 1. Init the "touch test mode" with NE_TouchTestStart() to prepare the
+///    hardware. During this mode, polygons are not drawn on the screen. For
+///    this reason, it is possible to use simplified models (without texture,
+///    normals, with fewer polygons, etc) to speed up the process.
+///
+/// 2. Call NE_TouchTestObject().
+///
+/// 3. Draw the model with NE_ModelDraw(), for example.
+///
+/// 4. Call NE_TouchTestResult() to know if it is being touched. If it is being
+///    touched, it returns the distance from the camera.
+///
+/// 5. Repeat 2-4 for each model you want to test.
+///
+/// 6. Call NE_TouchTestEnd() to exit "touch test mode".
+///
+/// Adapted from the Picking example of libnds by Gabe Ghearing.
+///
+/// @{
 
-/*! @defgroup touch_test Touch test
-
- * If you wanted to know if you are touching something, this is for you! These
- * functions perform tests to know if an object is under the stylus coordinates
- * and return its distance from the camera.
- *
- * Note: There is a bug when first two coordinates of viewport are different
- * from (0,0) in gluPickMatrix.
- *
- * Note2: This uses last stylus coordinates even if it has been released. You
- * will have to check by yourself if it is really touching the screen.
- *
- * Note3: It two objects are overlaping the test may fail to diferenciate which
- * of them is closer to the camera.
- *
- * Note4: If you want to draw something without using NE_ModelDraw(), you will
- * have to move the view to the center of your model and use
- * PosTest_Asynch(0, 0, 0).
- *
- * How to use this:
- *
- * 1 - Init a 'touch test mode' with NE_TouchTestStart() to prepare the hardware
- *     to perform this test.  During this mode, polygons are not drawn. Because
- *     of that, you could (and should) use models with less details than
- *     originals (no texture, no normals, less polygons...).
- *
- * 2 - Call NE_TouchTestObject().
- *
- * 3 - Draw the model with NE_ModelDraw().
- *
- * 4 - Call NE_TouchTestResult() to know if it is being touched. If it is
- *     touched, it returns the distance from the camera.
- *
- * 5 - Repeat 2-4 for each model you want to test.
- *
- * 6 - Call NE_TouchTestEnd() to return back to normal. Polygons are drawn on
- *     screen after this.
- *
- * Adapted from the Picking example of libNDS by Gabe Ghearing.
- *
- * @{
- */
-
-/*! \fn    void NE_TouchTestStart(void);
- *  \brief Start a 'touch test mode' and saves current matrices.
- *
- * Polygons drawn after this won't be displayed on screen. It is a good idea to
- * use models with less details than the original to this test.
- *
- * This doesn't work in emulators.
- *
- * gluPickMatrix has a bug that appears when the two first coordinates of
- * viewport are different from (0, 0).
- */
+/// Starts "touch test mode" and saves all current matrices.
+///
+/// Polygons drawn after this won't be displayed on screen. It is a good idea to
+/// use models with less details than the original to perform this test.
 void NE_TouchTestStart(void);
 
-/*! \fn    void NE_TouchTestObject(void);
- *  \brief Starts a test for a model.
- */
+/// Starts a test for a model.
 void NE_TouchTestObject(void);
 
-/*! \fn    int NE_TouchTestResult(void);
- *  \brief Returns -1 if the model is NOT being touched. If it is touched,
- *         returns the distance from the camera.
- */
+/// Gets the result of the touch test.
+///
+/// @return It returns -1 if the model is NOT being touched. If it is touched,
+///         it returns the distance to the camera.
 int NE_TouchTestResult(void);
 
-/*! \fn    void NE_TouchTestEnd(void);
- *  \brief Ends the 'touch test mode' and sets the matrices that were saved
- *         before. Polygons drawn after this will be displayed on screen.
- */
+/// Ends "touch test mode" and restores the previous matrices.
+///
+/// Polygons drawn after this will be displayed on screen.
 void NE_TouchTestEnd(void);
 
-/*! @} */
+/// @}
 
 #endif // NE_GENERAL_H__

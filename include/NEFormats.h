@@ -12,24 +12,26 @@
 /// @file   NEFormats.h
 /// @brief  Used to convert common formats into DS formats at runtime.
 
-/// @defgroup formats Format coversion functions.
+/// @defgroup formats Format coversion functions
 ///
 /// Functions to convert BMP files into DS textures. They support BMP of 4, 8,
 /// 16 (X1RGB5) and 24 bits per pixel.
 ///
 /// @{
 
+/// @struct NE_BMPHeader
 /// Header struct for a BMP file.
-typedef struct {
+typedef struct PACKED {
     u16 type;       /// Magic identifier
     u32 size;       /// File size in bytes
     u16 reserved1;  /// Reserved
     u16 reserved2;  /// Reserved
     u32 offset;     /// Offset to image data, bytes
-} NE_BMPHeader __attribute__((packed));
+} NE_BMPHeader;
 
+/// @struct NE_BMPInfoHeader
 /// Information struct of a BMP file.
-typedef struct {
+typedef struct PACKED {
     u32 size;               /// Header size in bytes
     u32 width;              /// Width of the image
     u32 height;             /// Height of the image
@@ -41,7 +43,7 @@ typedef struct {
     u32 yresolution;        /// Vertical resolution in pixels per meter
     u32 ncolors;            /// Number of colors
     u32 importantcolors;    /// Important colors
-} NE_BMPInfoHeader __attribute__((packed));
+} NE_BMPInfoHeader;
 
 /// Converts a BMP file from a filesystem to an RGBA texture and loads it to
 /// a material object.

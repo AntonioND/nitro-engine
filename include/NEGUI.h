@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -9,262 +9,224 @@
 
 #include "NEMain.h"
 
-/*! \file   NEGUI.h
- *  \brief  GUI functions. */
+/// @file   NEGUI.h
+/// @brief  GUI functions.
 
-/*! @defgroup gui_system GUI system
- *
- * Functions to create buttons, check boxes, radio buttons and slidebars.
- *
- * @{
-*/
+/// @defgroup gui_system GUI system
+///
+/// Functions to create basic buttons, check boxes, radio buttons and slidebars.
+///
+/// @{
 
-/*! \def   #define NE_GUI_DEFAULT_OBJECTS    64 */
-#define NE_GUI_DEFAULT_OBJECTS      64
+#define NE_GUI_DEFAULT_OBJECTS  64 /// Default max number of GUI elements
 
-#define NE_GUI_POLY_ID       62	/*! \def   #define NE_GUI_POLY_ID     62 */
-#define NE_GUI_POLY_ID_ALT   61	/*! \def   #define NE_GUI_POLY_ID_ALT 61 */
+#define NE_GUI_POLY_ID          62 /// Polygon ID to use for most GUI elements.
+#define NE_GUI_POLY_ID_ALT      61 /// Alternative poly ID to use for the GUI.
 
-/*! \def   #define NE_GUI_MIN_PRIORITY 100 */
-#define NE_GUI_MIN_PRIORITY 100
+#define NE_GUI_MIN_PRIORITY     100 /// Minimum 2D priority of GUI elements.
 
-/*! \enum  NE_GUITypes
- *  \brief GUI object types.
- */
+/// GUI element types.
 typedef enum {
-	NE_Button = 1,	/*!< Simple button. */
-	NE_CheckBox,	/*!< Check Box. */
-	NE_RadioButton,	/*!< Radio button. */
-	NE_SlideBar	/*!< Slide bar. */
+    /// Button
+    NE_Button = 1,
+    // Check box
+    NE_CheckBox,
+    // Radio button
+    NE_RadioButton,
+    // Slidebar (horizontal or vertical)
+    NE_SlideBar
 } NE_GUITypes;
 
-/*! \enum  NE_GUIState
- *  \brief GUI states.
- */
+/// Possible states of a GUI object.
 typedef enum {
-	NE_Error	= -1,		/*!< GUI hasn't been updated or input hasn't been updated. */
-	NE_None		= 0,		/*!< Not pressed. */
-	NE_Pressed	= 1,		/*!< Just pressed. */
-	NE_Held		= 1 << 1,	/*!< Held. */
-	NE_Clicked	= 1 << 2	/*!< Just released. */
+    /// The GUI hasn't been updated or the input hasn't been updated.
+    NE_Error   = -1,
+    /// The object isn't pressed.
+    NE_None    = 0,
+    /// The object has just been pressed.
+    NE_Pressed = 1,
+    /// The object is being held pressed.
+    NE_Held    = 1 << 1,
+    /// The object has just been released.
+    NE_Clicked = 1 << 2
 } NE_GUIState;
 
-/*! \struct NE_GUIObj
- *  \brief  Holds information of an GUI object.
- */
+/// Holds information of an GUI object.
 typedef struct {
-	NE_GUITypes type;
-	void *pointer;
+    NE_GUITypes type; /// Type of GUI object
+    void *pointer;    /// Pointer to object-specific information.
 } NE_GUIObj;
 
-//------------------------------------------------------------------------------
-
-/*! \fn    void NE_GUIUpdate(void);
- *  \brief Updates all GUI objects. NE_UpdateInput() must be called each frame
- *         for this to work.
- */
+/// Updates all GUI objects.
+///
+/// NE_UpdateInput() must be called every frame for this function to work.
 void NE_GUIUpdate(void);
 
-/*! \fn    void NE_GUIDraw(void);
- *  \brief Draw all elements. You have to call NE_2DViewInit() before this.
- */
+/// Draw all GUI objects.
+///
+/// You must call NE_2DViewInit() before this.
 void NE_GUIDraw(void);
 
-//------------------------------------------------------------------------------
-
-/*! \fn    NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2);
- *  \brief Returns a pointer to a new button.
- *  \param x1 (x1,y1) Upper left corner.
- *  \param y1 (x1,y1) Upper left corner.
- *  \param x2 (x2,y2) Down right corner.
- *  \param y2 (x2,y2) Down right corner.
- */
+/// Creates a new button object.
+///
+/// @param x1 (x1, y1) Top left corner.
+/// @param y1 (x1, y1) Top left corner.
+/// @param x2 (x2, y2) Bottom right corner.
+/// @param y2 (x2, y2) Bottom right corner.
+/// @return Returns a pointer to the new object.
 NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2);
 
-/*! \fn    NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2,
- *                                         bool initialvalue);
- *  \brief Returns a pointer to a new check button.
- *  \param x1 (x1,y1) Upper left corner.
- *  \param y1 (x1,y1) Upper left corner.
- *  \param x2 (x2,y2) Down right corner.
- *  \param y2 (x2,y2) Down right corner.
- *  \param initialvalue If true, checkbox is created in "checked" state.
- */
+/// Creates a new check button.
+///
+/// @param x1 (x1, y1) Top left corner.
+/// @param y1 (x1, y1) Top left corner.
+/// @param x2 (x2, y2) Bottom right corner.
+/// @param y2 (x2, y2) Bottom right corner.
+/// @param initialvalue If true, the checkbox is created in "checked" state.
+/// @return Returns a pointer to the new object.
 NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2,
-				bool initialvalue);
+                                bool initialvalue);
 
-/*! \fn    NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2,
- *                                            int group, bool initialvalue);
- *  \brief Returns a pointer to a new radio button.
- *  \param x1 (x1,y1) Upper left corner.
- *  \param y1 (x1,y1) Upper left corner.
- *  \param x2 (x2,y2) Down right corner.
- *  \param y2 (x2,y2) Down right corner.
- *  \param group Radio button group.
- *  \param initialvalue If true, button is created in "checked" state and resets
- *         other buttons in same group.
- */
+/// Creates a new radio button.
+///
+/// @param x1 (x1, y1) Top left corner.
+/// @param y1 (x1, y1) Top left corner.
+/// @param x2 (x2, y2) Bottom right corner.
+/// @param y2 (x2, y2) Bottom right corner.
+/// @param group Radio button group.
+/// @param initialvalue If true, the button is created in "checked" state and
+///                     resets all other buttons in same group.
+/// @return Returns a pointer to the new object.
 NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
-				   bool initialvalue);
+                                   bool initialvalue);
 
-/*! \fn    NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2,
- *                                         int min, int max, int initialvalue);
- *  \brief Returns a pointer to a slide bar. It checks if it is vertical or
- *         horizontal.
- *  \param x1 (x1,y1) Upper left corner.
- *  \param y1 (x1,y1) Upper left corner.
- *  \param x2 (x2,y2) Down right corner.
- *  \param y2 (x2,y2) Down right corner.
- *  \param min Min. value (it can be negative).
- *  \param max Max. value (it can be negative).
- *  \param initialvalue Initial value. You shouldn't give too big numbers to
- *         min and max. Sliding button's size changes between 1 and 100 of
- *         difference.
- */
+/// Creates a new slidebar.
+///
+/// It determines wether it is a vertical bar or horizontal bar depending on the
+/// size of the bar.
+///
+/// The size of the sliding button depends on the range of values. It changes
+/// sizes between the ranges of 1 to 100. Any range bigger than 100 has the same
+/// button size as a range of 100.
+///
+/// @param x1 (x1, y1) Top left corner.
+/// @param y1 (x1, y1) Top left corner.
+/// @param x2 (x2, y2) Bottom right corner.
+/// @param y2 (x2, y2) Bottom right corner.
+/// @param min Minimum value (it can be negative).
+/// @param max Maximum value (it can be negative).
+/// @param initialvalue Initial value.
+/// @return Returns a pointer to the new object.
 NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
-				int max, int initialvalue);
+                                int max, int initialvalue);
 
-//------------------------------------------------------------------------------
-
-/*! \fn    void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material,
- *                                 u32 color, u32 alpha,
- *                                 NE_Material *pressedmaterial,
- *                                 u32 pressedcolor, u32 pressedalpha);
- *  \brief Configures given button's material, color and alpha.
- *  \param btn Button to configure.
- *  \param material Default (not-pressed) texture.
- *  \param color Default (not-pressed) color.
- *  \param alpha Default (not-pressed) alpha value...
- *  \param pressedmaterial Pressed texture.
- *  \param pressedcolor Pressed color...
- *  \param pressedalpha Pressed alpha value...
- */
+/// Configures display properties of a button.
+///
+/// @param btn Button to configure.
+/// @param material Material used when not pressed.
+/// @param color Color used when not pressed.
+/// @param alpha Alpha value used when not pressed.
+/// @param pressedmaterial Material used when pressed.
+/// @param pressedcolor Color used when pressed.
+/// @param pressedalpha Alpha value used when pressed.
 void NE_GUIButtonConfig(NE_GUIObj *btn, NE_Material *material, u32 color,
-			u32 alpha, NE_Material *pressedmaterial,
-			u32 pressedcolor, u32 pressedalpha);
+                        u32 alpha, NE_Material *pressedmaterial,
+                        u32 pressedcolor, u32 pressedalpha);
 
-/*! \fn    void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
- *                                   NE_Material *materialfalse, u32 color,
- *                                   u32 alpha, u32 pressedcolor,
- *                                   u32 pressedalpha);
- *  \brief Configures given check box's material, color and alpha.
- *  \param chbx Check box to configure.
- *  \param materialtrue Texture used when is checked.
- *  \param materialfalse Texture used when is NOT checked.
- *  \param color Color when not pressed.
- *  \param alpha Alpha when not pressed.
- *  \param pressedcolor Color when pressed.
- *  \param pressedalpha Alpha when pressed.
- */
+/// Configures display properties of a check box.
+///
+/// @param chbx Check box to configure.
+/// @param materialtrue Material used when the check box is checked.
+/// @param materialfalse Material used when the check box not is checked.
+/// @param color Color used when not pressed.
+/// @param alpha Alpha value used when not pressed.
+/// @param pressedcolor Color used when pressed.
+/// @param pressedalpha Alpha value used when pressed.
 void NE_GUICheckBoxConfig(NE_GUIObj *chbx, NE_Material *materialtrue,
-			  NE_Material *materialfalse, u32 color, u32 alpha,
-			  u32 pressedcolor, u32 pressedalpha);
+                          NE_Material *materialfalse, u32 color, u32 alpha,
+                          u32 pressedcolor, u32 pressedalpha);
 
-/*! \fn    void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn,
- *                                      NE_Material *materialtrue,
- *                                      NE_Material *materialfalse, u32 color,
- *                                      u32 alpha, u32 pressedcolor,
- *                                      u32 pressedalpha);
- *  \brief Configures given radio button's material, color and alpha.
- *  \param rdbtn Radio button to configure.
- *  \param materialtrue Texture used when is checked.
- *  \param materialfalse Texture used when is NOT checked.
- *  \param color Color when not pressed.
- *  \param alpha Alpha when not pressed.
- *  \param pressedcolor Color when pressed.
- *  \param pressedalpha Alpha when pressed.
- */
+/// Configures display properties of a radio button.
+///
+/// @param rdbtn Radio button to configure.
+/// @param materialtrue Material used when the radio button is checked.
+/// @param materialfalse Material used when the radio button is not checked.
+/// @param color Color used when not pressed.
+/// @param alpha Alpha value used when not pressed.
+/// @param pressedcolor Color used when pressed.
+/// @param pressedalpha Alpha value used when pressed.
 void NE_GUIRadioButtonConfig(NE_GUIObj *rdbtn, NE_Material *materialtrue,
-			     NE_Material *materialfalse, u32 color, u32 alpha,
-			     u32 pressedcolor, u32 pressedalpha);
+                             NE_Material *materialfalse, u32 color, u32 alpha,
+                             u32 pressedcolor, u32 pressedalpha);
 
-/*! \fn    void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
- *                                   NE_Material *matbarbtn,
- *                                   NE_Material *matbar, u32 normalcolor,
- *                                   u32 pressedcolor, u32 barcolor, u32 alpha,
- *                                   u32 pressedalpha, u32 baralpha);
- *  \brief Configures given slide bar's material, color and alpha.
- *  \param sldbar Slide bar to configure.
- *  \param matbtn Button's texture.
- *  \param matbarbtn Sliding button's texture.
- *  \param matbar Bar texture.
- *  \param normalcolor Normal button's color.
- *  \param pressedcolor Pressed button's color.
- *  \param barcolor Bar color.
- *  \param alpha Normal button's alpha.
- *  \param pressedalpha Pressed button's alpha.
- *  \param baralpha Bar alpha.
- */
+/// Configures display properties of a slide bar.
+///
+/// @param sldbar Slide bar to configure.
+/// @param matbtn Material of the buttons on the sides.
+/// @param matbarbtn Material of the sliding button.
+/// @param matbar Material of the bar.
+/// @param normalcolor Color of buttons when not pressed.
+/// @param pressedcolor Color of buttons when pressed.
+/// @param barcolor Color of the bar.
+/// @param alpha Alpha value of buttons when not pressed.
+/// @param pressedalpha Alpha value of buttons when pressed.
+/// @param baralpha Alpha value of the bar.
 void NE_GUISlideBarConfig(NE_GUIObj *sldbar, NE_Material *matbtn,
-			  NE_Material *matbarbtn, NE_Material *matbar,
-			  u32 normalcolor, u32 pressedcolor, u32 barcolor,
-			  u32 alpha, u32 pressedalpha, u32 baralpha);
+                          NE_Material *matbarbtn, NE_Material *matbar,
+                          u32 normalcolor, u32 pressedcolor, u32 barcolor,
+                          u32 alpha, u32 pressedalpha, u32 baralpha);
 
-/*! \fn    void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max);
- *  \brief Configures given slide bar's min. and max. values.
- *  \param sldbr Slide bar to configure.
- *  \param min Min (it can be negative).
- *  \param max Max (it can be negative).
- *
- * You shouldn't give too big numbers. Sliding button's size changes between 1
- * and 100 of difference.
- */
+/// Sets the minimum and maximum values of this slide bar.
+///
+/// @param sldbr Slide bar to configure.
+/// @param min Minimum value (it can be negative).
+/// @param max Maximum value (it can be negative).
 void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max);
 
-//------------------------------------------------------------------------------
-
-/*! \fn    NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj);
- *  \brief Returns current event of any object.
- *  \param obj Pointer to the object.
- *
- * It returns a NE_GUIState element. If obj is a slide bar, returns
- * (event_button_a | event_button_b | event_button_bar).
- */
+/// Returns the current event of a GUI object.
+///
+/// It returns a NE_GUIState value. If the object is a slide is a slide bar it
+/// returns (event button A | event button B | event button bar) instead.
+///
+/// @param obj Pointer to the object.
+/// @return Event.
 NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj);
 
-/*! \fn    bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx);
- *  \brief Returns true if given check box is checked.
- *  \param chbx Check box.
- */
+/// Gets the value of a check box.
+///
+/// @param chbx Check box.
+/// @return It returns true if the check box is checked.
 bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx);
 
-/*! \fn    bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn);
- *  \brief Returns true if given radio button is checked.
- *  \param rdbtn Radio button.
- */
+/// Gets the value of a radio button.
+///
+/// @param rdbtn Radio button.
+/// @return It returns true if the radio button is checked.
 bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn);
 
-/*! \fn    int NE_GUISlideBarGetValue(NE_GUIObj *sldbr);
- *  \brief Returns given slide bar's value.
- *  \param sldbr Slide bar.
- */
+/// Gets the value of a slide bar.
+///
+/// @param sldbr Slide bar.
+/// @return It returns the value of the slide bar.
 int NE_GUISlideBarGetValue(NE_GUIObj *sldbr);
 
-//------------------------------------------------------------------------------
-
-/*! \fn    void NE_GUIDeleteObject(NE_GUIObj *obj);
- *  \brief Deletes given object.
- *  \param obj Object.
- */
+/// Deletes the given object.
+///
+/// @param obj Object.
 void NE_GUIDeleteObject(NE_GUIObj *obj);
 
-/*! \fn    void NE_GUIDeleteAll(void);
- *  \brief Deletes all objects.
- */
+/// Deletes all GUI objects and all memory used by them.
 void NE_GUIDeleteAll(void);
 
-/*! \fn    void NE_GUISystemReset(int number_of_objects);
- *  \brief Resets the GUI system and sets the maximun number of objects.
- *  \param number_of_objects Number of objects. If it is less than 1, it will
- *         create space for NE_GUI_DEFAULT_OBJECTS.
- */
-void NE_GUISystemReset(int number_of_objects);
+/// Resets the GUI system and sets the maximun number of objects.
+///
+/// @param max_objects Max number of objects. If it is lower than 1, the
+///                    function will create space for NE_GUI_DEFAULT_OBJECTS.
+void NE_GUISystemReset(int max_objects);
 
-/*! \fn    void NE_GUISystemEnd(void);
- *  \brief Ends GUI system and all memory used by it.
- */
+/// Ends GUI system and all memory used by it.
 void NE_GUISystemEnd(void);
 
-/*! @} */
+/// @}
 
 #endif // NE_GUI_H__
