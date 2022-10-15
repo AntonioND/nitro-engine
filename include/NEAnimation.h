@@ -20,8 +20,8 @@
 
 /// Holds information of an animation.
 typedef struct {
-    bool loadedfromfat; /// True if it was loaded from a filesystem.
-    const void *data;   /// Pointer to the animation data (DSA file).
+    bool loadedfromfat; ///< True if it was loaded from a filesystem.
+    const void *data;   ///< Pointer to the animation data (DSA file).
 } NE_Animation;
 
 /// Creates a new animation object.

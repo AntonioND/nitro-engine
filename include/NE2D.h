@@ -25,16 +25,18 @@
 
 /// Holds information of a 2D sprite.
 typedef struct {
-    s16 x, y;           /// Position in pixels
-    s16 w, h;           /// Size in pixels
-    int rot_angle;      /// Rotation
-    int scale;          /// Scale (f32)
-    int priority;       /// Priority (Z coordinate)
-    u32 color;          /// Color
-    NE_Material *mat;   /// Material
-    bool visible;       /// true if visible, false if not
-    u8 alpha;           /// Alpha value
-    u8 id;              /// Polygon ID
+    s16 x;            ///< X position in pixels
+    s16 y;            ///< Y position in pixels
+    s16 w;            ///< Width in pixels
+    s16 h;            ///< Height in pixels
+    int rot_angle;    ///< Rotation
+    int scale;        ///< Scale (f32)
+    int priority;     ///< Priority (Z coordinate)
+    u32 color;        ///< Color
+    NE_Material *mat; ///< Material
+    bool visible;     ///< true if visible, false if not
+    u8 alpha;         ///< Alpha value
+    u8 id;            ///< Polygon ID
 } NE_Sprite;
 
 /// Creates a new sprite.

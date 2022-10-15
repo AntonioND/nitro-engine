@@ -26,8 +26,10 @@ typedef void (*NE_Voidfunc)(void);
 
 /// Holds information of keys and stylus input for internal use.
 typedef struct {
-    uint32 kdown, kheld, kup;
-    touchPosition touch;
+    uint32 kdown;           ///< Keys that have just been pressed this frame.
+    uint32 kheld;           ///< Keys that are pressed.
+    uint32 kup;             ///< Keys that have just been released this frame.
+    touchPosition touch;    ///< Touch screen state
 } NE_Input;
 
 /// Updates input data for internal use.
@@ -119,12 +121,9 @@ int NE_GetVertexCount(void);
 
 /// Effects supported by NE_SpecialEffectSet().
 typedef enum {
-    /// Disable effects
-    NE_NONE,
-    /// Horizontal noise
-    NE_NOISE,
-    /// Horizontal sine waves
-    NE_SINE
+    NE_NONE,  ///< Disable effects
+    NE_NOISE, ///< Horizontal noise
+    NE_SINE   ///< Horizontal sine waves
 } NE_SpecialEffects;
 
 /// Vertical blank interrupt handler.
@@ -209,6 +208,7 @@ bool NE_GPUIsRendering(void);
 
 // TODO: Replace sprintf by snprintf
 
+/// TODO: Document
 #define NE_AssertMinMax(min, value, max, format...)         \
     do                                                      \
     {                                                       \
@@ -223,6 +223,7 @@ bool NE_GPUIsRendering(void);
         }                                                   \
     } while (0)
 
+/// TODO: Document
 #define NE_AssertPointer(ptr, format...)                    \
     do                                                      \
     {                                                       \
@@ -237,6 +238,7 @@ bool NE_GPUIsRendering(void);
         }                                                   \
     } while (0)
 
+/// TODO: Document
 #define NE_Assert(cond, format...)                          \
     do                                                      \
     {                                                       \
@@ -251,6 +253,7 @@ bool NE_GPUIsRendering(void);
         }                                                   \
     } while (0)
 
+/// TODO: Document
 #define NE_DebugPrint(format...)                            \
     do                                                      \
     {                                                       \

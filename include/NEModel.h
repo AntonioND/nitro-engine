@@ -22,40 +22,42 @@
 
 /// Possible animation types.
 typedef enum {
-    /// When the end is reached it jumps to the start.
-    NE_ANIM_LOOP,
-    /// When the end is reached it stops.
-    NE_ANIM_ONESHOT,
+    NE_ANIM_LOOP,    ///< When the end is reached it jumps to the start.
+    NE_ANIM_ONESHOT, ///< When the end is reached it stops.
 } NE_AnimationType;
 
 /// Holds information of the animation of a model.
 typedef struct {
-    NE_AnimationType type;  /// Animation type.
-    int32_t speed;          /// Animation speed (f32).
-    int32_t currframe;      /// Current frame. It can be between frames (f32).
-    int32_t numframes;      /// Number of frames in the animation (int).
+    NE_AnimationType type; ///< Animation type.
+    int32_t speed;         ///< Animation speed (f32).
+    int32_t currframe;     ///< Current frame. It can be between frames (f32).
+    int32_t numframes;     ///< Number of frames in the animation (int).
 } NE_AnimData;
 
 /// Possible model types.
 typedef enum {
-    /// Not animated.
-    NE_Static,
-    /// Animated.
-    NE_Animated
+    NE_Static,  ///< Not animated.
+    NE_Animated ///< Animated.
 } NE_ModelType;
 
 /// Holds information of a model.
 typedef struct {
-    bool meshfromfat;       /// True if the mesh has been loaded from storage
-    bool iscloned;          /// True if the model has been cloned
-    NE_ModelType modeltype; /// Model type (static or animated)
-    const u32 *meshdata;    /// Display list / DSM file
-    NE_Animation *animation;    /// Pointer to animation file
-    NE_AnimData animdata;   /// Animation data (current frame, speed, etc)
-    NE_Material *texture;   /// Material used by this model
-    int x, y, z;            /// Position of the model (f32)
-    int rx, ry, rz;         /// Rotation of the model
-    int sx, sy, sz;         /// Scale of the model (f32)
+    bool meshfromfat;        ///< True if the mesh has been loaded from storage
+    bool iscloned;           ///< True if the model has been cloned
+    NE_ModelType modeltype;  ///< Model type (static or animated)
+    const u32 *meshdata;     ///< Display list / DSM file
+    NE_Animation *animation; ///< Pointer to animation file
+    NE_AnimData animdata;    ///< Animation data (current frame, speed, etc)
+    NE_Material *texture;    ///< Material used by this model
+    int x;                   ///< X position of the model (f32)
+    int y;                   ///< Y position of the model (f32)
+    int z;                   ///< Z position of the model (f32)
+    int rx;                  ///< Rotation of the model by X axis
+    int ry;                  ///< Rotation of the model by Y axis
+    int rz;                  ///< Rotation of the model by Z axis
+    int sx;                  ///< X scale of the model (f32)
+    int sy;                  ///< Y scale of the model (f32)
+    int sz;                  ///< Z scale of the model (f32)
 } NE_Model;
 
 /// Creates a new model object.

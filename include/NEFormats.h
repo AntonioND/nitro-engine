@@ -19,30 +19,32 @@
 ///
 /// @{
 
+// TODO: PACKED breaks Doxygen
+
 /// @struct NE_BMPHeader
 /// Header struct for a BMP file.
 typedef struct PACKED {
-    u16 type;       /// Magic identifier
-    u32 size;       /// File size in bytes
-    u16 reserved1;  /// Reserved
-    u16 reserved2;  /// Reserved
-    u32 offset;     /// Offset to image data, bytes
+    u16 type;       ///< Magic identifier
+    u32 size;       ///< File size in bytes
+    u16 reserved1;  ///< Reserved
+    u16 reserved2;  ///< Reserved
+    u32 offset;     ///< Offset to image data, bytes
 } NE_BMPHeader;
 
 /// @struct NE_BMPInfoHeader
 /// Information struct of a BMP file.
 typedef struct PACKED {
-    u32 size;               /// Header size in bytes
-    u32 width;              /// Width of the image
-    u32 height;             /// Height of the image
-    u16 planes;             /// Number of color planes
-    u16 bits;               /// Bits per pixel
-    u32 compression;        /// Compression type
-    u32 imagesize;          /// Image size in bytes
-    u32 xresolution;        /// Horizontal resolution in pixels per meter
-    u32 yresolution;        /// Vertical resolution in pixels per meter
-    u32 ncolors;            /// Number of colors
-    u32 importantcolors;    /// Important colors
+    u32 size;               ///< Header size in bytes
+    u32 width;              ///< Width of the image
+    u32 height;             ///< Height of the image
+    u16 planes;             ///< Number of color planes
+    u16 bits;               ///< Bits per pixel
+    u32 compression;        ///< Compression type
+    u32 imagesize;          ///< Image size in bytes
+    u32 xresolution;        ///< Horizontal resolution in pixels per meter
+    u32 yresolution;        ///< Vertical resolution in pixels per meter
+    u32 ncolors;            ///< Number of colors
+    u32 importantcolors;    ///< Important colors
 } NE_BMPInfoHeader;
 
 /// Converts a BMP file from a filesystem to an RGBA texture and loads it to

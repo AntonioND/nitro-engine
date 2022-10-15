@@ -22,7 +22,7 @@
 
 /// Holds information of a palette.
 typedef struct {
-    int index; /// Index to internal palette object
+    int index; ///< Index to internal palette object
 } NE_Palette;
 
 /// Creates a new palette object.

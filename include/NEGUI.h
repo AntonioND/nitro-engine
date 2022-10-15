@@ -27,14 +27,10 @@
 
 /// GUI element types.
 typedef enum {
-    /// Button
-    NE_Button = 1,
-    // Check box
-    NE_CheckBox,
-    // Radio button
-    NE_RadioButton,
-    // Slidebar (horizontal or vertical)
-    NE_SlideBar
+    NE_Button = 1,  ///< Button
+    NE_CheckBox,    ///< Check box
+    NE_RadioButton, ///< Radio button
+    NE_SlideBar     ///< Slidebar (horizontal or vertical)
 } NE_GUITypes;
 
 /// Possible states of a GUI object.
@@ -53,8 +49,8 @@ typedef enum {
 
 /// Holds information of an GUI object.
 typedef struct {
-    NE_GUITypes type; /// Type of GUI object
-    void *pointer;    /// Pointer to object-specific information.
+    NE_GUITypes type; ///< Type of GUI object
+    void *pointer;    ///< Pointer to object-specific information.
 } NE_GUIObj;
 
 /// Updates all GUI objects.
