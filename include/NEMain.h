@@ -1,14 +1,20 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
-#ifndef NITRO_ENGINE_H__
-#define NITRO_ENGINE_H__
+#ifndef NE_MAIN_H__
+#define NE_MAIN_H__
 
-/*! \file   NEMain.h
- *  \brief  Main header of Nitro Engine.  */
+/// @file   NEMain.h
+/// @brief  Main header of Nitro Engine.
+
+/// @defgroup global_defines Global definitions
+///
+/// Definitions related to debug features and version number of the library.
+///
+/// @{
 
 #include <nds.h>
 #include <stdio.h>
@@ -19,15 +25,14 @@
 extern "C" {
 #endif
 
-//------------------------------------------------------------------------------
-// If Nitro Engine is compiled with this option, it will check a lot of things
-// and will output  error messages to an user-defined function. See the example
-// at Examples/Other/ErrorHandling.  If you have finished testing your code,
-// just comment the define and recompile Nitro Engine to save RAM and CPU usage.
-//------------------------------------------------------------------------------
+/// Enable debug features.
+///
+/// If Nitro Engine is compiled with this option, it will check a lot of things
+/// and it will print error messages to an user-defined function. Check the
+/// error handling example for more details. If you have finished testing your
+/// code, just comment the define out and recompile Nitro Engine to save RAM and
+/// CPU usage.
 #define NE_DEBUG
-
-//------------------------------------------------------------------------------
 
 #include "NE2D.h"
 #include "NEAnimation.h"
@@ -43,22 +48,25 @@ extern "C" {
 #include "NEText.h"
 #include "NETexture.h"
 
-//------------------------------------------------------------------------------
-
+/// Major version of Nitro Engine
 #define NITRO_ENGINE_MAJOR (0)
+/// Minor version of Nitro Engine
 #define NITRO_ENGINE_MINOR (7)
+/// Patch version of Nitro Engine
 #define NITRO_ENGINE_PATCH (0)
 
-#define NITRO_ENGINE_VERSION ((NITRO_ENGINE_MAJOR << 16) |	\
-			      (NITRO_ENGINE_MINOR << 8) |	\
-			      (NITRO_ENGINE_PATCH))
+/// Full version of Nitro Engine
+#define NITRO_ENGINE_VERSION ((NITRO_ENGINE_MAJOR << 16) |  \
+                              (NITRO_ENGINE_MINOR << 8) |   \
+                              (NITRO_ENGINE_PATCH))
 
+/// String with the version of Nitro Engine
 #define NITRO_ENGINE_VERSION_STRING "0.7.0"
 
-//------------------------------------------------------------------------------
+/// @}
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // NITRO_ENGINE_H__
+#endif // NE_MAIN_H__

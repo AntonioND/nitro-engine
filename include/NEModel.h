@@ -1,278 +1,258 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
 #ifndef NE_MODEL_H__
 #define NE_MODEL_H__
 
-/*! \file   NEModel.h
- *  \brief  Functions to draw and handle models.
- */
+/// @file   NEModel.h
+/// @brief  Functions to draw and handle models.
 
-/*! @defgroup model_system Model system
- *
- * System to create and manipulate animated or static models.
- * @{
- */
+/// @defgroup model_system Model handling system
+///
+/// Functions to create and manipulate animated or static models.
+///
+/// @{
 
-/*! \def    #define NE_NO_TEXTURE   -1 */
-#define NE_NO_TEXTURE   -1
+#define NE_NO_TEXTURE       -1 /// Value that represents a lack of textures
 
-#define NE_DEFAULT_MODELS 512	/*! \def #define NE_DEFAULT_MODELS 512 */
+#define NE_DEFAULT_MODELS   512 /// Default max number of models
 
-/*! \enum  NE_AnimationTypes
- *  \brief Possible animation types.
- */
+/// Possible animation types.
 typedef enum {
-	NE_ANIM_LOOP,		/*!< When the end is reached it jumps to the start. */
-	NE_ANIM_ONESHOT,	/*!< When the end is reached it stops. */
+    /// When the end is reached it jumps to the start.
+    NE_ANIM_LOOP,
+    /// When the end is reached it stops.
+    NE_ANIM_ONESHOT,
 } NE_AnimationType;
 
-/*! \struct NE_AnimData
- *  \brief  Holds information of the animation of a model.
- */
+/// Holds information of the animation of a model.
 typedef struct {
-	NE_AnimationType type;
-	int32_t speed;
-	int32_t currframe; // f32
-	int32_t numframes; // int
+    NE_AnimationType type;  /// Animation type.
+    int32_t speed;          /// Animation speed (f32).
+    int32_t currframe;      /// Current frame. It can be between frames (f32).
+    int32_t numframes;      /// Number of frames in the animation (int).
 } NE_AnimData;
 
-/*! \struct NE_Model
- *  \brief  Holds information of a model.
- */
-typedef struct {
-	bool meshfromfat;
-	bool iscloned;
-	int modeltype;		// Animated or not
-	const u32 *meshdata; // Display list / DSM file
-	NE_Animation *animation;
-	NE_AnimData animdata;
-	NE_Material *texture;
-	int x, y, z;		// f32
-	int rx, ry, rz;
-	int sx, sy, sz;		// f32
-} NE_Model;
-
-/*! \enum  NE_ModelType
- *  \brief Possible model types.
- */
+/// Possible model types.
 typedef enum {
-	NE_Static,		/*!< Not animated. */
-	NE_Animated		/*!< Animated. */
+    /// Not animated.
+    NE_Static,
+    /// Animated.
+    NE_Animated
 } NE_ModelType;
 
-/*! \fn    NE_Model *NE_ModelCreate(NE_ModelType type);
- *  \brief Returns a pointer to a NE_Model struct.
- */
+/// Holds information of a model.
+typedef struct {
+    bool meshfromfat;       /// True if the mesh has been loaded from storage
+    bool iscloned;          /// True if the model has been cloned
+    NE_ModelType modeltype; /// Model type (static or animated)
+    const u32 *meshdata;    /// Display list / DSM file
+    NE_Animation *animation;    /// Pointer to animation file
+    NE_AnimData animdata;   /// Animation data (current frame, speed, etc)
+    NE_Material *texture;   /// Material used by this model
+    int x, y, z;            /// Position of the model (f32)
+    int rx, ry, rz;         /// Rotation of the model
+    int sx, sy, sz;         /// Scale of the model (f32)
+} NE_Model;
+
+/// Creates a new model object.
+///
+/// @param type Model type (static or animated).
+/// @return Pointer to the newly created camera.
 NE_Model *NE_ModelCreate(NE_ModelType type);
 
-/*! \fn    void NE_ModelDelete(NE_Model *model);
- *  \brief Deletes a model struct previously loaded with NE_ModelCreate.
- *  \param model Pointer to the model.
- */
+/// Deletes a model.
+///
+/// @param model Pointer to the model.
 void NE_ModelDelete(NE_Model *model);
 
-/*! \fn    int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer);
- *  \brief Assign a display list in RAM to a static model.
- *  \param model Pointer to the model.
- *  \param pointer Pointer to the display list.
- */
+/// Assign a display list in RAM to a static model.
+///
+/// @param model Pointer to the model.
+/// @param pointer Pointer to the display list.
+/// @return It returns 1 on success, 0 on error.
 int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer);
 
-/*! \fn    int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path);
- *  \brief Loads a display list from FAT and assign it to a static model.
- *         It returns 1 on success.
- *  \param model Pointer to the model.
- *  \param path Path to the display list.
- */
+/// Loads a display list from a filesystem and assigns it to a static model.
+///
+/// @param model Pointer to the model.
+/// @param path Path to the display list.
+/// @return It returns 1 on success, 0 on error.
 int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path);
 
-/*! \fn    void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
- *  \brief Assign a material to a model.
- *  \param model Pointer to the model.
- *  \param material Pointer to the material.
- */
+/// Assign a material to a model.
+///
+/// @param model Pointer to the model.
+/// @param material Pointer to the material.
 void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
 
-/*! \fn    void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim);
- *  \brief Assign an animation to a model.
- *  \param model Pointer to the model.
- *  \param anim Pointer to the animation.
- */
+
+/// Assign an animation to a model.
+///
+/// @param model Pointer to the model.
+/// @param anim Pointer to the animation.
 void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim);
 
-/*! \fn    void NE_ModelDraw(NE_Model *model);
- *  \brief Draws a model.
- *  \param model Pointer to the model.
- */
+/// Draw a model.
+///
+/// @param model Pointer to the model.
 void NE_ModelDraw(NE_Model *model);
 
-/*! \fn    void NE_ModelClone(NE_Model *dest, NE_Model *source);
- *  \brief Clone model.
- *  \param dest Pointer to the destination model.
- *  \param source Pointer to the source model.
- *
- * NOTE: Be careful with this, if you delete source model and try to draw
- * destination model game will eventually crash.
- *
- * You MUST delete destination model if you delete source model.
- *
- * The two models MUST BE THE SAME TYPE!!! (Animated or static)
- *
- * You should use this if you make a tiled floor, for example, or for making
- * lots of enemies.
- */
+/// Clone model.
+///
+/// Be careful with this, if you delete the source model and try to draw the
+/// destination model the game will eventually crash (because the source data is
+/// no longer owned by Nitro Engine).
+///
+/// You must delete the destination model if you delete the source model.
+///
+/// The two models have to be of the same type (animated or static).
+///
+/// You could use this if you make a tiled floor, for example, or if you have
+/// many enemies that look the same way.
+///
+/// @param dest Pointer to the destination model.
+/// @param source Pointer to the source model.
 void NE_ModelClone(NE_Model *dest, NE_Model *source);
 
-/*! \fn    void NE_ModelSetCoordI(NE_Model *model, int x, int y, int z);
- *  \brief Set coordinates of a model.
- *  \param model Pointer to the model.
- *  \param x (x, y, z) Coordinates.
- *  \param y (x, y, z) Coordinates.
- *  \param z (x, y, z) Coordinates.
- */
+/// Set position of a model.
+///
+/// @param model Pointer to the model.
+/// @param x (x, y, z) Coordinates (f32).
+/// @param y (x, y, z) Coordinates (f32).
+/// @param z (x, y, z) Coordinates (f32).
 void NE_ModelSetCoordI(NE_Model *model, int x, int y, int z);
 
-/*! \def   NE_ModelSetCoord(NE_Model *model, float x, float y, float z);
- *  \brief Set coordinates of a model.
- *  \param m Pointer to the model.
- *  \param x (x, y, z) Coordinates.
- *  \param y (x, y, z) Coordinates.
- *  \param z (x, y, z) Coordinates.
- */
+/// Set position of a model.
+///
+/// @param m Pointer to the model.
+/// @param x (x, y, z) Coordinates (float).
+/// @param y (x, y, z) Coordinates (float).
+/// @param z (x, y, z) Coordinates (float).
 #define NE_ModelSetCoord(m, x, y, z) \
-	NE_ModelSetCoordI(m, floattof32(x), floattof32(y), floattof32(z))
+    NE_ModelSetCoordI(m, floattof32(x), floattof32(y), floattof32(z))
 
-/*! \fn    void NE_ModelScaleI(NE_Model *model, int x, int y, int z);
- *  \brief Set scale vector of a model.
- *  \param model Pointer to the model.
- *  \param x (x, y, z) Scale vector.
- *  \param y (x, y, z) Scale vector.
- *  \param z (x, y, z) Scale vector.
- */
+/// Set scale of a model.
+///
+/// @param model Pointer to the model.
+/// @param x (x, y, z) Scale (f32).
+/// @param y (x, y, z) Scale (f32).
+/// @param z (x, y, z) Scale (f32).
 void NE_ModelScaleI(NE_Model *model, int x, int y, int z);
 
-/*! \def   NE_ModelScale(NE_Model *model, float x, float y, float z);
- *  \brief Set scale vector of a model.
- *  \param m Pointer to the model.
- *  \param x (x, y, z) Scale vector.
- *  \param y (x, y, z) Scale vector.
- *  \param z (x, y, z) Scale vector.
- */
+/// Set scale of a model.
+///
+/// @param m Pointer to the model.
+/// @param x (x, y, z) Scale (float).
+/// @param y (x, y, z) Scale (float).
+/// @param z (x, y, z) Scale (float).
 #define NE_ModelScale(m, x, y, z) \
-	NE_ModelScaleI(m, floattof32(x), floattof32(y), floattof32(z))
+    NE_ModelScaleI(m, floattof32(x), floattof32(y), floattof32(z))
 
-/*! \fn    void NE_ModelTranslateI(NE_Model *model, int x, int y, int z);
- *  \brief Move a model.
- *  \param model Pointer to the model.
- *  \param x (x, y, z) Translate vector.
- *  \param y (x, y, z) Translate vector.
- *  \param z (x, y, z) Translate vector.
- */
+/// Translate a model.
+///
+/// @param model Pointer to the model.
+/// @param x (x, y, z) Translate vector (f32).
+/// @param y (x, y, z) Translate vector (f32).
+/// @param z (x, y, z) Translate vector (f32).
 void NE_ModelTranslateI(NE_Model *model, int x, int y, int z);
 
-/*! \def   NE_ModelTranslate(NE_Model *model, float x, float y, float z);
- *  \brief Move a model.
- *  \param m Pointer to the model.
- *  \param x (x, y, z) Translate vector.
- *  \param y (x, y, z) Translate vector.
- *  \param z (x, y, z) Translate vector.
- */
+/// Translate a model.
+///
+/// @param m  Pointer to the model.
+/// @param x (x, y, z) Translate vector (float).
+/// @param y (x, y, z) Translate vector (float).
+/// @param z (x, y, z) Translate vector (float).
 #define NE_ModelTranslate(m, x, y, z) \
-	NE_ModelTranslateI(m, floattof32(x), floattof32(y), floattof32(z))
+    NE_ModelTranslateI(m, floattof32(x), floattof32(y), floattof32(z))
 
-/*! \fn    void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz);
- *  \brief Set rotation of a model.
- *  \param model Pointer to the model.
- *  \param rx Rotation by X axis (0 - 511).
- *  \param ry Rotation by Y axis (0 - 511).
- *  \param rz Rotation by Z axis (0 - 511).
- */
+/// Set rotation of a model.
+///
+/// This function sets the rotation of the model to the provided values.
+///
+/// @param model Pointer to the model.
+/// @param rx Rotation by X axis (0 - 511).
+/// @param ry Rotation by Y axis (0 - 511).
+/// @param rz Rotation by Z axis (0 - 511).
 void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz);
 
-/*! \fn    void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz);
- *  \brief Increases rotation of a model.
- *  \param model Pointer to the model.
- *  \param rx Rotation by X axis (0 - 511).
- *  \param ry Rotation by Y axis (0 - 511).
- *  \param rz Rotation by Z axis (0 - 511).
- */
+/// Rotate a model.
+///
+/// This function adds the values to the current rotation of the model.
+///
+/// @param model Pointer to the model.
+/// @param rx Rotation by X axis (0 - 511).
+/// @param ry Rotation by Y axis (0 - 511).
+/// @param rz Rotation by Z axis (0 - 511).
 void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz);
 
-/*! \fn    void NE_ModelAnimateAll(void);
- *  \brief Needed to update current frame of every model.
- */
+/// Update internal state of the animation of all models.
 void NE_ModelAnimateAll(void);
 
-/*! \fn    void NE_ModelAnimStart(NE_Model *model, NE_AnimationTypes type,
- *                                int32_t speed);
- *  \brief Starts the animation of an animated model.
- *  \param model Pointer to the model.
- *  \param type Animation tipe. ( NE_ANIM_LOOP / NE_ANIM_ONESHOT )
- *  \brief speed Animation speed in f32 fixed point. It can be positive or
- *         negative. A speed of 0 stops the animation, a speed of 1 << 12 is the
- *         normal speed.
- */
+/// Starts the animation of an animated model.
+///
+/// The speed can be positive or negative. A speed of 0 stops the animation, a
+/// speed of 1 << 12 means that the model will advance one model frame per NDS
+/// frame. Anything in between will advance less than one model frame per NDS
+/// frame.
+///
+/// @param model Pointer to the model.
+/// @param type Animation type (NE_ANIM_LOOP / NE_ANIM_ONESHOT).
+/// @param speed Animation speed. (f32)
 void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed);
 
-/*! \fn    void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed);
- *  \brief speed Animation speed in f32 fixed point. It can be positive or
- *         negative. A speed of 0 stops the animation, a speed of 1 << 12 is the
- *         normal speed.
- *  \param model Pointer to the model.
- *  \param speed New speed.
- */
+/// Sets animation speed.
+///
+/// The speed can be positive or negative. A speed of 0 stops the animation, a
+/// speed of 1 << 12 means that the model will advance one model frame per NDS
+/// frame. Anything in between will advance less than one model frame per NDS
+/// frame.
+///
+/// @param model Pointer to the model.
+/// @param speed New speed. (f32)
 void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed);
 
-/*! \fn    int32_t NE_ModelAnimGetFrame(NE_Model *model);
- *  \brief Returns current frame of an animated model in f32 format.
- *  \param model Pointer to the model.
- */
+/// Returns the current frame of an animated model.
+///
+/// @param model Pointer to the model.
+/// @return Returns the frame in f32 format.
 int32_t NE_ModelAnimGetFrame(NE_Model *model);
 
-/*! \fn    void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame);
- *  \brief Sets current frame of an animated model in f32 format.
- *  \param model Pointer to the model.
- *  \param frame Frame to set.
- */
+/// Sets the current frame of an animated model.
+///
+/// @param model Pointer to the model.
+/// @param frame Frame to set. (f32)
 void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame);
 
-/*! \fn    int NE_ModelLoadDSM(NE_Model *model, const void *pointer);
- *  \brief Loads every frame of a DSM file in RAM to an animated model. Returns
- *         1 if no error happened.
- *  \param model Pointer to the model.
- *  \param pointer Pointer to the file.
- */
+/// Loads a DSM file stored in RAM to a model.
+///
+/// @param model Pointer to the model.
+/// @param pointer Pointer to the file.
+/// @return It returns 1 on success, 0 on error.
 int NE_ModelLoadDSM(NE_Model *model, const void *pointer);
 
-/*! \fn    int NE_ModelLoadDSMFAT(NE_Model *model, const char *path);
- *  \brief Loads every frame of a DSM file in FAT to an animated model. Returns
- *         1 if no error happened.
- *  \param model Pointer to the model.
- *  \param path Path to the file.
- */
+/// Loads a DSM file stored in a filesystem to a model.
+///
+/// @param model Pointer to the model.
+/// @param path Path to the file.
+/// @return It returns 1 on success, 0 on error.
 int NE_ModelLoadDSMFAT(NE_Model *model, const char *path);
 
-/*! \fn    void NE_ModelDeleteAll(void);
- *  \brief Deletes all models.
- */
+/// Deletes all models and frees all memory used by them.
 void NE_ModelDeleteAll(void);
 
-/*! \fn    void NE_ModelSystemReset(int number_of_models);
- *  \brief Resets the model system and sets the maximun number of models.
- *  \param number_of_models Number of models. If it is less than 1, it will
- *         create space for NE_DEFAULT_MODELS.
- */
-void NE_ModelSystemReset(int number_of_models);
+/// Resets the model system and sets the maximun number of models.
+///
+/// @param max_models Number of models. If it is lower than 1, it will create
+///                   space for NE_DEFAULT_MODELS.
+void NE_ModelSystemReset(int max_models);
 
-/*! \fn    void NE_ModelSystemEnd(void);
- *  \brief Ends model system and all memory used by it.
- */
+/// Ends model system and frees all memory used by it.
 void NE_ModelSystemEnd(void);
 
-/*! @} */
+/// @}
 
 #endif // NE_MODEL_H__
