@@ -10,6 +10,8 @@
 /// @file   NEPhysics.h
 /// @brief  Simple physics engine.
 
+#include "NEModel.h"
+
 /// @defgroup physics Physics engine
 ///
 /// A very simple physics engine. It only supports axis-aligned bounding boxes
@@ -182,8 +184,8 @@ void NE_PhysicsEnable(NE_Physics *pointer, bool value);
 /// Assign a model object to a physics object.
 ///
 /// @param physics Pointer to the physics object.
-/// @param modelpointer Pointer to the NE_Model object.
-void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer);
+/// @param modelpointer Pointer to the model.
+void NE_PhysicsSetModel(NE_Physics *physics, NE_Model *modelpointer);
 
 /// Sets physics group of an object.
 ///

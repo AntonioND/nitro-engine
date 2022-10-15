@@ -172,7 +172,7 @@ void NE_PhysicsEnable(NE_Physics *pointer, bool value)
     pointer->enabled = value;
 }
 
-void NE_PhysicsSetModel(NE_Physics *physics, void *modelpointer)
+void NE_PhysicsSetModel(NE_Physics *physics, NE_Model *modelpointer)
 {
     NE_AssertPointer(physics, "NULL physics pointer");
     NE_AssertPointer(modelpointer, "NULL model pointer");
