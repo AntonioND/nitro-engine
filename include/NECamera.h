@@ -31,7 +31,7 @@ typedef struct {
     bool matrix_is_updated; ///< Set to false when the matrix isn't up-to-date
 } NE_Camera;
 
-#define NE_DEFAULT_CAMERAS 16 /// Default max number of cameras.
+#define NE_DEFAULT_CAMERAS 16 ///< Default max number of cameras.
 
 /// Creates a new camera object.
 ///

@@ -16,9 +16,9 @@
 ///
 /// @{
 
-#define NE_NO_TEXTURE       -1 /// Value that represents a lack of textures
+#define NE_NO_TEXTURE       -1 ///< Value that represents a lack of textures
 
-#define NE_DEFAULT_MODELS   512 /// Default max number of models
+#define NE_DEFAULT_MODELS   512 ///< Default max number of models
 
 /// Possible animation types.
 typedef enum {

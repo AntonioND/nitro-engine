@@ -19,7 +19,7 @@
 ///
 /// @{
 
-#define NE_DEFAULT_PHYSICS  64 /// Default max number of physic objects
+#define NE_DEFAULT_PHYSICS  64 ///< Default max number of physic objects
 
 /// Minimun speed that an object needs to have to rebound after a collision.
 ///

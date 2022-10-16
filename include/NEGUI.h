@@ -18,12 +18,12 @@
 ///
 /// @{
 
-#define NE_GUI_DEFAULT_OBJECTS  64 /// Default max number of GUI elements
+#define NE_GUI_DEFAULT_OBJECTS  64 ///< Default max number of GUI elements
 
-#define NE_GUI_POLY_ID          62 /// Polygon ID to use for most GUI elements.
-#define NE_GUI_POLY_ID_ALT      61 /// Alternative poly ID to use for the GUI.
+#define NE_GUI_POLY_ID          62 ///< Polygon ID to use for most GUI elements.
+#define NE_GUI_POLY_ID_ALT      61 ///< Alternative poly ID to use for the GUI.
 
-#define NE_GUI_MIN_PRIORITY     100 /// Minimum 2D priority of GUI elements.
+#define NE_GUI_MIN_PRIORITY     100 ///< Minimum 2D priority of GUI elements.
 
 /// GUI element types.
 typedef enum {

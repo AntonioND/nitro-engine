@@ -18,7 +18,7 @@
 ///
 /// @{
 
-#define NE_DEFAULT_PALETTES 64 /// Default max number of palettes
+#define NE_DEFAULT_PALETTES 64 ///< Default max number of palettes
 
 /// Holds information of a palette.
 typedef struct {

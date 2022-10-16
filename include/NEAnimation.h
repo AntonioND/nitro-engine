@@ -16,7 +16,7 @@
 ///
 /// @{
 
-#define NE_DEFAULT_ANIMATIONS 32 /// Default max number of model animations.
+#define NE_DEFAULT_ANIMATIONS 32 ///< Default max number of model animations.
 
 /// Holds information of an animation.
 typedef struct {

@@ -21,7 +21,7 @@
 ///
 /// @{
 
-#define NE_DEFAULT_SPRITES 128 /// Default max number of sprites.
+#define NE_DEFAULT_SPRITES 128 ///< Default max number of sprites.
 
 /// Holds information of a 2D sprite.
 typedef struct {
