@@ -56,6 +56,7 @@ void NE_TextResetSystem(void);
 /// @param y Column.
 /// @param color Text color.
 /// @param text Text to print.
+/// @return Returns the number of characters printed.
 int NE_TextPrint(int slot, int x, int y, u32 color, const char *text);
 
 /// Prints text within the limits of a rectangle.
@@ -70,6 +71,7 @@ int NE_TextPrint(int slot, int x, int y, u32 color, const char *text);
 /// @param color Text color.
 /// @param charnum Number of characters to print. If -1 it prints everything.
 /// @param text Text to print.
+/// @return Returns the number of characters printed.
 int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
                     int charnum, const char *text);
 
@@ -82,6 +84,7 @@ int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 /// @param y (x, y) Start position in pixels.
 /// @param color Text color.
 /// @param text Text to print.
+/// @return Returns the number of characters printed.
 int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text);
 
 /// Prints text which isn't restricted to any row or column, within a rectangle.
@@ -94,6 +97,7 @@ int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text);
 /// @param color Text color.
 /// @param charnum Number of characters to print. If -1 it prints everything.
 /// @param text Text to print.
+/// @return Returns the number of characters printed.
 int NE_TextPrintBoxFree(int slot, int x, int y, int endx, int endy, u32 color,
             int charnum, const char *text);
 
