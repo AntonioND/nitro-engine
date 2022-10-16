@@ -20,7 +20,7 @@ void Draw3DScene(void)
 	NE_CameraUse(Camera);
 
 	// This has to be used to use fog...
-	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, NE_USE_FOG);
+	NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, NE_FOG_ENABLE);
 
 	NE_ModelDraw(Model);
 	NE_ModelDraw(Model2);
