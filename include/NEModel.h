@@ -28,11 +28,12 @@ typedef enum {
 
 /// Holds information of the animation of a model.
 typedef struct {
-    NE_AnimationType type; ///< Animation type.
-    int32_t speed;         ///< Animation speed (f32).
-    int32_t currframe;     ///< Current frame. It can be between frames (f32).
-    int32_t numframes;     ///< Number of frames in the animation (int).
-} NE_AnimData;
+    NE_Animation *animation; ///< Pointer to animation file
+    NE_AnimationType type;   ///< Animation type.
+    int32_t speed;           ///< Animation speed (f32).
+    int32_t currframe;       ///< Current frame. It can be between frames (f32).
+    int32_t numframes;       ///< Number of frames in the animation (int).
+} NE_AnimInfo;
 
 /// Possible model types.
 typedef enum {
@@ -46,8 +47,7 @@ typedef struct {
     bool iscloned;           ///< True if the model has been cloned
     NE_ModelType modeltype;  ///< Model type (static or animated)
     const u32 *meshdata;     ///< Display list / DSM file
-    NE_Animation *animation; ///< Pointer to animation file
-    NE_AnimData animdata;    ///< Animation data (current frame, speed, etc)
+    NE_AnimInfo *animinfo;   ///< Animation information
     NE_Material *texture;    ///< Material used by this model
     int x;                   ///< X position of the model (f32)
     int y;                   ///< Y position of the model (f32)

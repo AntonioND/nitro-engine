@@ -46,6 +46,12 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
     model->modeltype = type;
     model->meshdata = NULL;
 
+    if (type == NE_Animated)
+    {
+        model->animinfo = calloc(sizeof(NE_AnimInfo), 1);
+        NE_AssertPointer(model->animinfo, "Couldn't allocate animation info");
+    }
+
     return model;
 }
 
@@ -74,6 +80,9 @@ void NE_ModelDelete(NE_Model *model)
 
     if (!model->iscloned && model->meshfromfat)
         free((void *)model->meshdata);
+
+    if (type == NE_Animated)
+        free(model->animinfo);
 
     free(model);
 }
@@ -139,9 +148,10 @@ void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim)
 {
     NE_AssertPointer(model, "NULL model pointer");
     NE_AssertPointer(anim, "NULL animation pointer");
-    model->animation = anim;
+    NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
+    model->animinfo->animation = anim;
     uint32_t frames = DSMA_GetNumFrames(anim->data);
-    model->animdata.numframes = frames;
+    model->animinfo->numframes = frames;
 }
 
 //---------------------------------------------------------
@@ -157,7 +167,7 @@ void NE_ModelDraw(NE_Model *model)
 
     if (model->modeltype == NE_Animated)
     {
-        if (model->animation == NULL)
+        if (model->animinfo->animation == NULL)
             return;
     }
 
@@ -195,8 +205,8 @@ void NE_ModelDraw(NE_Model *model)
     }
     else // if(model->modeltype == NE_Animated)
     {
-        DSMA_DrawModel(model->meshdata, model->animation->data,
-                       model->animdata.currframe);
+        DSMA_DrawModel(model->meshdata, model->animinfo->animation->data,
+                       model->animinfo->currframe);
     }
 
     MATRIX_POP = 1;
@@ -211,7 +221,7 @@ void NE_ModelClone(NE_Model *dest, NE_Model *source)
 
     if (dest->modeltype == NE_Animated)
     {
-        memcpy(&(dest->animdata), &(source->animdata), sizeof(NE_AnimData));
+        memcpy(dest->animinfo, source->animinfo, sizeof(NE_AnimInfo));
         dest->iscloned = true;
         dest->texture = source->texture;
     }
@@ -276,30 +286,30 @@ void NE_ModelAnimateAll(void)
         if (NE_ModelPointers[i]->modeltype != NE_Animated)
             continue;
 
-        NE_AnimData *animdata = &(NE_ModelPointers[i]->animdata);
+        NE_AnimInfo *animinfo = NE_ModelPointers[i]->animinfo;
 
-        animdata->currframe += animdata->speed;
+        animinfo->currframe += animinfo->speed;
 
-        if (animdata->type ==  NE_ANIM_LOOP)
+        if (animinfo->type ==  NE_ANIM_LOOP)
         {
-            int32_t endval = inttof32(animdata->numframes);
-            if (animdata->currframe >= endval)
-                animdata->currframe -= endval;
-            else if (animdata->currframe < 0)
-                animdata->currframe += endval;
+            int32_t endval = inttof32(animinfo->numframes);
+            if (animinfo->currframe >= endval)
+                animinfo->currframe -= endval;
+            else if (animinfo->currframe < 0)
+                animinfo->currframe += endval;
         }
-        else if (animdata->type ==  NE_ANIM_ONESHOT)
+        else if (animinfo->type ==  NE_ANIM_ONESHOT)
         {
-            int32_t endval = inttof32(animdata->numframes - 1);
-            if (animdata->currframe > endval)
+            int32_t endval = inttof32(animinfo->numframes - 1);
+            if (animinfo->currframe > endval)
             {
-                animdata->currframe = endval;
-                animdata->speed = 0;
+                animinfo->currframe = endval;
+                animinfo->speed = 0;
             }
-            else if (animdata->currframe < 0)
+            else if (animinfo->currframe < 0)
             {
-                animdata->currframe = 0;
-                animdata->speed = 0;
+                animinfo->currframe = 0;
+                animinfo->speed = 0;
             }
         }
     }
@@ -309,23 +319,23 @@ void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed)
 {
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-    model->animdata.type = type;
-    model->animdata.speed = speed;
-    model->animdata.currframe = 0;
+    model->animinfo->type = type;
+    model->animinfo->speed = speed;
+    model->animinfo->currframe = 0;
 }
 
 void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed)
 {
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-    model->animdata.speed = speed;
+    model->animinfo->speed = speed;
 }
 
 int32_t NE_ModelAnimGetFrame(NE_Model *model)
 {
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
-    return model->animdata.currframe;
+    return model->animinfo->currframe;
 }
 
 void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame)
@@ -333,7 +343,7 @@ void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame)
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
     // TODO: Check if it is off bounds
-    model->animdata.currframe = frame;
+    model->animinfo->currframe = frame;
 }
 
 int NE_ModelLoadDSMFAT(NE_Model *model, const char *path)
