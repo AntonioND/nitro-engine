@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -129,23 +129,17 @@ int main(void)
     {
         scanKeys(); // This function is needed for the GUI
 
-        printf("\x1b[0;0HSlide bar 1: %d  ",
-               NE_GUISlideBarGetValue(SldBar1));
-        printf("\nSlide bar 2: %d  ",
-               NE_GUISlideBarGetValue(SldBar2));
-
-        printf("\n\nRadio button 1: %d ",
-               NE_GUIRadioButtonGetValue(RaBtn1));
-        printf("\nRadio button 2: %d ",
-               NE_GUIRadioButtonGetValue(RaBtn2));
-        printf("\nRadio button 3: %d ",
-               NE_GUIRadioButtonGetValue(RaBtn3));
-
-        printf("\n\nCheck box: %d ",
-               NE_GUICheckBoxGetValue(ChBx));
-
-        printf("\n\nButton event: %d ",
-               NE_GUIObjectGetEvent(Button));
+        printf("\x1b[0;0H");
+        printf("Slide bar 1: %d  \n", NE_GUISlideBarGetValue(SldBar1));
+        printf("Slide bar 2: %d  \n", NE_GUISlideBarGetValue(SldBar2));
+        printf("\n");
+        printf("Radio button 1: %d \n", NE_GUIRadioButtonGetValue(RaBtn1));
+        printf("Radio button 2: %d \n", NE_GUIRadioButtonGetValue(RaBtn2));
+        printf("Radio button 3: %d \n", NE_GUIRadioButtonGetValue(RaBtn3));
+        printf("\n");
+        printf("Check box: %d \n", NE_GUICheckBoxGetValue(ChBx));
+        printf("\n");
+        printf("Button event: %d ", NE_GUIObjectGetEvent(Button));
 
         // Draw things...
         NE_Process(Draw3DScene);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -30,51 +30,52 @@ NE_Palette *Palette, *Palette2;
 
 void Draw3DScene(void)
 {
-	NE_2DViewInit();
+    NE_2DViewInit();
 
-	NE_2DDrawTexturedQuad(10, 10,
-			      10 + 57, 10 + 100,
-			      0, Material);
+    NE_2DDrawTexturedQuad(10, 10,
+                          10 + 57, 10 + 100,
+                          0, Material);
 
-	NE_2DDrawTexturedQuad(118, 10,
-			      246, 138,
-			      0, Material2);
+    NE_2DDrawTexturedQuad(118, 10,
+                          246, 138,
+                          0, Material2);
 }
 
 int main(void)
 {
-	irqEnable(IRQ_HBLANK);
-	irqSet(IRQ_VBLANK, NE_VBLFunc);
-	irqSet(IRQ_HBLANK, NE_HBLFunc);
+    irqEnable(IRQ_HBLANK);
+    irqSet(IRQ_VBLANK, NE_VBLFunc);
+    irqSet(IRQ_HBLANK, NE_HBLFunc);
 
-	// Init 3D mode
-	NE_Init3D();
+    // Init 3D mode
+    NE_Init3D();
 
-	// Allocate objects for a material
-	Material = NE_MaterialCreate();
-	Palette = NE_PaletteCreate();
+    // Allocate objects for a material
+    Material = NE_MaterialCreate();
+    Palette = NE_PaletteCreate();
 
-	NE_MaterialTexLoad(Material,
-			   GL_RGB32_A3, // Texture type
-			   57, 100,     // Width, height (in pixels)
-			   TEXGEN_TEXCOORD, (u8 *) test_tex_bin);
-	NE_PaletteLoad(Palette, (u16 *)test_pal_bin, 32, GL_RGB32_A3);
-	NE_MaterialTexSetPal(Material, Palette);
+    NE_MaterialTexLoad(Material,
+                       GL_RGB32_A3, // Texture type
+                       57, 100,     // Width, height (in pixels)
+                       TEXGEN_TEXCOORD, (u8 *)test_tex_bin);
+    NE_PaletteLoad(Palette, (u16 *)test_pal_bin, 32, GL_RGB32_A3);
+    NE_MaterialTexSetPal(Material, Palette);
 
-	// Allocate objects for another material
-	Material2 = NE_MaterialCreate();
-	Palette2 = NE_PaletteCreate();
+    // Allocate objects for another material
+    Material2 = NE_MaterialCreate();
+    Palette2 = NE_PaletteCreate();
 
-	NE_MaterialTexLoad(Material2, GL_RGB4, 100, 100, TEXGEN_TEXCOORD,
-			   (u8 *) test2_tex_bin);
-	NE_PaletteLoad(Palette2, (u16 *)test2_pal_bin, 32, GL_RGB4);
-	NE_MaterialTexSetPal(Material2, Palette2);
+    NE_MaterialTexLoad(Material2, GL_RGB4, 100, 100, TEXGEN_TEXCOORD,
+                       (u8 *)test2_tex_bin);
+    NE_PaletteLoad(Palette2, (u16 *)test2_pal_bin, 32, GL_RGB4);
+    NE_MaterialTexSetPal(Material2, Palette2);
 
-	while (1) {
-		// Draw 3D scene
-		NE_Process(Draw3DScene);
-		NE_WaitForVBL(0);
-	}
+    while (1)
+    {
+        // Draw 3D scene
+        NE_Process(Draw3DScene);
+        NE_WaitForVBL(0);
+    }
 
-	return 0;
+    return 0;
 }
