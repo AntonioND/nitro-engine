@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: CC0-1.0
 //
-// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
 //
 // This file is part of Nitro Engine
 
