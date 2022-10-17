@@ -43,21 +43,22 @@ typedef enum {
 
 /// Holds information of a model.
 typedef struct {
-    bool meshfromfat;        ///< True if the mesh has been loaded from storage
-    bool iscloned;           ///< True if the model has been cloned
-    NE_ModelType modeltype;  ///< Model type (static or animated)
-    const u32 *meshdata;     ///< Display list / DSM file
-    NE_AnimInfo *animinfo;   ///< Animation information
-    NE_Material *texture;    ///< Material used by this model
-    int x;                   ///< X position of the model (f32)
-    int y;                   ///< Y position of the model (f32)
-    int z;                   ///< Z position of the model (f32)
-    int rx;                  ///< Rotation of the model by X axis
-    int ry;                  ///< Rotation of the model by Y axis
-    int rz;                  ///< Rotation of the model by Z axis
-    int sx;                  ///< X scale of the model (f32)
-    int sy;                  ///< Y scale of the model (f32)
-    int sz;                  ///< Z scale of the model (f32)
+    bool meshfromfat;         ///< True if the mesh has been loaded from storage
+    bool iscloned;            ///< True if the model has been cloned
+    NE_ModelType modeltype;   ///< Model type (static or animated)
+    const u32 *meshdata;      ///< Display list / DSM file
+    NE_AnimInfo *animinfo[2]; ///< Animation information (two can be blended)
+    int32_t anim_blend;       ///< Animation blend factor
+    NE_Material *texture;     ///< Material used by this model
+    int x;                    ///< X position of the model (f32)
+    int y;                    ///< Y position of the model (f32)
+    int z;                    ///< Z position of the model (f32)
+    int rx;                   ///< Rotation of the model by X axis
+    int ry;                   ///< Rotation of the model by Y axis
+    int rz;                   ///< Rotation of the model by Z axis
+    int sx;                   ///< X scale of the model (f32)
+    int sy;                   ///< Y scale of the model (f32)
+    int sz;                   ///< Z scale of the model (f32)
 } NE_Model;
 
 /// Creates a new model object.
@@ -91,12 +92,31 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path);
 /// @param material Pointer to the material.
 void NE_ModelSetMaterial(NE_Model *model, NE_Material *material);
 
-
 /// Assign an animation to a model.
 ///
 /// @param model Pointer to the model.
 /// @param anim Pointer to the animation.
 void NE_ModelSetAnimation(NE_Model *model, NE_Animation *anim);
+
+/// Assign a secondary animation to a model.
+///
+/// The secondary animation is an animation that is averaged with the main
+/// animation. This is useful to do transitions between animations. This takes a
+/// bit more of CPU to display, though.
+///
+/// Whenever you want to go back to having one animation, you have to use
+/// NE_ModelAnimSecondaryClear(). This function lets you stop blending
+/// animations, and it gives you the option to preserve the main or the
+/// secondary animation.
+///
+/// Function NE_ModelAnimSecondarySetFactor() lets you specify a value to
+/// specify the blending factor, where 0.0 means "display the main animation
+/// only" and 1.0 means "display the secondary animation only". The initial
+/// value after calling NE_ModelAnimSecondaryStart() is 0.0.
+///
+/// @param model Pointer to the model.
+/// @param anim Pointer to the animation.
+void NE_ModelSetAnimationSecondary(NE_Model *model, NE_Animation *anim);
 
 /// Draw a model.
 ///
@@ -206,6 +226,14 @@ void NE_ModelAnimateAll(void);
 /// @param speed Animation speed. (f32)
 void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed);
 
+/// Starts the secondary animation of an animated model.
+///
+/// @param model Pointer to the model.
+/// @param type Animation type (NE_ANIM_LOOP / NE_ANIM_ONESHOT).
+/// @param speed Animation speed. (f32)
+void NE_ModelAnimSecondaryStart(NE_Model *model, NE_AnimationType type,
+                                int32_t speed);
+
 /// Sets animation speed.
 ///
 /// The speed can be positive or negative. A speed of 0 stops the animation, a
@@ -217,17 +245,55 @@ void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed);
 /// @param speed New speed. (f32)
 void NE_ModelAnimSetSpeed(NE_Model *model, int32_t speed);
 
+/// Sets animation speed of the secondary animation.
+///
+/// @param model Pointer to the model.
+/// @param speed New speed. (f32)
+void NE_ModelAnimSecondarySetSpeed(NE_Model *model, int32_t speed);
+
 /// Returns the current frame of an animated model.
 ///
 /// @param model Pointer to the model.
 /// @return Returns the frame in f32 format.
 int32_t NE_ModelAnimGetFrame(NE_Model *model);
 
+/// Returns the current frame of the secondary animation of an animated model.
+///
+/// @param model Pointer to the model.
+/// @return Returns the frame in f32 format.
+int32_t NE_ModelAnimSecondaryGetFrame(NE_Model *model);
+
 /// Sets the current frame of an animated model.
 ///
 /// @param model Pointer to the model.
 /// @param frame Frame to set. (f32)
 void NE_ModelAnimSetFrame(NE_Model *model, int32_t frame);
+
+/// Sets the current frame of the secondary animation of an animated model.
+///
+/// @param model Pointer to the model.
+/// @param frame Frame to set. (f32)
+void NE_ModelAnimSecondarySetFrame(NE_Model *model, int32_t frame);
+
+/// Sets the current blending factor between animations.
+///
+/// This is a value between 0.0 and 1.0 where 0.0 means "display the main
+/// animation only" and 1.0 means "display the secondary animation only".
+///
+/// @param model Pointer to the model.
+/// @param factor Blending factor to set. (f32)
+void NE_ModelAnimSecondarySetFactor(NE_Model *model, int32_t factor);
+
+/// Clears the secondary animation of a model.
+///
+/// It is possible to replace the main animation by the secondary animation, or
+/// to simply remove the secondary animation. In both cases, the secondary
+/// animation will be cleared.
+///
+/// @param model Pointer to the model.
+/// @param replace_base_anim Set to true to replace the base animation by the
+///                          secondary animation.
+void NE_ModelAnimSecondaryClear(NE_Model *model, bool replace_base_anim);
 
 /// Loads a DSM file stored in RAM to a model.
 ///
