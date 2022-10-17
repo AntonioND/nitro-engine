@@ -49,7 +49,7 @@ Screenshots
 
 Screenshots of some of the examples included with Nitro Engine:
 
-.. |a_lot_of_balls| image:: screenshots/a_lot_of_balls.png
+.. |animated_model| image:: screenshots/animated_model.png
 .. |box_tower| image:: screenshots/box_tower.png
 .. |fog| image:: screenshots/fog.png
 .. |multiple_models| image:: screenshots/multiple_models.png
@@ -57,9 +57,9 @@ Screenshots of some of the examples included with Nitro Engine:
 .. |sprites| image:: screenshots/sprites.png
 
 +------------------+-------------------+
-| A lot of balls   | Box tower physics |
+| Animated model   | Box tower physics |
 +------------------+-------------------+
-| |a_lot_of_balls| | |box_tower|       |
+| |animated_model| | |box_tower|       |
 +------------------+-------------------+
 
 +------------------+-------------------+
