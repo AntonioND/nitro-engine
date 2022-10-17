@@ -7,12 +7,13 @@
 #include <NEMain.h>
 
 #include "robot_dsm_bin.h"
+#include "robot_walk_dsa_bin.h"
 #include "robot_wave_dsa_bin.h"
 #include "texture128_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
-NE_Animation *Animation;
+NE_Animation *Animation[2];
 NE_Material *Texture;
 
 void Draw3DScene(void)
@@ -35,12 +36,16 @@ int main(void)
 
     Camera = NE_CameraCreate();
     Model = NE_ModelCreate(NE_Animated);
-    Animation = NE_AnimationCreate();
+    Animation[0] = NE_AnimationCreate();
+    Animation[1] = NE_AnimationCreate();
 
-    NE_AnimationLoad(Animation, robot_wave_dsa_bin);
+    NE_AnimationLoad(Animation[0], robot_walk_dsa_bin);
+    NE_AnimationLoad(Animation[1], robot_wave_dsa_bin);
     NE_ModelLoadDSM(Model, robot_dsm_bin);
-    NE_ModelSetAnimation(Model, Animation);
+    NE_ModelSetAnimation(Model, Animation[0]);
+    NE_ModelSetAnimationSecondary(Model, Animation[1]);
     NE_ModelAnimStart(Model, NE_ANIM_LOOP, floattof32(0.1));
+    NE_ModelAnimSecondaryStart(Model, NE_ANIM_LOOP, floattof32(0.1));
 
     NE_CameraSet(Camera,
                  6, 3, -4,
@@ -56,6 +61,13 @@ int main(void)
     NE_LightSet(0, NE_White, -0.9, 0, 0);
     NE_ClearColorSet(NE_Black, 31, 63);
 
+    int32_t blend = floattof32(0.5);
+
+    iprintf("\x1b[0;0H"
+            "L/R: Remove one animation\n"
+            "A/B: Blend factor\n"
+            "Pad: Rotate\n");
+
     while (1)
     {
         scanKeys();
@@ -70,9 +82,34 @@ int main(void)
         if (keys & KEY_DOWN)
             NE_ModelRotate(Model,0,0,-2);
 
-        printf("\x1b[0;0H"
-               "CPU%%: %d  \nFrame: %.3f  ",
-               NE_GetCPUPercent(), f32tofloat(NE_ModelAnimGetFrame(Model)));
+        if (keys & KEY_A)
+        {
+            blend += floattof32(0.02);
+            if (blend > inttof32(1))
+                blend = inttof32(1);
+        }
+        if (keys & KEY_B)
+        {
+            blend -= floattof32(0.02);
+            if (blend < 0)
+                blend = 0;
+        }
+
+        if (keys & KEY_L)
+            NE_ModelAnimSecondaryClear(Model, true);
+        if (keys & KEY_R)
+            NE_ModelAnimSecondaryClear(Model, false);
+
+        NE_ModelAnimSecondarySetFactor(Model, blend);
+
+        printf("\x1b[20;0H"
+               "CPU%%: %d  \n"
+               "Blend factor:      %.3f  \n"
+               "Frame (main):      %.3f  \n"
+               "Frame (secondary): %.3f  ",
+               NE_GetCPUPercent(), f32tofloat(blend),
+               f32tofloat(NE_ModelAnimGetFrame(Model)),
+               f32tofloat(NE_ModelAnimSecondaryGetFrame(Model)));
 
         NE_Process(Draw3DScene);
         NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
