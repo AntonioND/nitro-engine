@@ -26,18 +26,20 @@ Features:
 Setup
 -----
 
-1. Copy this folder (or create a symbolic link) to
-   ``<path/to/devkitpro>/nitro-engine`` so that the Makefiles can find the
-   library.
+1. Clone this repository. Create a symbolic link) to it inside the devkitPro
+   folder in your system. For example, in Linux, create a symlink so that
+   ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine.
 
-2. Go to that folder and run ``make``. This should build the library. If
-   everything goes right, you're ready to go.
+2. Go to the cloned repository type ``make`` on the terminal. This should build
+   the library.
 
 3. If you want to check that everything is working as expected, open one of the
    folders of the examples and type ``make``. That should build an ``.nds`` file
    that you can run on an emulator or real hardware. Note that some features of
    the 3D hardware aren't emulated by most emulators, so you may need to use an
-   actual NDS to test some things.
+   actual NDS to test some things. **melonDS** seems to emulate all features
+   correctly. **DeSmuME** doesn't emulate the polygon/vertices count registers,
+   so the touch test feature of Nitro Engine doesn't work.
 
 4. By default, Nitro Engine is compiled with debug options enabled. Go to
    ``NEMain.h`` and comment the line ``#define NE_DEBUG`` to disable them and
