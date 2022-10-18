@@ -15,7 +15,7 @@ Features:
 - Support for animated models, thanks to the `DSMA library
   <https://github.com/AntonioND/dsma-library>`_, which converts MD5 models (with
   skeletal animation) into a format that can be rendered with hardware
-  acceleration.
+  acceleration. It can also blend two animations together (for transitions).
 - Support for all format of textures (except compressed textures).
 - Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
 - Functions to render 2D images accelerated by 3D hardware.
