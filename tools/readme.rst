@@ -18,3 +18,8 @@ The following tools are used to export models created on the PC to the NDS:
   format that allows them to be displayed on the NDS efficiently.
 
   https://github.com/AntonioND/dsma-library
+
+- **img2ds** (WIP)
+
+  Converts images in several formats to NDS textures and palettes. It is
+  recommended to use PNG files with transparency.
