@@ -16,8 +16,8 @@
 //
 //     NE_ModelLoadStaticMesh(Model, (u32 *)binfilename_bin);
 //
-#include "nitrocat_bin.h"
-#include "texture_bin.h"
+#include "robot_bin.h"
+#include "texture_tex_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -50,15 +50,15 @@ int main(void)
 
     // Set coordinates for the camera
     NE_CameraSet(Camera,
-                 -8, 0, 0,  // Position
-                  0, 0, 0,  // Look at
+                 -8, 3, 0,  // Position
+                  0, 3, 0,  // Look at
                   0, 1, 0); // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, (u32 *)nitrocat_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)robot_bin);
     // Load a RGB texture from RAM and assign it to "Material".
-    NE_MaterialTexLoad(Material, GL_RGB, 128, 128, TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+                       (u8 *)texture_tex_bin);
 
     // Assign texture to model...
     NE_ModelSetMaterial(Model, Material);
@@ -76,9 +76,9 @@ int main(void)
 
         // Rotate model using the pad
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
-        if (keys & KEY_DOWN)
             NE_ModelRotate(Model, 0, 0, -2);
+        if (keys & KEY_DOWN)
+            NE_ModelRotate(Model, 0, 0, 2);
         if (keys & KEY_RIGHT)
             NE_ModelRotate(Model, 0, 2, 0);
         if (keys & KEY_LEFT)

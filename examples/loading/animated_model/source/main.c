@@ -8,7 +8,7 @@
 
 #include "robot_dsm_bin.h"
 #include "robot_wave_dsa_bin.h"
-#include "texture128_bin.h"
+#include "texture_tex_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -48,8 +48,8 @@ int main(void)
                  0, 1, 0);
 
     Texture = NE_MaterialCreate();
-    NE_MaterialTexLoad(Texture, GL_RGBA, 128, 128, TEXGEN_TEXCOORD,
-                       (void *)texture128_bin);
+    NE_MaterialTexLoad(Texture, GL_RGBA, 256, 256, TEXGEN_TEXCOORD,
+                       (void *)texture_tex_bin);
 
     NE_ModelSetMaterial(Model, Texture);
 

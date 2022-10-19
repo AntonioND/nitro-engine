@@ -7,7 +7,8 @@
 // Include for Nitro Engine
 #include <NEMain.h>
 
-// Include model and textures
+// Include model and textures. The textures are just BMP files renamed to ".bin"
+// so that they are found by the Makefile.
 #include "bmp8bit_bin.h"
 #include "bmp4bit_bin.h"
 #include "model_bin.h"

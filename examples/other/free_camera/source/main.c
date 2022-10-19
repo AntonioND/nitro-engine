@@ -6,8 +6,8 @@
 
 #include <NEMain.h>
 
-#include "nitrocat_bin.h"
-#include "texture_bin.h"
+#include "robot_bin.h"
+#include "texture_tex_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -39,20 +39,18 @@ int main()
 
     // Set coordinates for the camera
     NE_CameraSet(Camera,
-                 -10, 0, 0, // Position
-                   0, 0, 0,   // Look at
-                   0, 1, 0);  // Up direction
+                 -8, 3, 0,  // Position
+                  0, 3, 0,  // Look at
+                  0, 1, 0); // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, (u32 *)nitrocat_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)robot_bin);
     // Load a RGB texture from RAM and assign it to "Material".
-    NE_MaterialTexLoad(Material, GL_RGB, 128, 128, TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+                       (u8 *)texture_tex_bin);
 
     // Assign texture to model...
     NE_ModelSetMaterial(Model, Material);
-
-    NE_ModelScale(Model, 5, 5, 5);
 
     // We set up a light and its color
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
@@ -84,9 +82,9 @@ int main()
             NE_CameraRotateFree(Camera, 0, 3, 0);
 
         if (keys & KEY_A)
-            NE_CameraMoveFree(Camera, 0.2, 0, 0);
+            NE_CameraMoveFree(Camera, 0.05, 0, 0);
         else if (keys & KEY_B)
-            NE_CameraMoveFree(Camera, -0.2, 0, 0);
+            NE_CameraMoveFree(Camera, -0.05, 0, 0);
 
         NE_Process(Draw3DScene);
         NE_WaitForVBL(0);
