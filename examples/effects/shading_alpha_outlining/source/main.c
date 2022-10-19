@@ -6,8 +6,8 @@
 
 #include <NEMain.h>
 
-#include "nitrocat_bin.h"
-#include "texture_bin.h"
+#include "teapot_bin.h"
+#include "teapot_tex_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -36,7 +36,7 @@ int main(void)
 
     // Init console and Nitro Engine
     NE_Init3D();
-    // Use banks A and B for textures. libnds uses bank C for the demo text
+    // Use banks A and B for teapots. libnds uses bank C for the demo text
     // console.
     NE_TextureSystemReset(0, 0, NE_VRAM_AB);
     // This is needed to print text
@@ -49,15 +49,16 @@ int main(void)
 
     // Set camera coordinates
     NE_CameraSet(Camera,
-                 -8, 0, 0,
-                  0, 0, 0,
-                  0, 1, 0);
+                 0, 0, -3,
+                 0, 0, 0,
+                 0, 1, 0);
 
     // Load mesh from RAM and assign it to a model
-    NE_ModelLoadStaticMesh(Model, (u32 *)nitrocat_bin);
-    // Load texture from RAM and assign it to a material
-    NE_MaterialTexLoad(Material, GL_RGB, 128, 128, TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)teapot_bin);
+    // Load teapot from RAM and assign it to a material
+    NE_MaterialTexLoad(Material, GL_RGB, 256, 256,
+                       TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T,
+                       (u8 *)teapot_tex_bin);
 
     // Assign material to the model
     NE_ModelSetMaterial(Model, Material);

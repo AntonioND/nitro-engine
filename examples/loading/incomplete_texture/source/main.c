@@ -6,10 +6,10 @@
 
 #include <NEMain.h>
 
-#include "test_tex_bin.h"
-#include "test_pal_bin.h"
-#include "test2_tex_bin.h"
-#include "test2_pal_bin.h"
+#include "a3pal32_pal_bin.h"
+#include "a3pal32_tex_bin.h"
+#include "pal4_pal_bin.h"
+#include "pal4_tex_bin.h"
 
 NE_Material *Material, *Material2;
 NE_Palette *Palette, *Palette2;
@@ -32,12 +32,12 @@ void Draw3DScene(void)
 {
     NE_2DViewInit();
 
-    NE_2DDrawTexturedQuad(10, 10,
-                          10 + 57, 10 + 100,
+    NE_2DDrawTexturedQuad(40, 10,
+                          40 + 50, 10 + 128,
                           0, Material);
 
-    NE_2DDrawTexturedQuad(118, 10,
-                          246, 138,
+    NE_2DDrawTexturedQuad(128, 10,
+                          128 + 100, 10 + 100,
                           0, Material2);
 }
 
@@ -56,9 +56,9 @@ int main(void)
 
     NE_MaterialTexLoad(Material,
                        GL_RGB32_A3, // Texture type
-                       57, 100,     // Width, height (in pixels)
-                       TEXGEN_TEXCOORD, (u8 *)test_tex_bin);
-    NE_PaletteLoad(Palette, (u16 *)test_pal_bin, 32, GL_RGB32_A3);
+                       100, 256,    // Width, height (in pixels)
+                       TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
+    NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, GL_RGB32_A3);
     NE_MaterialTexSetPal(Material, Palette);
 
     // Allocate objects for another material
@@ -66,8 +66,8 @@ int main(void)
     Palette2 = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material2, GL_RGB4, 100, 100, TEXGEN_TEXCOORD,
-                       (u8 *)test2_tex_bin);
-    NE_PaletteLoad(Palette2, (u16 *)test2_pal_bin, 32, GL_RGB4);
+                       (u8 *)pal4_tex_bin);
+    NE_PaletteLoad(Palette2, (u16 *)pal4_pal_bin, 4, GL_RGB4);
     NE_MaterialTexSetPal(Material2, Palette2);
 
     while (1)

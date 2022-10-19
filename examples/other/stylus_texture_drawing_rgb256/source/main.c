@@ -6,7 +6,8 @@
 
 #include <NEMain.h>
 
-#include "bmp8bit_bin.h"
+#include "pal256_tex_bin.h"
+#include "pal256_pal_bin.h"
 
 NE_Material *Material;
 NE_Palette *Palette;
@@ -15,7 +16,7 @@ void Draw3DScene(void)
 {
     NE_2DViewInit();
     NE_2DDrawTexturedQuad(0, 0,
-                          128, 128,
+                          256, 256,
                           0, Material);
 }
 
@@ -35,7 +36,10 @@ int main(void)
     Palette = NE_PaletteCreate();
 
     // Load texture
-    NE_MaterialTexLoadBMPtoRGB256(Material, Palette, (void *) bmp8bit_bin, 1);
+    NE_MaterialTexLoad(Material, GL_RGB256, 256, 256, TEXGEN_TEXCOORD,
+                       (void *)pal256_tex_bin);
+    NE_PaletteLoad(Palette, (void *)pal256_pal_bin, 32, GL_RGB256);
+    NE_MaterialTexSetPal(Material, Palette);
 
     // Modify color 254 of the palette so that we can use it to draw with a
     // known color
@@ -57,7 +61,14 @@ int main(void)
         if (keysHeld() & KEY_TOUCH)
         {
             NE_TextureDrawingStart(Material);
-            NE_TexturePutPixelRGB256(touch.px >> 1, touch.py >> 1, 254);
+
+            // The function NE_TexturePutPixelRGB256() makes sure to not draw
+            // outside of the function, so we don't have to check here.
+            NE_TexturePutPixelRGB256(touch.px, touch.py, 254);
+            NE_TexturePutPixelRGB256(touch.px + 1, touch.py, 254);
+            NE_TexturePutPixelRGB256(touch.px, touch.py + 1, 254);
+            NE_TexturePutPixelRGB256(touch.px + 1, touch.py + 1, 254);
+
             NE_TextureDrawingEnd();
         }
     }

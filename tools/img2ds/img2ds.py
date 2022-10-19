@@ -301,9 +301,9 @@ def convert_img(in_path, out_name, out_folder, out_format):
 
         width, height = img.size
         if width not in VALID_TEXTURE_SIZES:
-            print("WARN: Width {width} is not a valid texture size")
+            print(f"WARN: Width {width} is not a valid texture size")
         if height not in VALID_TEXTURE_SIZES:
-            print("WARN: Height {height} is not a valid texture size")
+            print(f"WARN: Height {height} is not a valid texture size")
 
         if out_format == "A1RGB5":
             texture, palette = convert_a1rgb5(img)

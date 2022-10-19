@@ -6,8 +6,8 @@
 
 #include <NEMain.h>
 
-#include "texture_bin.h"
-#include "model_bin.h"
+#include "texture_tex_bin.h"
+#include "sphere_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model, *Model2, *Model3;
@@ -54,13 +54,13 @@ int main(void)
                   0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Model, (u32 *)model_bin);
-    NE_ModelLoadStaticMesh(Model2, (u32 *)model_bin);
-    NE_ModelLoadStaticMesh(Model3, (u32 *)model_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)sphere_bin);
+    NE_ModelLoadStaticMesh(Model2, (u32 *)sphere_bin);
+    NE_ModelLoadStaticMesh(Model3, (u32 *)sphere_bin);
 
     // Load texture
-    NE_MaterialTexLoad(Material, GL_RGB, 64, 64, TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+                       (u8 *)texture_tex_bin);
 
     // Assign the same material to every model object.
     NE_ModelSetMaterial(Model, Material);
@@ -79,9 +79,9 @@ int main(void)
     u32 color = NE_Black;
 
     // Some parameters
-    u16 depth = 0x7800;
-    u8 shift = 3;
-    u8 mass = 1;
+    u16 depth = 0x7C00;
+    u8 shift = 5;
+    u8 mass = 2;
 
     while (1)
     {

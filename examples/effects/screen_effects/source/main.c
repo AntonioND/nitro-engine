@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "nitrocat_bin.h"
+#include "teapot_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -46,12 +46,12 @@ int main(void)
 
     // Setup camera
     NE_CameraSet(Camera,
-                 -8, 0, 0,
-                  0, 0, 0,
-                  0, 1, 0);
+                 0, 0, -3,
+                 0, 0, 0,
+                 0, 1, 0);
 
     // Load model
-    NE_ModelLoadStaticMesh(Model, (u32 *)nitrocat_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)teapot_bin);
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);

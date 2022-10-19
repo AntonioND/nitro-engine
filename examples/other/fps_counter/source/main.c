@@ -8,8 +8,8 @@
 
 #include <NEMain.h>
 
-#include "nitrocat_bin.h"
-#include "texture_bin.h"
+#include "teapot_bin.h"
+#include "teapot_tex_bin.h"
 
 // Note: There are better ways to do this, for example, using the VBL interrupt
 // to check if the second has changed.
@@ -44,16 +44,17 @@ int main(void)
 
     // Set coordinates for the camera
     NE_CameraSet(Camera,
-                 -8, 0, 0,  // Position
-                  0, 0, 0,  // Look at
-                  0, 1, 0); // Up direction
+                 0, 0, -3,  // Position
+                 0, 0, 0,   // Look at
+                 0, 1, 0);  // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, (u32 *)nitrocat_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)teapot_bin);
 
     // Load a RGB texture from RAM and assign it to "Material".
-    NE_MaterialTexLoad(Material, GL_RGB, 128, 128, TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_MaterialTexLoad(Material, GL_RGB, 256, 256,
+                       TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T,
+                       (u8 *)teapot_tex_bin);
 
     // Assign texture to model...
     NE_ModelSetMaterial(Model, Material);
