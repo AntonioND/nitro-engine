@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "model_bin.h"
+#include "sphere_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model[10];
@@ -79,7 +79,7 @@ int main(void)
 
     // Load model
     for (int i = 0; i < 10; i++)
-        NE_ModelLoadStaticMesh(Model[i], (u32 *)model_bin);
+        NE_ModelLoadStaticMesh(Model[i], (u32 *)sphere_bin);
 
     // Set up lights
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);

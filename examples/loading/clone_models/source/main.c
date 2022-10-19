@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "model_bin.h"
+#include "sphere_bin.h"
 
 // Pointers to objects...
 NE_Camera *Camera;
@@ -65,7 +65,7 @@ int main()
                     0, 1, 0);
 
     // Load model once
-    NE_ModelLoadStaticMesh(Model[0], (u32 *)model_bin);
+    NE_ModelLoadStaticMesh(Model[0], (u32 *)sphere_bin);
 
     // Clone model to the test of the objects
     for (int i = 1; i < 16; i++)
