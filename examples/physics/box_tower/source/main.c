@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "model_bin.h"
+#include "cube_bin.h"
 
 NE_Camera *Camara;
 NE_Model *Model[6];
@@ -44,7 +44,7 @@ int main(void)
         Model[i] = NE_ModelCreate(NE_Static);
         Physics[i] = NE_PhysicsCreate(NE_BoundingBox);
 
-        NE_ModelLoadStaticMesh(Model[i], (u32 *)model_bin);
+        NE_ModelLoadStaticMesh(Model[i], (u32 *)cube_bin);
 
         NE_PhysicsSetModel(Physics[i], (void *)Model[i]);
 

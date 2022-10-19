@@ -6,11 +6,14 @@
 
 #include <NEMain.h>
 
-#include "test_tex_bin.h"
-#include "test_pal_bin.h"
+#include "a5pal8_tex_bin.h"
+#include "a5pal8_pal_bin.h"
 
-NE_Material *Material, *Material2;
-NE_Palette *Palette;
+#include "a3pal32_tex_bin.h"
+#include "a3pal32_pal_bin.h"
+
+NE_Material *Material1, *Material2;
+NE_Palette *Palette1, *Palette2;
 
 void Draw3DScene(void)
 {
@@ -18,7 +21,7 @@ void Draw3DScene(void)
 
     NE_2DDrawTexturedQuad(0, 0,
                           256, 192,
-                          0, Material);
+                          0, Material1);
 }
 
 void Draw3DScene2(void)
@@ -40,23 +43,25 @@ int main(void)
     NE_InitDual3D();
 
     // Allocate objects
-    Material = NE_MaterialCreate();
+    Material1 = NE_MaterialCreate();
     Material2 = NE_MaterialCreate();
-    Palette = NE_PaletteCreate();
+    Palette1 = NE_PaletteCreate();
+    Palette2 = NE_PaletteCreate();
 
     // Load part of the texture ignoring some of its height. You can't do
     // this with width because of how textures are laid out in VRAM.
-    NE_MaterialTexLoad(Material, GL_RGB32_A3, 128, 96, TEXGEN_TEXCOORD,
-                       (u8 *)test_tex_bin);
+    NE_MaterialTexLoad(Material1, GL_RGB32_A3, 256, 192, TEXGEN_TEXCOORD,
+                       (u8 *)a3pal32_tex_bin);
 
     // Load complete texture
-    NE_MaterialTexLoad(Material2, GL_RGB32_A3, 128, 128, TEXGEN_TEXCOORD,
-                       (u8 *)test_tex_bin);
+    NE_MaterialTexLoad(Material2, GL_RGB8_A5, 256, 256, TEXGEN_TEXCOORD,
+                       (u8 *)a5pal8_tex_bin);
 
-    NE_PaletteLoad(Palette, (u16 *)test_pal_bin, 32, GL_RGB32_A3);
+    NE_PaletteLoad(Palette1, (u16 *)a3pal32_pal_bin, 32, GL_RGB32_A3);
+    NE_PaletteLoad(Palette2, (u16 *)a5pal8_pal_bin, 32, GL_RGB8_A5);
 
-    NE_MaterialTexSetPal(Material, Palette);
-    NE_MaterialTexSetPal(Material2, Palette);
+    NE_MaterialTexSetPal(Material1, Palette1);
+    NE_MaterialTexSetPal(Material2, Palette2);
 
     while (1)
     {
