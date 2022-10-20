@@ -285,7 +285,24 @@ def convert_a5pal8(img):
 
 
 def convert_depthbmp(img):
-    pass
+    texture = []
+    palette = []
+
+    rgba = img.convert(mode="RGBA")
+    for pixel in list(rgba.getdata()):
+        r, g, b, a = pixel
+
+        if r > 0:
+            v = 0
+        else:
+            v = int(0x67FF + (0x1800 * b / 255))
+
+        if a == 0:
+            v = v | (1 << 15) # Fog enabled
+
+        texture.extend([v & 0xFF, v >> 8])
+
+    return texture, palette
 
 
 def convert_img(in_path, out_name, out_folder, out_format):
