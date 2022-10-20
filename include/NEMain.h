@@ -25,15 +25,6 @@
 extern "C" {
 #endif
 
-/// Enable debug features.
-///
-/// If Nitro Engine is compiled with this option, it will check a lot of things
-/// and it will print error messages to an user-defined function. Check the
-/// error handling example for more details. If you have finished testing your
-/// code, just comment the define out and recompile Nitro Engine to save RAM and
-/// CPU usage.
-#define NE_DEBUG
-
 #include "NE2D.h"
 #include "NEAnimation.h"
 #include "NECamera.h"

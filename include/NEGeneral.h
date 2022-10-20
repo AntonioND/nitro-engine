@@ -19,6 +19,12 @@
 /// General functions to control Nitro Engine, setup screens, print debug
 /// messages, etc.
 ///
+/// If Nitro Engine is compiled with debug features, it will check a lot of
+/// things and it will print error messages to an user-defined function. Check
+/// the error handling example for more details. If you have finished testing
+/// your code, just comment the define out and recompile Nitro Engine to save
+/// RAM and CPU usage.
+///
 /// @{
 
 /// Void function pointer used in NE_Process and NE_ProcessDual.
@@ -287,11 +293,30 @@ void NE_DebugSetHandlerConsole(void);
 
 #else // #ifndef NE_DEBUG
 
-#define NE_AssertMinMax(min, value, max, format...)
-#define NE_AssertPointer(ptr, format...)
-#define NE_Assert(cond, format...)
+#define NE_AssertMinMax(min, value, max, format...) \
+    do {                                            \
+        (void)(min);                                \
+        (void)(value);                              \
+        (void)(max);                                \
+    } while (0);
+
+#define NE_AssertPointer(ptr, format...)            \
+    do {                                            \
+        (void)(ptr);                                \
+    } while (0);
+
+#define NE_Assert(cond, format...)                  \
+    do {                                            \
+        (void)(cond);                               \
+    } while (0);
+
 #define NE_DebugPrint(format...)
-#define NE_DebugSetHandler(fn)
+
+#define NE_DebugSetHandler(fn)                      \
+    do {                                            \
+        (void)(fn);                                 \
+    } while (0);
+
 #define NE_DebugSetHandlerConsole()
 
 #endif

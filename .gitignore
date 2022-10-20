@@ -1,7 +1,8 @@
 # Compiled files
 build/
+build_debug/
+build_release/
 lib/
-*.o
 *.nds
 *.elf
 

@@ -15,11 +15,17 @@ include $(DEVKITARM)/ds_rules
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET		:=	NE
-BUILD		:=	build
 SOURCES		:=	source source/dsma
 DATA		:=	data
 INCLUDES	:=	include
+
+ifeq ($(NE_DEBUG),1)
+	TARGET	:=	NE_debug
+	BUILD	:=	build_debug
+else
+	TARGET	:=	NE
+	BUILD	:=	build_release
+endif
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -30,6 +36,10 @@ CFLAGS	:=	-g -Wall -O2\
 		-march=armv5te -mtune=arm946e-s \
 		-fomit-frame-pointer -ffast-math \
 		$(ARCH) -Wno-address-of-packed-member
+
+ifeq ($(NE_DEBUG),1)
+	CFLAGS	+= -DNE_DEBUG
+endif
 
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
@@ -103,7 +113,7 @@ $(BUILD): lib
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) lib
+	@rm -fr build_debug build_release lib
 
 #---------------------------------------------------------------------------------
 else

@@ -28,10 +28,20 @@ Setup
 
 1. Clone this repository. Create a symbolic link) to it inside the devkitPro
    folder in your system. For example, in Linux, create a symlink so that
-   ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine.
+   ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine:
 
-2. Go to the cloned repository type ``make`` on the terminal. This should build
-   the library.
+   .. code:: bash
+
+       ln -sT /path/to/nitro-engine /opt/devkitpro/nitro-engine
+
+2. Go to the ``nitro-engine`` folder and type this on the terminal:
+
+   .. code:: bash
+
+       make
+       make NE_DEBUG=1
+
+   This should build the library in both debug and release modes.
 
 3. If you want to check that everything is working as expected, open one of the
    folders of the examples and type ``make``. That should build an ``.nds`` file
@@ -41,10 +51,12 @@ Setup
    correctly. **DeSmuME** doesn't emulate the polygon/vertices count registers,
    so the touch test feature of Nitro Engine doesn't work.
 
-4. By default, Nitro Engine is compiled with debug options enabled. Go to
-   ``NEMain.h`` and comment the line ``#define NE_DEBUG`` to disable them and
-   save CPU usage and memory. You'll need to recompile the library for the new
-   value to take effect.
+4. Normally you should link your programs with ``-lNE``, which is the release
+   version of Nitro Engine. If you want to use the debug features of Nitro
+   Engine, you should link with ``-lNE_debug``, and add ``-DNE_DEBUG`` to the
+   ``CFLAGS`` and ``CPPFLAGS`` in your Makefile. Make sure to clean and rebuild
+   your project after doing the changes mentioned in this step. Check the
+   **error_handling** function to see how to use the debug mode of Nitro Engine.
 
 Screenshots
 -----------
