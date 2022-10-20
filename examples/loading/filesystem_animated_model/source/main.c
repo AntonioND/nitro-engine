@@ -79,7 +79,8 @@ int main(void)
         return 0;
     }
 
-    if (NE_FATMaterialTexLoadBMPtoRGBA(Material, "texture.bmp", true) == 0)
+    if (NE_MaterialTexLoadFAT(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
+                              "texture_tex.bin") == 0)
     {
         printf("Couldn't load texture...");
         WaitLoop();
@@ -96,24 +97,15 @@ int main(void)
 
     NE_ClearColorSet(NE_Black, 31, 63);
 
-    float scale = 1;
-
     while (1)
     {
-        printf("\x1b[0;0HPad: Rotate\nA/B: Scale\nSTART: Exit");
+        printf("\x1b[0;0HPad: Rotate\nSTART: Exit");
 
         scanKeys();
         uint32 keys = keysHeld();
 
         if (keys & KEY_START)
             break;
-
-        if (keys & KEY_A)
-            scale += 0.1;
-        if (keys & KEY_B)
-            scale -= 0.1;
-
-        NE_ModelScale(Model, scale, scale, scale);
 
         if (keys & KEY_RIGHT)
             NE_ModelRotate(Model, 0, 2, 0);
