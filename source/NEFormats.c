@@ -38,7 +38,7 @@ static void *NE_ConvertBMPtoRGBA(void *pointer, bool transpcolor)
 
     if (infoheader->bits != 16 && infoheader->bits != 24)
     {
-        NE_DebugPrint("Unsuported depth for GL_RGBA conversion (%d)",
+        NE_DebugPrint("Unsuported depth for NE_A1RGB5 conversion (%d)",
                       infoheader->bits);
         return NULL;
     }
@@ -168,7 +168,7 @@ static void *NE_ConvertBMPtoRGB256(void *pointer, u16 *palettebuffer)
 
     if (infoheader->bits != 8 && infoheader->bits != 4)
     {
-        NE_DebugPrint("Unsupported depth for GL_RGB256 conversion (%d)",
+        NE_DebugPrint("Unsupported depth for NE_PAL256 conversion (%d)",
                       infoheader->bits);
         return NULL;
     }
@@ -317,8 +317,8 @@ int NE_MaterialTexLoadBMPtoRGBA(NE_Material *tex, void *pointer,
     if (temp == NULL)
         return 0;
 
-    int ret = NE_MaterialTexLoad(tex, GL_RGBA, lastx, lasty,
-                     TEXGEN_TEXCOORD, (u8 *) temp);
+    int ret = NE_MaterialTexLoad(tex, NE_A1RGB5, lastx, lasty,
+                                 NE_TEXGEN_TEXCOORD, (u8 *)temp);
     free(temp);
 
     if (ret == 0)
@@ -340,17 +340,17 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal,
         return 0;
 
     void *texturepointer = NE_ConvertBMPtoRGB256(pointer, palettebuffer);
-    NE_AssertPointer(texturepointer, "Couldn't convert BMP file to GL_RGB256");
+    NE_AssertPointer(texturepointer, "Couldn't convert BMP file to NE_PAL256");
     if (texturepointer == NULL)
     {
         free(palettebuffer);
         return 0;
     }
 
-    u32 transp = transpcolor ? GL_TEXTURE_COLOR0_TRANSPARENT : 0;
+    u32 transp = transpcolor ? NE_TEXTURE_COLOR0_TRANSPARENT : 0;
 
-    int ret = NE_MaterialTexLoad(tex, GL_RGB256, lastx, lasty,
-                                 TEXGEN_TEXCOORD | transp,
+    int ret = NE_MaterialTexLoad(tex, NE_PAL256, lastx, lasty,
+                                 NE_TEXGEN_TEXCOORD | transp,
                                  (u8 *)texturepointer);
     free(texturepointer);
 
@@ -360,7 +360,7 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal,
         free(palettebuffer);
         return 0;
     }
-    ret = NE_PaletteLoad(pal, palettebuffer, numcolors, GL_RGB256);
+    ret = NE_PaletteLoad(pal, palettebuffer, numcolors, NE_PAL256);
     free(palettebuffer);
 
     if (ret == 0)

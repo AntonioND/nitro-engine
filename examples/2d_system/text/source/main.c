@@ -57,9 +57,9 @@ int main(void)
 
     Text = NE_MaterialCreate();
     Text2 = NE_MaterialCreate();
-    NE_MaterialTexLoad(Text, GL_RGBA, 256, 64, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Text, NE_A1RGB5, 256, 64, NE_TEXGEN_TEXCOORD,
                        (void *)text_tex_bin);
-    NE_MaterialTexLoad(Text2, GL_RGBA, 512, 128, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Text2, NE_A1RGB5, 512, 128, NE_TEXGEN_TEXCOORD,
                        (void *)text2_tex_bin);
 
     NE_TextInit(0,     // Font slot

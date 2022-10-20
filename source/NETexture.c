@@ -108,8 +108,9 @@ void NE_MaterialColorDelete(NE_Material *tex)
     tex->color = NE_White;
 }
 
-int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
-                          int sizeX, int sizeY, int param, char *path)
+int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
+                          int sizeX, int sizeY, NE_TextureFlags flags,
+                          char *path)
 {
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(path, "NULL path pointer");
@@ -118,13 +119,13 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
     char *ptr = NE_FATLoadData(path);
     NE_AssertPointer(ptr, "Couldn't load file from FAT");
 
-    int ret = NE_MaterialTexLoad(tex, type, sizeX, sizeY, param, (u8 *)ptr);
+    int ret = NE_MaterialTexLoad(tex, fmt, sizeX, sizeY, flags, (u8 *)ptr);
     free(ptr);
     return ret;
 }
 
 static int __NE_TextureResizeWidth(void *source, void *dest,
-                                   GL_TEXTURE_TYPE_ENUM type,
+                                   NE_TextureFormat fmt,
                                    int height, int width, int newwidth)
 {
     NE_AssertPointer(source, "NULL source pointer");
@@ -132,22 +133,22 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
 
     static const int __NE_TextureDepth[] = {
         0,  // Nothing
-        8,  // RGB32_A3
-        2,  // RGB4
-        4,  // RGB16
-        8,  // RGB256
-        0,  // Compressed
-        8,  // RGB8_A5
-        16, // RGBA
-        16  // RGB
+        8,  // NE_A3PAL32
+        2,  // NE_PAL4
+        4,  // NE_PAL16
+        8,  // NE_PAL256
+        0,  // NE_COMPRESSED
+        8,  // NE_A5PAL8
+        16, // NE_A1RGB5
+        16  // NE_RGB5
     };
 
-    int bits = __NE_TextureDepth[type];
+    int bits = __NE_TextureDepth[fmt];
 
     if (bits == 16)
     {
-        // GL_RGBA or GL_RGB
-        // -----------------
+        // NE_A1RGB5 or NE_RGB5
+        // --------------------
 
         // Cast to correct width
         u16 *d = dest;
@@ -168,8 +169,8 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
     }
     else if (bits == 8)
     {
-        // GL_RGB256, GL_RGB32_A3 or GL_RGB8_A5
-        // ------------------------------------
+        // NE_PAL256, NE_A3PAL32 or NE_A5PAL8
+        // ----------------------------------
 
         // Cast to correct width
         u8 *d = dest;
@@ -189,7 +190,7 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
     }
     else if (bits == 4)
     {
-        // GL_RGB16
+        // NE_PAL16
         // --------
 
         // Cast to correct width
@@ -226,7 +227,7 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
     }
     else if (bits == 2)
     {
-        // GL_RGB4
+        // NE_PAL4
         // -------
 
         // Cast to correct width
@@ -266,18 +267,19 @@ static int __NE_TextureResizeWidth(void *source, void *dest,
 
 static const int __NE_TextureSizeShift[] = {
     0, // Nothing
-    1, // RGB32_A3
-    3, // RGB4
-    2, // RGB16
-    1, // RGB256
-    0, // Compressed
-    1, // RGB8_A5
-    0, // RGBA
-    0, // RGB
+    1, // NE_A3PAL32
+    3, // NE_PAL4
+    2, // NE_PAL16
+    1, // NE_PAL256
+    0, // NE_COMPRESSED
+    1, // NE_A5PAL8
+    0, // NE_A1RGB5
+    0, // NE_RGB5
 };
 
-int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
-                       int sizeY, int param, void *texture)
+int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
+                       int sizeX, int sizeY, NE_TextureFlags flags,
+                       void *texture)
 {
     NE_AssertPointer(tex, "NULL material pointer");
 
@@ -324,12 +326,12 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
         // delete the temporary buffer used to expand it.
 
         size = (__NE_GetValidSize(sizeX) * sizeY << 1) >>
-                __NE_TextureSizeShift[type];
+                __NE_TextureSizeShift[fmt];
 
         void *newbuffer = malloc(size);
         NE_AssertPointer(newbuffer, "Not enough memory for temporary buffer");
 
-        if (__NE_TextureResizeWidth(texture, newbuffer, type, sizeY, sizeX,
+        if (__NE_TextureResizeWidth(texture, newbuffer, fmt, sizeY, sizeX,
                                     __NE_GetValidSize(sizeX)) == 0)
         {
             free(newbuffer);
@@ -345,7 +347,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
     // The height doesn't need to be power of 2, but we will have to cheat later
     // and make the DS believe it is a power of 2.
     if (!invalidwidth)
-        size = (sizeX * sizeY << 1) >> __NE_TextureSizeShift[type];
+        size = (sizeX * sizeY << 1) >> __NE_TextureSizeShift[fmt];
 
     u32 *addr = (u32 *) NE_Alloc(NE_TexAllocList, size, 8);
 
@@ -365,14 +367,14 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
     u32 vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
                        VRAM_D_LCD);
 
-    // We do GL_RGB as GL_RGBA, but we set each alpha bit to 1 during the
+    // We do NE_RGB5 as NE_A1RGB5, but we set each alpha bit to 1 during the
     // copy to VRAM.
-    if (type == GL_RGB)
+    if (fmt == NE_RGB5)
     {
         u16 *src = (u16 *)texture;
         u16 *dest = (u16 *)addr;
         NE_MaterialTexParam(tex, sizeX, __NE_GetValidSize(sizeY), addr,
-                            GL_RGBA, param);
+                            NE_A1RGB5, flags);
 
         while (size--)
         {
@@ -384,7 +386,7 @@ int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type, int sizeX,
     {
         // For everything else, we do a straight copy
         NE_MaterialTexParam(tex, sizeX, __NE_GetValidSize(sizeY), addr,
-                            type, param);
+                            fmt, flags);
 
         swiCopy((u32 *)texture, addr, (size >> 2) | COPY_MODE_WORD);
     }
@@ -755,8 +757,8 @@ void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
 {
     NE_AssertPointer(drawingtexture_adress,
                      "No texture active for drawing");
-    NE_Assert(drawingtexture_type == GL_RGBA,
-              "Ative texture isn't GL_RGBA");
+    NE_Assert(drawingtexture_type == NE_A1RGB5,
+              "Ative texture isn't NE_A1RGB5");
 
     if (x >= drawingtexture_x || y >= drawingtexture_y)
         return;
@@ -768,8 +770,8 @@ void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
 {
     NE_AssertPointer(drawingtexture_adress,
                      "No texture active for drawing.");
-    NE_Assert(drawingtexture_type == GL_RGB256,
-              "Active texture isn't GL_RGB256");
+    NE_Assert(drawingtexture_type == NE_PAL256,
+              "Active texture isn't NE_PAL256");
 
     if (x >= drawingtexture_x || y >= drawingtexture_y)
         return;

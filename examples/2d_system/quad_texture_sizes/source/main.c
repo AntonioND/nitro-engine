@@ -51,11 +51,11 @@ int main(void)
     Material_medium = NE_MaterialCreate();
     Material_big = NE_MaterialCreate();
 
-    NE_MaterialTexLoad(Material_small, GL_RGBA, 8, 8, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material_small, NE_A1RGB5, 8, 8, NE_TEXGEN_TEXCOORD,
                        (void *)small_tex_bin);
-    NE_MaterialTexLoad(Material_medium, GL_RGBA, 16, 16, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material_medium, NE_A1RGB5, 16, 16, NE_TEXGEN_TEXCOORD,
                        (void *)medium_tex_bin);
-    NE_MaterialTexLoad(Material_big, GL_RGBA, 64, 64, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material_big, NE_A1RGB5, 64, 64, NE_TEXGEN_TEXCOORD,
                        (void *)big_tex_bin);
 
     NE_ClearColorSet(NE_DarkGray, 31, 63);

@@ -37,6 +37,31 @@ typedef struct {
     bool useshininess; ///< Use shininess table
 } NE_Material;
 
+/// Supported texture formats
+typedef enum {
+    NE_A3PAL32    = 1, ///< 32 color palette, 3 bits of alpha
+    NE_PAL4       = 2, ///< 4 color palette
+    NE_PAL16      = 3, ///< 16 color palette
+    NE_PAL256     = 4, ///< 256 color palette
+    NE_COMPRESSED = 5, ///< Compressed (not supported yet)
+    NE_A5PAL8     = 6, ///< 8 color palette, 5 bits of alpha
+    NE_A1RGB5     = 7, ///< Direct color (5 bits per channel), 1 bit of alpha
+    NE_RGB5       = 8  ///< Direct color (5 bits per channel), alpha set to 1
+} NE_TextureFormat;
+
+/// Supported texture options
+typedef enum {
+    NE_TEXTURE_WRAP_S = (1U << 16), ///< Wrap/repeat texture on S axis
+    NE_TEXTURE_WRAP_T = (1U << 17), ///< Wrap/repeat texture on T axis
+    NE_TEXTURE_FLIP_S = (1U << 18), ///< Flip texture on S axis when wrapping
+    NE_TEXTURE_FLIP_T = (1U << 19), ///< Flip texture on T axis when wrapping
+    NE_TEXTURE_COLOR0_TRANSPARENT = (1U << 29), ///< Make palette index 0 transparent
+    NE_TEXGEN_OFF      = (0U << 30), ///< Don't modify texture coordinates
+    NE_TEXGEN_TEXCOORD = (1U << 30), ///< Multiply coordinates by texture matrix
+    NE_TEXGEN_NORMAL   = (2U << 30), ///< Texcoords = Normal * texture matrix (spherical reflection)
+    NE_TEXGEN_POSITION = (3U << 30)  ///< Texcoords = Vertex * texture matrix
+} NE_TextureFlags;
+
 /// Creates a new material object.
 ///
 /// @return Pointer to the newly created material.
@@ -65,14 +90,15 @@ void NE_MaterialColorDelete(NE_Material *tex);
 /// actually save VRAM space.
 ///
 /// @param tex Material.
-/// @param type Texture type.
+/// @param fmt Texture format.
 /// @param sizeX (sizeX, sizeY) Texture size.
 /// @param sizeY (sizeX, sizeY) Texture size.
-/// @param param Parameters of the texture.
+/// @param flags Parameters of the texture.
 /// @param path Path of the texture file.
 /// @return It returns 1 on success, 0 on error.
-int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
-              int sizeX, int sizeY, int param, char *path);
+int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
+                          int sizeX, int sizeY, NE_TextureFlags flags,
+                          char *path);
 
 /// Loads a texture from RAM and assigns it to a material object.
 ///
@@ -83,14 +109,15 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
 /// actually save VRAM space.
 ///
 /// @param tex Material.
-/// @param type Texture type.
+/// @param fmt Texture format.
 /// @param sizeX (sizeX, sizeY) Texture size.
 /// @param sizeY (sizeX, sizeY) Texture size.
-/// @param param Parameters of the texture.
+/// @param flags Parameters of the texture.
 /// @param texture Pointer to the texture data.
 /// @return It returns 1 on success, 0 on error.
-int NE_MaterialTexLoad(NE_Material *tex, GL_TEXTURE_TYPE_ENUM type,
-                       int sizeX, int sizeY, int param, void *texture);
+int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
+                       int sizeX, int sizeY, NE_TextureFlags flags,
+                       void *texture);
 
 /// Copies the texture of a material into another material.
 ///

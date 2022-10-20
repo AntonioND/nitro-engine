@@ -59,7 +59,7 @@ int main(void)
                  0, 0, 0,
                  0, 1, 0);
 
-    NE_MaterialTexLoad(Material, GL_RGBA, 128, 128, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_A1RGB5, 128, 128, NE_TEXGEN_TEXCOORD,
                        (u8 *)texture_tex_bin);
 
     while (1)

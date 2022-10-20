@@ -53,7 +53,7 @@ int main(void)
                  0, 1, 0);
 
     Texture = NE_MaterialCreate();
-    NE_MaterialTexLoad(Texture, GL_RGBA, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Texture, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        (void *)texture_tex_bin);
 
     NE_ModelSetMaterial(Model, Texture);

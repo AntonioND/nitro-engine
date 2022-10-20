@@ -31,9 +31,9 @@ int main(void)
     Material = NE_MaterialCreate();
     Palette = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material, GL_RGB16, 128, 128, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_PAL16, 128, 128, NE_TEXGEN_TEXCOORD,
                        (void *)icon_tex_bin);
-    NE_PaletteLoad(Palette, (void *)icon_pal_bin, 32, GL_RGB16);
+    NE_PaletteLoad(Palette, (void *)icon_pal_bin, 32, NE_PAL16);
     NE_MaterialTexSetPal(Material, Palette);
 
 

@@ -55,19 +55,19 @@ int main(void)
     Palette = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material,
-                       GL_RGB32_A3, // Texture type
-                       100, 256,    // Width, height (in pixels)
-                       TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
-    NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, GL_RGB32_A3);
+                       NE_A3PAL32, // Texture type
+                       100, 256,   // Width, height (in pixels)
+                       NE_TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
+    NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
     NE_MaterialTexSetPal(Material, Palette);
 
     // Allocate objects for another material
     Material2 = NE_MaterialCreate();
     Palette2 = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material2, GL_RGB4, 100, 100, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material2, NE_PAL4, 100, 100, NE_TEXGEN_TEXCOORD,
                        (u8 *)pal4_tex_bin);
-    NE_PaletteLoad(Palette2, (u16 *)pal4_pal_bin, 4, GL_RGB4);
+    NE_PaletteLoad(Palette2, (u16 *)pal4_pal_bin, 4, NE_PAL4);
     NE_MaterialTexSetPal(Material2, Palette2);
 
     while (1)

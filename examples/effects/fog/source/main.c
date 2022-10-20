@@ -59,7 +59,7 @@ int main(void)
     NE_ModelLoadStaticMesh(Model3, (u32 *)sphere_bin);
 
     // Load texture
-    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        (u8 *)texture_tex_bin);
 
     // Assign the same material to every model object.

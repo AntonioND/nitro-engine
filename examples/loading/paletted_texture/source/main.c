@@ -50,15 +50,15 @@ int main(void)
 
     // Load part of the texture ignoring some of its height. You can't do
     // this with width because of how textures are laid out in VRAM.
-    NE_MaterialTexLoad(Material1, GL_RGB32_A3, 256, 192, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material1, NE_A3PAL32, 256, 192, NE_TEXGEN_TEXCOORD,
                        (u8 *)a3pal32_tex_bin);
 
     // Load complete texture
-    NE_MaterialTexLoad(Material2, GL_RGB8_A5, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material2, NE_A5PAL8, 256, 256, NE_TEXGEN_TEXCOORD,
                        (u8 *)a5pal8_tex_bin);
 
-    NE_PaletteLoad(Palette1, (u16 *)a3pal32_pal_bin, 32, GL_RGB32_A3);
-    NE_PaletteLoad(Palette2, (u16 *)a5pal8_pal_bin, 32, GL_RGB8_A5);
+    NE_PaletteLoad(Palette1, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
+    NE_PaletteLoad(Palette2, (u16 *)a5pal8_pal_bin, 32, NE_A5PAL8);
 
     NE_MaterialTexSetPal(Material1, Palette1);
     NE_MaterialTexSetPal(Material2, Palette2);

@@ -100,7 +100,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
     }
 
     NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList, numcolor << 1,
-                                        1 << (4 - (format == GL_RGB4)));
+                                        1 << (4 - (format == NE_PAL4)));
     if (NE_PalInfo[slot].pointer == NULL)
     {
         NE_DebugPrint("Not enough memory");
@@ -149,7 +149,7 @@ void NE_PaletteUse(NE_Palette *pal)
 {
     NE_AssertPointer(pal, "NULL pointer");
     NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
-    unsigned int shift = 4 - (NE_PalInfo[pal->index].format == GL_RGB4);
+    unsigned int shift = 4 - (NE_PalInfo[pal->index].format == NE_PAL4);
     GFX_PAL_FORMAT = (uintptr_t)NE_PalInfo[pal->index].pointer >> shift;
 }
 
@@ -222,7 +222,7 @@ void NE_PaletteDefragMem(void)
 
             NE_Free(NE_PalAllocList, (void*)NE_PalInfo[i].pointer);
             void *pointer = NE_Alloc(NE_PalAllocList, size,
-                                     1 << (4 - (NE_PalInfo[i].format == GL_RGB4)));
+                                     1 << (4 - (NE_PalInfo[i].format == NE_PAL4)));
 
             NE_AssertPointer(pointer, "Couldn't reallocate palette");
 
@@ -280,7 +280,7 @@ void *NE_PaletteModificationStart(NE_Palette *pal)
 void NE_PaletteRGB256SetColor(u8 colorindex, u16 color)
 {
     NE_AssertPointer(palette_adress, "No active palette");
-    NE_Assert(palette_format == GL_RGB256, "Active palette isn't GL_RGB256");
+    NE_Assert(palette_format == NE_PAL256, "Active palette isn't NE_PAL256");
 
     palette_adress[colorindex] = color;
 }

@@ -48,22 +48,22 @@ int main(void)
     TruePal = NE_PaletteCreate();
     EmptyPal = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(ButtonImg, GL_RGB256, 64, 64,
-                       TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT,
+    NE_MaterialTexLoad(ButtonImg, NE_PAL256, 64, 64,
+                       NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)button_tex_bin);
-    NE_PaletteLoad(ButtonPal, (void *)button_pal_bin, 256, GL_RGB256);
+    NE_PaletteLoad(ButtonPal, (void *)button_pal_bin, 256, NE_PAL256);
     NE_MaterialTexSetPal(ButtonImg, ButtonPal);
 
-    NE_MaterialTexLoad(EmptyImg, GL_RGB256, 64, 64,
-                       TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT,
+    NE_MaterialTexLoad(EmptyImg, NE_PAL256, 64, 64,
+                       NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)empty_tex_bin);
-    NE_PaletteLoad(EmptyPal, (void *)empty_pal_bin, 256, GL_RGB256);
+    NE_PaletteLoad(EmptyPal, (void *)empty_pal_bin, 256, NE_PAL256);
     NE_MaterialTexSetPal(EmptyImg, EmptyPal);
 
-    NE_MaterialTexLoad(TrueImg, GL_RGB256, 64, 64,
-                       TEXGEN_TEXCOORD | GL_TEXTURE_COLOR0_TRANSPARENT,
+    NE_MaterialTexLoad(TrueImg, NE_PAL256, 64, 64,
+                       NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)true_tex_bin);
-    NE_PaletteLoad(TruePal, (void *)true_pal_bin, 256, GL_RGB256);
+    NE_PaletteLoad(TruePal, (void *)true_pal_bin, 256, NE_PAL256);
     NE_MaterialTexSetPal(TrueImg, TruePal);
 
 

@@ -36,9 +36,9 @@ int main(void)
     Palette = NE_PaletteCreate();
 
     // Load texture
-    NE_MaterialTexLoad(Material, GL_RGB256, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_PAL256, 256, 256, NE_TEXGEN_TEXCOORD,
                        (void *)pal256_tex_bin);
-    NE_PaletteLoad(Palette, (void *)pal256_pal_bin, 32, GL_RGB256);
+    NE_PaletteLoad(Palette, (void *)pal256_pal_bin, 32, NE_PAL256);
     NE_MaterialTexSetPal(Material, Palette);
 
     // Modify color 254 of the palette so that we can use it to draw with a

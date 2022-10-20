@@ -26,7 +26,7 @@ int main()
     lcdMainOnBottom();
 
     Material = NE_MaterialCreate();
-    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        (u8 *)a1rgb5_tex_bin);
 
     // Wait a bit...

@@ -57,7 +57,7 @@ int main(void)
     // Load mesh from RAM and assign it to the object "Model".
     NE_ModelLoadStaticMesh(Model, (u32 *)robot_bin);
     // Load a RGB texture from RAM and assign it to "Material".
-    NE_MaterialTexLoad(Material, GL_RGB, 256, 256, TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        (u8 *)texture_tex_bin);
 
     // Assign texture to model...

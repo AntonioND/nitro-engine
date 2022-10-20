@@ -57,8 +57,8 @@ int main(void)
     // Load model. The texture coordinates are outside of [0.0, 1.0], so it is
     // needed to enable wrapping.
     NE_ModelLoadStaticMesh(Model, (u32*)teapot_bin);
-    NE_MaterialTexLoad(Material, GL_RGBA, 256, 256,
-                       TEXGEN_TEXCOORD | GL_TEXTURE_WRAP_S | GL_TEXTURE_WRAP_T,
+    NE_MaterialTexLoad(Material, NE_A1RGB5, 256, 256,
+                       NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
                        (u8 *)teapot_tex_bin);
     NE_ModelSetMaterial(Model, Material);
 
