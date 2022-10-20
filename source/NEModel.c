@@ -176,7 +176,7 @@ void NE_ModelSetAnimationSecondary(NE_Model *model, NE_Animation *anim)
 // Internal use... see below
 extern bool NE_TestTouch;
 
-void NE_ModelDraw(NE_Model *model)
+void NE_ModelDraw(const NE_Model *model)
 {
     NE_AssertPointer(model, "NULL pointer");
     if (model->meshdata == NULL)
@@ -387,14 +387,14 @@ void NE_ModelAnimSecondarySetSpeed(NE_Model *model, int32_t speed)
     model->animinfo[1]->speed = speed;
 }
 
-int32_t NE_ModelAnimGetFrame(NE_Model *model)
+int32_t NE_ModelAnimGetFrame(const NE_Model *model)
 {
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
     return model->animinfo[0]->currframe;
 }
 
-int32_t NE_ModelAnimSecondaryGetFrame(NE_Model *model)
+int32_t NE_ModelAnimSecondaryGetFrame(const NE_Model *model)
 {
     NE_AssertPointer(model, "NULL pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");

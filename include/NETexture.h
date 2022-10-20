@@ -136,7 +136,6 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest);
 /// @param pal Palette.
 void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal);
 
-
 /// Set active material to use when drawing polygons.
 ///
 /// If the pointer passed is NULL the function will disable textures and new
@@ -144,7 +143,7 @@ void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal);
 /// a valid material.
 ///
 /// @param tex Material to be used.
-void NE_MaterialUse(NE_Material *tex);
+void NE_MaterialUse(const NE_Material *tex);
 
 /// Flags to choose which VRAM banks Nitro Engine can use to allocate textures.
 typedef enum {
@@ -216,7 +215,7 @@ void NE_TextureSystemEnd(void);
 ///
 /// @param tex Material.
 /// @return Returns the size in pixels.
-int NE_TextureGetSizeX(NE_Material *tex);
+int NE_TextureGetSizeX(const NE_Material *tex);
 
 /// Returns the height of a texture.
 ///
@@ -224,7 +223,7 @@ int NE_TextureGetSizeX(NE_Material *tex);
 ///
 /// @param tex Material.
 /// @return Returns the size in pixels.
-int NE_TextureGetSizeY(NE_Material *tex);
+int NE_TextureGetSizeY(const NE_Material *tex);
 
 /// Returns the real width of a texture.
 ///
@@ -233,7 +232,7 @@ int NE_TextureGetSizeY(NE_Material *tex);
 ///
 /// @param tex Material.
 /// @return Returns the size in pixels.
-int NE_TextureGetRealSizeX(NE_Material *tex);
+int NE_TextureGetRealSizeX(const NE_Material *tex);
 
 /// Returns the real height size of a texture.
 ///
@@ -242,7 +241,7 @@ int NE_TextureGetRealSizeX(NE_Material *tex);
 ///
 /// @param tex Material.
 /// @return Returns the size in pixels.
-int NE_TextureGetRealSizeY(NE_Material *tex);
+int NE_TextureGetRealSizeY(const NE_Material *tex);
 
 /// Sets lighting propierties of this material.
 ///
@@ -282,7 +281,7 @@ void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient, u32 specular,
 ///
 /// @param tex Texture to modify.
 /// @return Returns a pointer to the base address of the texture in VRAM.
-void *NE_TextureDrawingStart(NE_Material *tex);
+void *NE_TextureDrawingStart(const NE_Material *tex);
 
 /// Sets the specified pixel to the specified color.
 ///

@@ -10,7 +10,7 @@
 
 typedef struct {
     int sizex, sizey;
-    NE_Material *material;
+    const NE_Material *material;
 } ne_textinfo_t;
 
 static ne_textinfo_t NE_TextInfo[NE_MAX_TEXT_FONTS];
@@ -27,7 +27,7 @@ void NE_TextPriorityReset(void)
     NE_TEXT_PRIORITY = 0;
 }
 
-void NE_TextInit(int slot, NE_Material *mat, int sizex, int sizey)
+void NE_TextInit(int slot, const NE_Material *mat, int sizex, int sizey)
 {
     NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
     NE_AssertPointer(mat, "NULL pointer");
@@ -73,7 +73,7 @@ static void _ne_texturecuadprint(int xcrd1, int ycrd1, int xcrd2, int ycrd2,
     GFX_VERTEX_XY = (ycrd1 << 16) | (xcrd2 & 0xFFFF);
 }
 
-static void _ne_charprint(ne_textinfo_t * textinfo, int xcrd1, int ycrd1,
+static void _ne_charprint(const ne_textinfo_t * textinfo, int xcrd1, int ycrd1,
                           char character)
 {
     // Texture coords
@@ -92,7 +92,7 @@ int NE_TextPrint(int slot, int x, int y, u32 color, const char *text)
 {
     NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-    ne_textinfo_t *textinfo = &NE_TextInfo[slot];
+    const ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
     if (textinfo->material == NULL)
         return -1;
@@ -142,7 +142,7 @@ int NE_TextPrintBox(int slot, int x, int y, int endx, int endy, u32 color,
 {
     NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-    ne_textinfo_t *textinfo = &NE_TextInfo[slot];
+    const ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
     if (textinfo->material == NULL)
         return -1;
@@ -199,7 +199,7 @@ int NE_TextPrintFree(int slot, int x, int y, u32 color, const char *text)
 {
     NE_AssertMinMax(0, slot, NE_MAX_TEXT_FONTS, "Invalid slot %d", slot);
 
-    ne_textinfo_t *textinfo = &NE_TextInfo[slot];
+    const ne_textinfo_t *textinfo = &NE_TextInfo[slot];
 
     if (textinfo->material == NULL)
         return -1;

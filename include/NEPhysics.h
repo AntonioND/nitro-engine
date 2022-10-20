@@ -210,7 +210,7 @@ void NE_PhysicsOnCollision(NE_Physics *physics, NE_OnCollision action);
 ///
 /// @param pointer Pointer to the object.
 /// @return True if there is a collision, false otherwise.
-bool NE_PhysicsIsColliding(NE_Physics *pointer);
+bool NE_PhysicsIsColliding(const NE_Physics *pointer);
 
 /// Updates all physics objects.
 void NE_PhysicsUpdateAll(void);
@@ -228,7 +228,8 @@ void NE_PhysicsUpdate(NE_Physics *pointer);
 /// @param pointer1 Pointer to first object.
 /// @param pointer2 Pointer to second object.
 /// @return Returns true if two objects are colliding.
-bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2);
+bool NE_PhysicsCheckCollision(const NE_Physics *pointer1,
+                              const NE_Physics *pointer2);
 
 /// @}
 

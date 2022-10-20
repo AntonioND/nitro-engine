@@ -191,7 +191,7 @@ void NE_PhysicsOnCollision(NE_Physics *physics, NE_OnCollision action)
     physics->oncollision = action;
 }
 
-bool NE_PhysicsIsColliding(NE_Physics *pointer)
+bool NE_PhysicsIsColliding(const NE_Physics *pointer)
 {
     NE_AssertPointer(pointer, "NULL pointer");
     return pointer->iscolliding;
@@ -405,7 +405,8 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
     }
 }
 
-bool NE_PhysicsCheckCollision(NE_Physics *pointer1, NE_Physics *pointer2)
+bool NE_PhysicsCheckCollision(const NE_Physics *pointer1,
+                              const NE_Physics *pointer2)
 {
     NE_AssertPointer(pointer1, "NULL pointer 1");
     NE_AssertPointer(pointer2, "NULL pointer 2");

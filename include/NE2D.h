@@ -140,7 +140,7 @@ void NE_SpriteSystemEnd(void);
 /// function.
 ///
 /// @param sprite Sprite to be drawn.
-void NE_SpriteDraw(NE_Sprite *sprite);
+void NE_SpriteDraw(const NE_Sprite *sprite);
 
 /// Draws all visible sprites.
 ///
@@ -241,7 +241,7 @@ void NE_2DDrawQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color1,
 /// @param z Priority.
 /// @param mat Material to use.
 void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                           NE_Material *mat);
+                           const NE_Material *mat);
 
 /// Draws a quad with a material at the given coordinates with a flat color.
 ///
@@ -253,7 +253,7 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 /// @param mat Material to use.
 /// @param color Color
 void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                                NE_Material *mat, u32 color);
+                                const NE_Material *mat, u32 color);
 
 /// Draws a quad with a material at the given coordinates with a color gradient.
 ///
@@ -268,8 +268,8 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 /// @param color3 Lower right color.
 /// @param color4 Lower left color.
 void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                                   NE_Material *mat, u32 color1, u32 color2,
-                                   u32 color3, u32 color4);
+                                   const NE_Material *mat, u32 color1,
+                                   u32 color2, u32 color3, u32 color4);
 
 /// @}
 

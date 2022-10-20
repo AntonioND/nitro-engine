@@ -55,7 +55,7 @@ void NE_PaletteDelete(NE_Palette *pal);
 /// Tells the GPU to use the palette in the specified object.
 ///
 /// @param pal Pointer to the palette object.
-void NE_PaletteUse(NE_Palette *pal);
+void NE_PaletteUse(const NE_Palette *pal);
 
 /// Resets the palette system and sets the new max number of palettes.
 ///
@@ -96,7 +96,7 @@ void NE_PaletteSystemEnd(void);
 ///
 /// @param pal Palette to modify.
 /// @return Returns a pointer to the base address of the palette in VRAM.
-void *NE_PaletteModificationStart(NE_Palette *pal);
+void *NE_PaletteModificationStart(const NE_Palette *pal);
 
 /// Set the desired entry of a palette to a new color.
 ///

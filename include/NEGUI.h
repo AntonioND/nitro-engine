@@ -186,25 +186,25 @@ void NE_GUISlideBarSetMinMax(NE_GUIObj *sldbr, int min, int max);
 ///
 /// @param obj Pointer to the object.
 /// @return Event.
-NE_GUIState NE_GUIObjectGetEvent(NE_GUIObj *obj);
+NE_GUIState NE_GUIObjectGetEvent(const NE_GUIObj *obj);
 
 /// Gets the value of a check box.
 ///
 /// @param chbx Check box.
 /// @return It returns true if the check box is checked.
-bool NE_GUICheckBoxGetValue(NE_GUIObj *chbx);
+bool NE_GUICheckBoxGetValue(const NE_GUIObj *chbx);
 
 /// Gets the value of a radio button.
 ///
 /// @param rdbtn Radio button.
 /// @return It returns true if the radio button is checked.
-bool NE_GUIRadioButtonGetValue(NE_GUIObj *rdbtn);
+bool NE_GUIRadioButtonGetValue(const NE_GUIObj *rdbtn);
 
 /// Gets the value of a slide bar.
 ///
 /// @param sldbr Slide bar.
 /// @return It returns the value of the slide bar.
-int NE_GUISlideBarGetValue(NE_GUIObj *sldbr);
+int NE_GUISlideBarGetValue(const NE_GUIObj *sldbr);
 
 /// Deletes the given object.
 ///

@@ -161,7 +161,7 @@ void NE_SpriteSystemEnd(void)
     ne_sprite_system_inited = false;
 }
 
-void NE_SpriteDraw(NE_Sprite *sprite)
+void NE_SpriteDraw(const NE_Sprite *sprite)
 {
     if (!ne_sprite_system_inited)
         return;
@@ -251,8 +251,8 @@ void NE_SpriteDrawAll(void)
 
 // Internal use. See NETexture.c
 
-int __NE_TextureGetRawX(NE_Material *tex);
-int __NE_TextureGetRawY(NE_Material *tex);
+int __NE_TextureGetRawX(const NE_Material *tex);
+int __NE_TextureGetRawY(const NE_Material *tex);
 
 //--------------------------------------------
 
@@ -355,7 +355,7 @@ void NE_2DDrawQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color1,
 }
 
 void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                           NE_Material *mat)
+                           const NE_Material *mat)
 {
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
@@ -382,7 +382,7 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 }
 
 void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                                NE_Material *mat, u32 color)
+                                const NE_Material *mat, u32 color)
 {
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
@@ -411,8 +411,8 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 }
 
 void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
-                                   NE_Material *mat, u32 color1, u32 color2,
-                                   u32 color3, u32 color4)
+                                   const NE_Material *mat, u32 color1,
+                                   u32 color2, u32 color3, u32 color4)
 {
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");

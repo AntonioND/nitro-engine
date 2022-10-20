@@ -121,7 +121,7 @@ void NE_ModelSetAnimationSecondary(NE_Model *model, NE_Animation *anim);
 /// Draw a model.
 ///
 /// @param model Pointer to the model.
-void NE_ModelDraw(NE_Model *model);
+void NE_ModelDraw(const NE_Model *model);
 
 /// Clone model.
 ///
@@ -255,13 +255,13 @@ void NE_ModelAnimSecondarySetSpeed(NE_Model *model, int32_t speed);
 ///
 /// @param model Pointer to the model.
 /// @return Returns the frame in f32 format.
-int32_t NE_ModelAnimGetFrame(NE_Model *model);
+int32_t NE_ModelAnimGetFrame(const NE_Model *model);
 
 /// Returns the current frame of the secondary animation of an animated model.
 ///
 /// @param model Pointer to the model.
 /// @return Returns the frame in f32 format.
-int32_t NE_ModelAnimSecondaryGetFrame(NE_Model *model);
+int32_t NE_ModelAnimSecondaryGetFrame(const NE_Model *model);
 
 /// Sets the current frame of an animated model.
 ///

@@ -37,7 +37,7 @@ void NE_TextPriorityReset(void);
 /// @param mat Font texture.
 /// @param sizex (sizex, sizey) Size of one character.
 /// @param sizey (sizex, sizey) Size of one character.
-void NE_TextInit(int slot, NE_Material *mat, int sizex, int sizey);
+void NE_TextInit(int slot, const NE_Material *mat, int sizex, int sizey);
 
 /// Clears the given text font slot.
 ///

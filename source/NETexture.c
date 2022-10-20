@@ -417,7 +417,7 @@ void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
     NE_Texture[tex->texindex].palette = pal;
 }
 
-void NE_MaterialUse(NE_Material *tex)
+void NE_MaterialUse(const NE_Material *tex)
 {
     if (tex == NULL)
     {
@@ -653,7 +653,7 @@ void NE_TextureSystemEnd(void)
 }
 
 // Internal use
-int __NE_TextureGetRawX(NE_Material *tex)
+int __NE_TextureGetRawX(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE,
@@ -662,35 +662,35 @@ int __NE_TextureGetRawX(NE_Material *tex)
 }
 
 // Internal use
-int __NE_TextureGetRawY(NE_Material *tex)
+int __NE_TextureGetRawY(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
     return (NE_Texture[tex->texindex].param & (0x7 << 23)) >> 23;
 }
 
-int NE_TextureGetRealSizeX(NE_Material *tex)
+int NE_TextureGetRealSizeX(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
     return 8 << __NE_TextureGetRawX(tex);
 }
 
-int NE_TextureGetRealSizeY(NE_Material *tex)
+int NE_TextureGetRealSizeY(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
     return 8 << __NE_TextureGetRawY(tex);
 }
 
-int NE_TextureGetSizeX(NE_Material *tex)
+int NE_TextureGetSizeX(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
     return NE_Texture[tex->texindex].sizex;
 }
 
-int NE_TextureGetSizeY(NE_Material *tex)
+int NE_TextureGetSizeY(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
@@ -732,7 +732,7 @@ static int drawingtexture_type;
 static int drawingtexture_realx;
 static u32 ne_vram_saved;
 
-void *NE_TextureDrawingStart(NE_Material *tex)
+void *NE_TextureDrawingStart(const NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");

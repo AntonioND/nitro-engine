@@ -145,7 +145,7 @@ void NE_PaletteDelete(NE_Palette *pal)
     NE_DebugPrint("Material not found");
 }
 
-void NE_PaletteUse(NE_Palette *pal)
+void NE_PaletteUse(const NE_Palette *pal)
 {
     NE_AssertPointer(pal, "NULL pointer");
     NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
@@ -262,7 +262,7 @@ void NE_PaletteSystemEnd(void)
 static u16 *palette_adress = NULL;
 static int palette_format;
 
-void *NE_PaletteModificationStart(NE_Palette *pal)
+void *NE_PaletteModificationStart(const NE_Palette *pal)
 {
     NE_AssertPointer(pal, "NULL pointer");
     NE_Assert(pal->index != NE_NO_PALETTE, "No asigned palette");
