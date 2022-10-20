@@ -10,14 +10,10 @@
 
 #include <NEMain.h>
 
-// To use this example you have to patch the NDS ROM with DLDI and copy
-// nitro-engine folder to the root of your card.
-//
-// It will load the two BMPs and you will be able to take a screenshot.
-
 NE_Camera *Camera;
 NE_Model *Model;
-NE_Material *OpaqueMaterial, *TransparentMaterial;
+NE_Material *MaterialBlue, *MaterialRed;
+NE_Palette *PaletteBlue, *PaletteRed;
 
 void Draw3DScene(void)
 {
@@ -54,31 +50,39 @@ int main(void)
     // Allocate space for objects...
     Model = NE_ModelCreate(NE_Static);
     Camera = NE_CameraCreate();
-    OpaqueMaterial = NE_MaterialCreate();
-    TransparentMaterial = NE_MaterialCreate();
+    MaterialBlue = NE_MaterialCreate();
+    MaterialRed = NE_MaterialCreate();
+    PaletteBlue = NE_PaletteCreate();
+    PaletteRed = NE_PaletteCreate();
 
     // Setup camera
     NE_CameraSet(Camera,
-                 -2, -2, -2,
+                 -1, -1, -1,
                   0, 0, 0,
                   0, 1, 0);
 
     // Load things from FAT
     NE_ModelLoadStaticMeshFAT(Model, "cube.bin");
-    NE_FATMaterialTexLoadBMPtoRGBA(TransparentMaterial, "bmp16bit_x1rgb5.bmp", 1);
-    NE_FATMaterialTexLoadBMPtoRGBA(OpaqueMaterial, "bmp24bit.bmp", 0);
+
+    NE_MaterialTexLoadFAT(MaterialBlue, NE_A3PAL32, 64, 64, NE_TEXGEN_TEXCOORD,
+                          "spiral_blue_pal32_tex.bin");
+    NE_MaterialTexLoadFAT(MaterialRed, NE_A3PAL32, 64, 64, NE_TEXGEN_TEXCOORD,
+                          "spiral_red_pal32_tex.bin");
+
+    NE_PaletteLoadFAT(PaletteBlue, "spiral_blue_pal32_pal.bin", NE_A3PAL32);
+    NE_PaletteLoadFAT(PaletteRed, "spiral_red_pal32_pal.bin", NE_A3PAL32);
+
+    NE_MaterialTexSetPal(MaterialBlue, PaletteBlue);
+    NE_MaterialTexSetPal(MaterialRed, PaletteRed);
 
     // Assign material to model
-    NE_ModelSetMaterial(Model, TransparentMaterial);
+    NE_ModelSetMaterial(Model, MaterialBlue);
 
     // Set up light
     NE_LightSet(0, NE_White, 0, -1, -1);
 
     // Background color
     NE_ClearColorSet(NE_Gray, 31, 63);
-
-    // Reduce size of the cube, the original model is 7.5 x 7.5 x 7.5
-    NE_ModelScale(Model, 0.3, 0.3, 0.3);
 
     while (1)
     {
@@ -90,9 +94,9 @@ int main(void)
 
         // Change material if pressed
         if (keys & KEY_B)
-            NE_ModelSetMaterial(Model, OpaqueMaterial);
+            NE_ModelSetMaterial(Model, MaterialBlue);
         if (keys & KEY_A)
-            NE_ModelSetMaterial(Model, TransparentMaterial);
+            NE_ModelSetMaterial(Model, MaterialRed);
 
         printf("\x1b[0;0HA/B: Change material.\n\nSTART: Exit.");
 
