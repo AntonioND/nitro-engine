@@ -4,11 +4,22 @@
 //
 // This file is part of Nitro Engine
 
+// The depth bitmap is a bit complicated... It is quite difficult to regulate
+// the depth so that the image and the result make sense.
+//
+// With img2ds, the color you have to use to set the depth is blue. The clear
+// bitmap is in its farthest point if blue is 255.
+//
+// If you want to hide everything, including the 2D projection, use red (any
+// value overrides the value in the blue channel).
+//
+// Check assets.sh to see how to convert the images.
+
 #include <NEMain.h>
 
 #include "background_tex_bin.h"
 #include "depth_tex_bin.h"
-#include "model_bin.h"
+#include "cube_bin.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -53,7 +64,7 @@ int main(void)
                  0, 1, 0);
 
     Model = NE_ModelCreate(NE_Static);
-    NE_ModelLoadStaticMesh(Model, (u32 *)model_bin);
+    NE_ModelLoadStaticMesh(Model, (u32 *)cube_bin);
 
     NE_LightSet(0, NE_Yellow, -1, -1, 0);
     NE_LightSet(1, NE_Red, -1, 1, 0);
