@@ -226,17 +226,20 @@ void NE_ModelDraw(NE_Model *model)
     {
         if (model->animinfo[0]->animation && model->animinfo[1]->animation)
         {
-            DSMA_DrawModelBlendAnimation(model->meshdata,
+            int ret = DSMA_DrawModelBlendAnimation(model->meshdata,
                     model->animinfo[0]->animation->data,
                     model->animinfo[0]->currframe,
                     model->animinfo[1]->animation->data,
                     model->animinfo[1]->currframe,
                     model->anim_blend);
+            NE_Assert(ret == DSMA_SUCCESS, "Failed to draw animated model");
         }
         else // if (model->animinfo[0]->animation)
         {
-            DSMA_DrawModel(model->meshdata, model->animinfo[0]->animation->data,
-                           model->animinfo[0]->currframe);
+            int ret = DSMA_DrawModel(model->meshdata,
+                                     model->animinfo[0]->animation->data,
+                                     model->animinfo[0]->currframe);
+            NE_Assert(ret == DSMA_SUCCESS, "Failed to draw animated model");
         }
     }
 
