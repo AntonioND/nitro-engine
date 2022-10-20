@@ -91,9 +91,9 @@ void NE_SwapScreens(void);
 /// @param y2 (x2, y2) Top right pixel.
 void NE_Viewport(int x1, int y1, int x2, int y2);
 
-///  Set cameras Fov.
+///  Set cameras field of view.
 ///
-///  @param fovValue Fov [0,...].
+///  @param fovValue FOV [0, ...] in degrees.
 void NE_SetFov(int fovValue);
 
 /// Set near and far clipping planes.

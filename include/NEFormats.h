@@ -17,6 +17,9 @@
 /// Functions to convert BMP files into DS textures. They support BMP of 4, 8,
 /// 16 (X1RGB5) and 24 bits per pixel.
 ///
+/// It is discouraged to use this set of functions. Instead, use preconverted
+/// textures.
+///
 /// @{
 
 // TODO: PACKED breaks Doxygen
