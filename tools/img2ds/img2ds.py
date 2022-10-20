@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>
 
-# This tool depends on pillow: pip3 install pillow
+# This tool depends on pillow: pip3 install pillow (tested with version 9.0.1)
 
 import os
 
@@ -63,6 +63,10 @@ class Palette():
 
 
 def convert_a1rgb5(img):
+    print("Converting to A1RGB5:")
+    print("- If image alpha == 0 -> Result alpha = 0")
+    print("- If image alpha != 0 -> Result alpha = 1")
+
     texture = []
     palette = []
 
@@ -83,6 +87,11 @@ def convert_a1rgb5(img):
 
 
 def convert_pal256(img):
+    print("Converting to RGB256:")
+    print("- If image alpha == 0 -> Color index = 0")
+    print("- If image alpha != 0 -> Color index = actual color")
+    print("- Use NE_TEXTURE_COLOR0_TRANSPARENT to make color 0 transparent")
+
     texture = []
     palette = []
 
@@ -119,6 +128,11 @@ def convert_pal256(img):
 
 
 def convert_pal16(img):
+    print("Converting to RGB16:")
+    print("- If image alpha == 0 -> Color index = 0")
+    print("- If image alpha != 0 -> Color index = actual color")
+    print("- Use NE_TEXTURE_COLOR0_TRANSPARENT to make color 0 transparent")
+
     texture = []
     palette = []
 
@@ -162,6 +176,11 @@ def convert_pal16(img):
 
 
 def convert_pal4(img):
+    print("Converting to RGB4:")
+    print("- If image alpha == 0 -> Color index = 0")
+    print("- If image alpha != 0 -> Color index = actual color")
+    print("- Use NE_TEXTURE_COLOR0_TRANSPARENT to make color 0 transparent")
+
     texture = []
     palette = []
 
@@ -207,6 +226,8 @@ def convert_pal4(img):
 
 
 def convert_a3pal32(img):
+    print("Converting to A3PAL32")
+
     texture = []
     palette = []
 
@@ -246,6 +267,8 @@ def convert_a3pal32(img):
 
 
 def convert_a5pal8(img):
+    print("Converting to A5PAL8")
+
     texture = []
     palette = []
 
@@ -285,6 +308,14 @@ def convert_a5pal8(img):
 
 
 def convert_depthbmp(img):
+    print("Converting to DEPTHBMP:")
+    print("- Depth is calculated like this:")
+    print("    if (R > 0) -> Value = 0x00000 (Hides 2D + 3D)")
+    print("    else -> Value = 0x67FF + (0x1800 * B / 255) (Gradually hides 3D)")
+    print("- If image alpha == 0 -> Fog = 1")
+    print("- If image alpha != 0 -> Fog = 0")
+    print("- NOTE: This may change in the future")
+
     texture = []
     palette = []
 
@@ -366,8 +397,8 @@ if __name__ == "__main__":
                         help="output name: [name]_tex.bin, [name]_pal.bin")
     parser.add_argument("--output", required=True,
                         help="output directory")
-    parser.add_argument("--format", required=True,
-        help="format of the texture: A1RGB5, PAL258, PAL16, PAL4, A3PAL32, A5PAL8, DEPTHBMP")
+    parser.add_argument("--format", required=True, choices=VALID_FORMATS,
+                        help="format of the texture")
 
     args = parser.parse_args()
 
