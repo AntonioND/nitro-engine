@@ -90,7 +90,8 @@ If you want to contact me (Antonio Niño Díaz) directly you can email me at:
 License
 -------
 
-The code of this repository is under the MIT license.
+The code of this repository is under the MIT license. The examples are under the
+CC0-1.0 license.
 
 The full text of the licenses can be found under the ``licenses`` folder.
 
@@ -100,15 +101,14 @@ Future work
 - Asynchronous loading of assets.
 - Support for compressed textures.
 
-Credits
--------
+Thanks to
+---------
 
-- Michael Noland (joat), Jason Rogers (dovoto) and Dave Murphy (WinterMute) for
-  libnds.
-- The maintainers of devkitPro.
-- Chishm for libfat and DLDI
-- The guys of gbadev for their help
-- Martin Korth for no$gba and gbatek
-- Kasikiare for NDS Model Exporter
-- PadrinatoR for NDS Mesh Converter
-- Ti-Ra-Nog for his help testing the engine
+- **devkitPro**: https://devkitpro.org/
+- **libnds**: https://github.com/devkitPro/libnds
+- **DLDI**: https://www.chishm.com/DLDI/
+- **DeSmuME**: http://desmume.org/
+- **melonDS**: https://melonds.kuribo64.net/
+- **no$gba**: https://problemkaputt.de/gba.htm
+- **gbatek**: https://problemkaputt.de/gbatek.htm
+- **gbadev forums**: https://forum.gbadev.org/
