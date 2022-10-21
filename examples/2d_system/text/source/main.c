@@ -11,12 +11,13 @@
 
 NE_Material *Text, *Text2;
 
+touchPosition touch;
+
 void Draw3DScene(void)
 {
     NE_2DViewInit(); // Init 2D view
 
     scanKeys(); // Update stylus coordinates when screen is pressed
-    touchPosition touch;
 
     if (keysHeld() & KEY_TOUCH)
         touchRead(&touch);
@@ -50,6 +51,8 @@ int main(void)
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
+
+    memset(&touch, 0, sizeof(touchPosition));
 
     NE_Init3D();
     // Move 3D screen to lower screen
