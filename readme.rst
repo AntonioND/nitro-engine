@@ -56,7 +56,7 @@ Setup
    Engine, you should link with ``-lNE_debug``, and add ``-DNE_DEBUG`` to the
    ``CFLAGS`` and ``CPPFLAGS`` in your Makefile. Make sure to clean and rebuild
    your project after doing the changes mentioned in this step. Check the
-   **error_handling** function to see how to use the debug mode of Nitro Engine.
+   **error_handling** example to see how to use the debug mode of Nitro Engine.
 
 Screenshots
 -----------
