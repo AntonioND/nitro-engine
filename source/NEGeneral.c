@@ -141,11 +141,11 @@ static void NE_Init__(void)
     NE_AnimationSystemReset(0);
     NE_TextPriorityReset();
 
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
+    MATRIX_CONTROL = GL_TEXTURE;
+    MATRIX_IDENTITY = 0;
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    MATRIX_CONTROL = GL_PROJECTION;
+    MATRIX_IDENTITY = 0;
 
     // The DS uses a table for shinyness..this generates a half-ass one
     glMaterialShinyness();
@@ -170,8 +170,8 @@ static void NE_Init__(void)
     fov = 70;
     NE_Viewport(0, 0, 255, 191);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    MATRIX_CONTROL = GL_MODELVIEW;
+    MATRIX_IDENTITY = 0;
 
     // Ready!!
 
@@ -591,13 +591,13 @@ void NE_TouchTestStart(void)
     glViewport(255, 255, 255, 255);
 
     // Save current state
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
+    MATRIX_CONTROL = GL_MODELVIEW;
+    MATRIX_PUSH = 0;
+    MATRIX_CONTROL = GL_PROJECTION;
+    MATRIX_PUSH = 0;
 
     // Setup temporary render environment
-    glLoadIdentity();
+    MATRIX_IDENTITY = 0;
 
     int temp[4] = {
         NE_viewport[0], NE_viewport[1], NE_viewport[2], NE_viewport[3]
@@ -608,7 +608,7 @@ void NE_TouchTestStart(void)
     gluPerspectivef32(fov * DEGREES_IN_CIRCLE / 360, NE_screenratio,
                       ne_znear, ne_zfar);
 
-    glMatrixMode(GL_MODELVIEW);
+    MATRIX_CONTROL = GL_MODELVIEW;
 
     NE_Assert(!NE_TestTouch, "Test already active");
 
@@ -656,8 +656,8 @@ void NE_TouchTestEnd(void)
     glViewport(NE_viewport[0], NE_viewport[1], NE_viewport[2], NE_viewport[3]);
 
     // Restore previous state
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix(1);
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix(1);
+    MATRIX_CONTROL = GL_PROJECTION;
+    MATRIX_POP = 1;
+    MATRIX_CONTROL = GL_MODELVIEW;
+    MATRIX_POP = 1;
 }

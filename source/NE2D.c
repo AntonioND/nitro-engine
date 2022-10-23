@@ -173,7 +173,7 @@ void NE_SpriteDraw(const NE_Sprite *sprite)
 
     if (sprite->rot_angle)
     {
-        glPushMatrix();
+        MATRIX_PUSH = 0;
 
         NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
                                         sprite->y + (sprite->h >> 1),
@@ -195,7 +195,7 @@ void NE_SpriteDraw(const NE_Sprite *sprite)
                                sprite->priority, sprite->mat, sprite->color);
 
     if (sprite->rot_angle)
-        glPopMatrix(1);
+        MATRIX_POP = 1;
 }
 
 void NE_SpriteDrawAll(void)
@@ -215,7 +215,7 @@ void NE_SpriteDrawAll(void)
 
         if (sprite->rot_angle)
         {
-            glPushMatrix();
+            MATRIX_PUSH = 0;
 
             NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
                                             sprite->y + (sprite->h >> 1),
@@ -239,7 +239,7 @@ void NE_SpriteDrawAll(void)
                                    sprite->mat, sprite->color);
 
         if (sprite->rot_angle)
-            glPopMatrix(1);
+            MATRIX_POP = 1;
     }
 }
 
