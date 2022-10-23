@@ -258,7 +258,7 @@ int __NE_TextureGetRawY(const NE_Material *tex);
 
 void NE_2DViewInit(void)
 {
-    glViewport(0, 0, 255, 191);
+    GFX_VIEWPORT = 0 | (0 << 8) | (255 << 16) | (191 << 24);
 
     // The projection matrix actually thinks that the size of the DS is
     // (256 << 12) x (192 << 12). After this, we scale the MODELVIEW matrix to

@@ -17,7 +17,7 @@ const char NE_VersioString[] =
 static bool NE_UsingConsole;
 bool NE_TestTouch;
 static int NE_screenratio;
-static u8 NE_viewport[4];
+static uint32_t NE_viewport;
 static u8 NE_Screen;
 bool NE_Dual;
 
@@ -79,12 +79,9 @@ void NE_End(void)
 
 void NE_Viewport(int x1, int y1, int x2, int y2)
 {
-    glViewport(x1, y1, x2, y2);
-
-    NE_viewport[0] = x1;
-    NE_viewport[1] = y1;
-    NE_viewport[2] = x2;
-    NE_viewport[3] = y2;
+    // Save viewport
+    NE_viewport = x1 | (y1 << 8) | (x2 << 16) | (y2 << 24);
+    GFX_VIEWPORT = NE_viewport;
 
     NE_screenratio = divf32((x2 - x1 + 1) << 12, (y2 - y1 + 1) << 12);
 
@@ -293,7 +290,7 @@ void NE_Process(NE_Voidfunc drawscene)
 {
     NE_UpdateInput();
 
-    glViewport(NE_viewport[0], NE_viewport[1], NE_viewport[2], NE_viewport[3]);
+    GFX_VIEWPORT = NE_viewport;
 
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
@@ -355,12 +352,8 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
-    glViewport(0, 0, 255, 191);
-
-    NE_viewport[0] = 0;
-    NE_viewport[1] = 0;
-    NE_viewport[2] = 255;
-    NE_viewport[3] = 191;
+    NE_viewport = 0 | (0 << 8) | (255 << 16) | (191 << 24);
+    GFX_VIEWPORT = NE_viewport;
 
     MATRIX_CONTROL = GL_PROJECTION;
     MATRIX_IDENTITY = 0;
@@ -588,7 +581,7 @@ static int ne_vertexcount;
 void NE_TouchTestStart(void)
 {
     // Hide what we are going to draw
-    glViewport(255, 255, 255, 255);
+    GFX_VIEWPORT = 255 | (255 << 8) | (255 << 16) | (255 << 24);
 
     // Save current state
     MATRIX_CONTROL = GL_MODELVIEW;
@@ -600,7 +593,10 @@ void NE_TouchTestStart(void)
     MATRIX_IDENTITY = 0;
 
     int temp[4] = {
-        NE_viewport[0], NE_viewport[1], NE_viewport[2], NE_viewport[3]
+        NE_viewport & 0xFF,
+        (NE_viewport >> 8) & 0xFF,
+        (NE_viewport >> 16) & 0xFF,
+        (NE_viewport >> 24) & 0xFF
     };
 
     // Render only what is below the cursor
@@ -653,7 +649,7 @@ void NE_TouchTestEnd(void)
     NE_TestTouch = false;
 
     // Reset the viewport
-    glViewport(NE_viewport[0], NE_viewport[1], NE_viewport[2], NE_viewport[3]);
+    GFX_VIEWPORT = NE_viewport;
 
     // Restore previous state
     MATRIX_CONTROL = GL_PROJECTION;
