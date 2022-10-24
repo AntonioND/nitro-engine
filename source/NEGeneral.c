@@ -7,6 +7,7 @@
 #include <nds/arm9/postest.h>
 
 #include "NEMain.h"
+#include "NEMath.h"
 
 /// @file NEGeneral.c
 
@@ -79,16 +80,19 @@ void NE_End(void)
 
 void NE_Viewport(int x1, int y1, int x2, int y2)
 {
+    // Start calculating screen ratio in f32 format
+    ne_div_start((x2 - x1 + 1) << 12, (y2 - y1 + 1));
+
     // Save viewport
     NE_viewport = x1 | (y1 << 8) | (x2 << 16) | (y2 << 24);
     GFX_VIEWPORT = NE_viewport;
 
-    NE_screenratio = divf32((x2 - x1 + 1) << 12, (y2 - y1 + 1) << 12);
-
     MATRIX_CONTROL = GL_PROJECTION; // New projection matix for this viewport
     MATRIX_IDENTITY = 0;
-    gluPerspectivef32(fov * DEGREES_IN_CIRCLE / 360, NE_screenratio,
-                      ne_znear, ne_zfar);
+
+    int fovy = fov * DEGREES_IN_CIRCLE / 360;
+    NE_screenratio = ne_div_result();
+    gluPerspectivef32(fovy, NE_screenratio, ne_znear, ne_zfar);
 
     MATRIX_CONTROL = GL_MODELVIEW;
 }
@@ -290,9 +294,9 @@ void NE_Process(NE_Voidfunc drawscene)
 {
     NE_UpdateInput();
 
-    GFX_VIEWPORT = NE_viewport;
-
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    GFX_VIEWPORT = NE_viewport;
 
     MATRIX_CONTROL = GL_PROJECTION;
     MATRIX_IDENTITY = 0;
@@ -352,15 +356,8 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
-    NE_viewport = 0 | (0 << 8) | (255 << 16) | (191 << 24);
-    GFX_VIEWPORT = NE_viewport;
+    NE_Viewport(0, 0, 255, 191);
 
-    MATRIX_CONTROL = GL_PROJECTION;
-    MATRIX_IDENTITY = 0;
-    gluPerspectivef32(fov * DEGREES_IN_CIRCLE / 360,
-                      floattof32(256.0 / 192.0), ne_znear, ne_zfar);
-
-    MATRIX_CONTROL = GL_MODELVIEW;
     MATRIX_IDENTITY = 0;
 
     NE_AssertPointer(topscreen, "NULL function pointer (top screen)");
