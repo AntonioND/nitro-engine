@@ -85,19 +85,22 @@ void NE_OutliningSetColor(u32 index, u32 color)
 {
     NE_AssertMinMax(0, index, 7, "Invalaid outlining color index %lu", index);
 
-    glSetOutlineColor(index, color);
+    GFX_EDGE_TABLE[index] = color;
 }
 
 void NE_ShadingEnable(bool value)
 {
     if (value)
     {
-        glSetToonTableRange(0, 15, RGB15(8, 8, 8));
-        glSetToonTableRange(16, 31, RGB15(24, 24, 24));
+        for (int i = 0; i < 16; i++)
+            GFX_TOON_TABLE[i] = RGB15(8, 8, 8);
+        for (int i = 16; i < 32; i++)
+            GFX_TOON_TABLE[i] = RGB15(24, 24, 24);
     }
     else
     {
-        glSetToonTableRange(0, 31, 0);
+        for (int i = 0; i < 32; i++)
+            GFX_TOON_TABLE[i] = 0;
     }
 }
 
