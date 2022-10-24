@@ -117,8 +117,8 @@ static void NE_Init__(void)
     // Clear the FIFO
     GFX_STATUS |= (1 << 29);
 
-    glFlush(0);
-    glFlush(0);
+    GFX_FLUSH = 0;
+    GFX_FLUSH = 0;
 
     lcdMainOnTop();
 
@@ -126,11 +126,12 @@ static void NE_Init__(void)
 
     GFX_CONTROL = GL_TEXTURE_2D | GL_ANTIALIAS | GL_BLEND;
 
-    glAlphaFunc(BLEND_ALPHA);
+    GFX_ALPHA_TEST = 0;
 
     NE_ClearColorSet(NE_Black, 31, 63);
     NE_FogEnableBackground(false);
-    glClearDepth(GL_MAX_DEPTH);
+
+    GFX_CLEAR_DEPTH = GL_MAX_DEPTH;
 
     // Default number of objects for everyting - Textures are inited in
     // NE_Init3D and NE_InitDual3D
