@@ -72,6 +72,20 @@ void NE_LightSetI(int index, u32 color, int x, int y, int z);
 /// @param color Color.
 void NE_LightSetColor(int index, u32 color);
 
+/// Types of functions used to generate a shininess table.
+typedef enum {
+    NE_SHININESS_NONE,      ///< Fill table with zeroes
+    NE_SHININESS_LINEAR,    ///< Increase values linearly
+    NE_SHININESS_QUADRATIC, ///< Increase values proportionaly to x^2
+    NE_SHININESS_CUBIC,     ///< Increase values proportionaly to x^3
+    NE_SHININESS_QUARTIC    ///< Increase values proportionaly to x^4
+} NE_ShininessFunction;
+
+/// Generate and load a shininess table used for specular lighting.
+///
+/// @param function The name of the function used to generate the table.
+void NE_ShininessTableGenerate(NE_ShininessFunction function);
+
 /// Begins a polygon.
 ///
 /// @param mode Type of polygon to draw (GL_TRIANGLE, GL_QUAD...).

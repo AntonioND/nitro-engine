@@ -149,8 +149,8 @@ static void NE_Init__(void)
     MATRIX_CONTROL = GL_PROJECTION;
     MATRIX_IDENTITY = 0;
 
-    // The DS uses a table for shinyness..this generates a half-ass one
-    glMaterialShinyness();
+    // Shininess table used for specular lighting
+    NE_ShininessTableGenerate(NE_SHININESS_CUBIC);
 
     // setup default material properties
     NE_MaterialSetDefaultPropierties(RGB15(20, 20, 20), RGB15(16, 16, 16),

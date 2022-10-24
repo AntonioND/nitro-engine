@@ -37,6 +37,56 @@ void NE_LightSetI(int index, u32 color, int x, int y, int z)
     GFX_LIGHT_COLOR = ((index & 3) << 30) | color;
 }
 
+void NE_ShininessTableGenerate(NE_ShininessFunction function)
+{
+    uint32_t table[128 / 4];
+    uint8_t *bytes = (uint8_t *)table;
+
+    if (function == NE_SHININESS_LINEAR)
+    {
+        for (int i = 0; i < 128; i++)
+            bytes[i] = i * 2;
+            //bytes[i] = 128 - i;
+    }
+    else if (function == NE_SHININESS_QUADRATIC)
+    {
+        for (int i = 0; i < 128; i++)
+        {
+            int v = i * i;
+            int div = 128;
+            bytes[i] = v * 2 / div;
+        }
+    }
+    else if (function == NE_SHININESS_CUBIC)
+    {
+        for (int i = 0; i < 128; i++)
+        {
+            int v = i * i * i;
+            int div = 128 * 128;
+            bytes[i] = v * 2 / div;
+        }
+    }
+    else if (function == NE_SHININESS_QUARTIC)
+    {
+        for (int i = 0; i < 128; i++)
+        {
+            int v = i * i * i * i;
+            int div = 128 * 128 * 128;
+            bytes[i] = v * 2 / div;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 128 / 4; i++)
+            GFX_SHININESS = 0;
+
+        return;
+    }
+
+    for (int i = 0; i < 128 / 4; i++)
+        GFX_SHININESS = table[i];
+}
+
 void NE_PolyBegin(int mode)
 {
     GFX_BEGIN = mode;
