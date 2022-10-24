@@ -64,11 +64,11 @@ int main(void)
 
     // Set some propierties to Material
     NE_MaterialSetPropierties(Material,
-                              RGB15(31, 31, 31), // Diffuse
+                              RGB15(0, 0, 0),    // Diffuse
                               RGB15(0, 0, 0),    // Ambient
-                              RGB15(0, 0, 0),    // Specular
+                              RGB15(31, 31, 31), // Specular
                               RGB15(0, 0, 0),    // Emission
-                              false, false);     // Vtx color, use shininess table
+                              false, true);      // Vtx color, use shininess table
 
     // Set light color and direction
     NE_LightSet(0, NE_White, 0, 1, 0);
@@ -76,13 +76,19 @@ int main(void)
     NE_LightSet(2, NE_Red, 1, 0, 0);
     NE_LightSet(3, NE_Green, -1, 0, 0);
 
+    NE_ShininessFunction shininess = NE_SHININESS_QUADRATIC;
+
     while (1)
     {
         // Get keys information
         scanKeys();
         uint32 keys = keysHeld();
+        uint32 keys_down = keysDown();
 
-        printf("\x1b[0;0HPad: Rotate.\nA: Set wireframe mode.");
+        printf("\x1b[0;0H"
+               "PAD: Rotate\n"
+               "A: Set wireframe mode\n"
+               "L/R: Change shininess\n");
 
         // Rotate model
         if (keys & KEY_UP)
@@ -98,6 +104,28 @@ int main(void)
             wireframe = true;
         else
             wireframe = false;
+
+        const char *names[] = {
+            [NE_SHININESS_NONE]      = "None     ",
+            [NE_SHININESS_LINEAR]    = "Linear   ",
+            [NE_SHININESS_QUADRATIC] = "Quadratic",
+            [NE_SHININESS_CUBIC]     = "Cubic    ",
+            [NE_SHININESS_QUARTIC]   = "Quartic  "
+        };
+        printf("\nShininess: %s", names[shininess]);
+
+        if (keys_down & KEY_L)
+        {
+            if (shininess > NE_SHININESS_NONE)
+                shininess--;
+        }
+        if (keys_down & KEY_R)
+        {
+            if (shininess < NE_SHININESS_QUARTIC)
+                shininess++;
+        }
+
+        NE_ShininessTableGenerate(shininess);
 
         NE_Process(Draw3DScene);
         NE_WaitForVBL(0);
