@@ -11,27 +11,33 @@
 #include "teapot_tex_bin.h"
 
 NE_Camera *Camera;
-NE_Model *Model;
-NE_Material *Material;
+NE_Model *ModelSpecular, *ModelDiffuse;
+NE_Material *MaterialSpecular, *MaterialDiffuse;
 
 bool wireframe;
 
-void Draw3DScene(void)
+void Draw3DScene1(void)
 {
     NE_CameraUse(Camera);
 
-    if (wireframe)
-        NE_PolyFormat(0, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
-    else
-        NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+    NE_PolyFormat(wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
-    NE_ModelDraw(Model);
+    NE_ModelDraw(ModelSpecular);
 
-    printf("\x1b[10;0H"
+    printf("\x1b[22;0H"
            "Polygon count: %d   \n"
            "Vertex count: %d   ",
            NE_GetPolygonCount(),
            NE_GetVertexCount());
+}
+
+void Draw3DScene2(void)
+{
+    NE_CameraUse(Camera);
+
+    NE_PolyFormat(wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    NE_ModelDraw(ModelDiffuse);
 }
 
 int main(void)
@@ -40,16 +46,15 @@ int main(void)
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
-    NE_Init3D();
-    // libnds uses VRAM_C for the text console, reserve A and B only
-    NE_TextureSystemReset(0, 0, NE_VRAM_AB);
-    // Init console in non-3D screen
-    consoleDemoInit();
+    NE_InitDual3D();
+    NE_InitConsole();
 
     // Allocate objects
-    Model = NE_ModelCreate(NE_Static);
     Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
+    ModelSpecular = NE_ModelCreate(NE_Static);
+    ModelDiffuse = NE_ModelCreate(NE_Static);
+    MaterialSpecular = NE_MaterialCreate();
+    MaterialDiffuse = NE_MaterialCreate();
 
     // Setup camera
     NE_CameraSet(Camera,
@@ -57,13 +62,35 @@ int main(void)
                  0, 0, 0,
                  0, 1, 0);
 
-    // Load model. The texture coordinates are outside of [0.0, 1.0], so it is
-    // needed to enable wrapping.
-    NE_ModelLoadStaticMesh(Model, (u32*)teapot_bin);
-    NE_MaterialTexLoad(Material, NE_A1RGB5, 256, 256,
+    // Load model
+    NE_ModelLoadStaticMesh(ModelSpecular, (u32*)teapot_bin);
+    NE_ModelClone(ModelDiffuse, ModelSpecular);
+
+    // Load texture and clone it. The texture coordinates of the model are
+    // outside of [0.0, 1.0], so it is needed to enable wrapping.
+    NE_MaterialTexLoad(MaterialSpecular, NE_A1RGB5, 256, 256,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
                        (u8 *)teapot_tex_bin);
-    NE_ModelSetMaterial(Model, Material);
+    NE_MaterialClone(MaterialSpecular, MaterialDiffuse);
+
+    NE_ModelSetMaterial(ModelSpecular, MaterialSpecular);
+    NE_ModelSetMaterial(ModelDiffuse, MaterialDiffuse);
+
+    // Set some propierties to the materials
+
+    NE_MaterialSetPropierties(MaterialSpecular,
+                              RGB15(0, 0, 0),    // Diffuse
+                              RGB15(0, 0, 0),    // Ambient
+                              RGB15(31, 31, 31), // Specular
+                              RGB15(0, 0, 0),    // Emission
+                              false, true);      // Vtx color, use shininess table
+
+    NE_MaterialSetPropierties(MaterialDiffuse,
+                              RGB15(31, 31, 31), // Diffuse
+                              RGB15(0, 0, 0),    // Ambient
+                              RGB15(0, 0, 0),    // Specular
+                              RGB15(0, 0, 0),    // Emission
+                              false, false);     // Vtx color, use shininess table
 
     // Set light color and direction
     NE_LightSet(0, NE_White, 0, 1, 0);
@@ -71,8 +98,7 @@ int main(void)
     NE_LightSet(2, NE_Red, 1, 0, 0);
     NE_LightSet(3, NE_Green, -1, 0, 0);
 
-    bool use_specular = true;
-    NE_ShininessFunction shininess = NE_SHININESS_QUADRATIC;
+    NE_ShininessFunction shininess = NE_SHININESS_CUBIC;
 
     while (1)
     {
@@ -84,7 +110,6 @@ int main(void)
         printf("\x1b[0;0H"
                "PAD: Rotate\n"
                "A: Set wireframe mode\n"
-               "X/Y: Specular or diffuse\n"
                "L/R: Change shininess\n");
 
         if (keys & KEY_A)
@@ -94,13 +119,25 @@ int main(void)
 
         // Rotate model
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, -2, 0, 0);
+        {
+            NE_ModelRotate(ModelSpecular, -2, 0, 0);
+            NE_ModelRotate(ModelDiffuse, -2, 0, 0);
+        }
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 2, 0, 0);
+        {
+            NE_ModelRotate(ModelSpecular, 2, 0, 0);
+            NE_ModelRotate(ModelDiffuse, 2, 0, 0);
+        }
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+        {
+            NE_ModelRotate(ModelSpecular, 0, 2, 0);
+            NE_ModelRotate(ModelDiffuse, 0, 2, 0);
+        }
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+        {
+            NE_ModelRotate(ModelSpecular, 0, -2, 0);
+            NE_ModelRotate(ModelDiffuse, 0, -2, 0);
+        }
 
         // Shininess table
         // ---------------
@@ -127,38 +164,7 @@ int main(void)
 
         NE_ShininessTableGenerate(shininess);
 
-        // Diffuse or specular
-        // -------------------
-
-        if (keys & KEY_X)
-            use_specular = true;
-        if (keys & KEY_Y)
-            use_specular = false;
-
-        if (use_specular)
-        {
-            // Set some propierties to Material
-            NE_MaterialSetPropierties(Material,
-                        RGB15(0, 0, 0),    // Diffuse
-                        RGB15(0, 0, 0),    // Ambient
-                        RGB15(31, 31, 31), // Specular
-                        RGB15(0, 0, 0),    // Emission
-                        false, true);      // Vtx color, use shininess table
-        }
-        else
-        {
-            // Set some propierties to Material
-            NE_MaterialSetPropierties(Material,
-                        RGB15(31, 31, 31), // Diffuse
-                        RGB15(0, 0, 0),    // Ambient
-                        RGB15(0, 0, 0),    // Specular
-                        RGB15(0, 0, 0),    // Emission
-                        false, false);     // Vtx color, use shininess table
-        }
-
-        printf("\nMaterial type: %s", use_specular ? "Specular" : "Diffuse ");
-
-        NE_Process(Draw3DScene);
+        NE_ProcessDual(Draw3DScene1, Draw3DScene2);
         NE_WaitForVBL(0);
     }
 
