@@ -27,8 +27,11 @@ void Draw3DScene(void)
 
     NE_ModelDraw(Model);
 
-    printf("\x1b[5;0HPolygon count: %d   \nVertex count: %d   ",
-           NE_GetPolygonCount(), NE_GetVertexCount());
+    printf("\x1b[10;0H"
+           "Polygon count: %d   \n"
+           "Vertex count: %d   ",
+           NE_GetPolygonCount(),
+           NE_GetVertexCount());
 }
 
 int main(void)
@@ -62,20 +65,13 @@ int main(void)
                        (u8 *)teapot_tex_bin);
     NE_ModelSetMaterial(Model, Material);
 
-    // Set some propierties to Material
-    NE_MaterialSetPropierties(Material,
-                              RGB15(0, 0, 0),    // Diffuse
-                              RGB15(0, 0, 0),    // Ambient
-                              RGB15(31, 31, 31), // Specular
-                              RGB15(0, 0, 0),    // Emission
-                              false, true);      // Vtx color, use shininess table
-
     // Set light color and direction
     NE_LightSet(0, NE_White, 0, 1, 0);
     NE_LightSet(1, NE_Blue, 0, -1, 0);
     NE_LightSet(2, NE_Red, 1, 0, 0);
     NE_LightSet(3, NE_Green, -1, 0, 0);
 
+    bool use_specular = true;
     NE_ShininessFunction shininess = NE_SHININESS_QUADRATIC;
 
     while (1)
@@ -88,7 +84,13 @@ int main(void)
         printf("\x1b[0;0H"
                "PAD: Rotate\n"
                "A: Set wireframe mode\n"
+               "X/Y: Specular or diffuse\n"
                "L/R: Change shininess\n");
+
+        if (keys & KEY_A)
+            wireframe = true;
+        else
+            wireframe = false;
 
         // Rotate model
         if (keys & KEY_UP)
@@ -100,10 +102,8 @@ int main(void)
         if (keys & KEY_LEFT)
             NE_ModelRotate(Model, 0, -2, 0);
 
-        if (keys & KEY_A)
-            wireframe = true;
-        else
-            wireframe = false;
+        // Shininess table
+        // ---------------
 
         const char *names[] = {
             [NE_SHININESS_NONE]      = "None     ",
@@ -126,6 +126,37 @@ int main(void)
         }
 
         NE_ShininessTableGenerate(shininess);
+
+        // Diffuse or specular
+        // -------------------
+
+        if (keys & KEY_X)
+            use_specular = true;
+        if (keys & KEY_Y)
+            use_specular = false;
+
+        if (use_specular)
+        {
+            // Set some propierties to Material
+            NE_MaterialSetPropierties(Material,
+                        RGB15(0, 0, 0),    // Diffuse
+                        RGB15(0, 0, 0),    // Ambient
+                        RGB15(31, 31, 31), // Specular
+                        RGB15(0, 0, 0),    // Emission
+                        false, true);      // Vtx color, use shininess table
+        }
+        else
+        {
+            // Set some propierties to Material
+            NE_MaterialSetPropierties(Material,
+                        RGB15(31, 31, 31), // Diffuse
+                        RGB15(0, 0, 0),    // Ambient
+                        RGB15(0, 0, 0),    // Specular
+                        RGB15(0, 0, 0),    // Emission
+                        false, false);     // Vtx color, use shininess table
+        }
+
+        printf("\nMaterial type: %s", use_specular ? "Specular" : "Diffuse ");
 
         NE_Process(Draw3DScene);
         NE_WaitForVBL(0);
