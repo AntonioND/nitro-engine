@@ -10,6 +10,8 @@ import os
 
 from PIL import Image
 
+from palette import Palette
+
 VALID_TEXTURE_SIZES = [8, 16, 32, 64, 128, 256, 512, 1024]
 VALID_FORMATS = ["A1RGB5", "PAL256", "PAL16", "PAL4", "A3PAL32", "A5PAL8",
                  "DEPTHBMP"]
@@ -22,44 +24,6 @@ def is_valid_texture_size(size):
 def save_binary_file(path, byte_list):
     with open(path, "wb") as f:
         f.write(bytearray(byte_list))
-
-
-def rgb15(r, g, b):
-    r = r >> 3
-    g = g >> 3
-    b = b >> 3
-    return r | (g << 5) | (b << 10)
-
-
-class Palette():
-    def __init__(self):
-        self.palette = []
-        # Start thinking that color 0 isn't transparent
-        self.color_0_transparent = False
-
-    def set_color_0_transparent(self):
-        self.color_0_transparent = True
-
-    def add_color(self, r, g, b):
-        """r, g and b must be between 0 and 255."""
-        c = rgb15(r, g, b)
-        if c in self.palette:
-            return
-        self.palette.append(c)
-
-    def get_index(self, r, g, b):
-        c = rgb15(r, g, b)
-        index = self.palette.index(c)
-        if self.color_0_transparent:
-            index = index + 1
-        return index
-
-    def get_palette(self):
-        if self.color_0_transparent:
-            # Make color 0 magenta for VRAM viewers in emulators
-            zero = rgb15(255, 0, 255)
-            return [zero] + self.palette
-        return self.palette
 
 
 def convert_a1rgb5(img):
@@ -104,7 +68,7 @@ def convert_pal256(img):
         if a < 255:
             pal.set_color_0_transparent()
         else:
-            pal.add_color(r, g, b)
+            pal.add_color(r >> 3, g >> 3, b >> 3)
 
     num_colors = len(pal.get_palette())
 
@@ -113,7 +77,8 @@ def convert_pal256(img):
     if num_colors > 256:
         raise Exception(f"Too many colors: {num_colors} > 256")
 
-    for color in pal.get_palette():
+    for entry in pal.get_palette():
+        color = entry[0] | (entry[1] << 5) | (entry[2] << 10)
         palette.extend([color & 0xFF, color >> 8])
 
     # Generate texture
@@ -122,7 +87,7 @@ def convert_pal256(img):
         if a < 255:
             texture.append(0)
         else:
-            texture.append(pal.get_index(r, g, b))
+            texture.append(pal.get_index(r >> 3, g >> 3, b >> 3))
 
     return texture, palette
 
@@ -145,7 +110,7 @@ def convert_pal16(img):
         if a < 255:
             pal.set_color_0_transparent()
         else:
-            pal.add_color(r, g, b)
+            pal.add_color(r >> 3, g >> 3, b >> 3)
 
     num_colors = len(pal.get_palette())
 
@@ -154,7 +119,8 @@ def convert_pal16(img):
     if num_colors > 16:
         raise Exception(f"Too many colors: {num_colors} > 16")
 
-    for color in pal.get_palette():
+    for entry in pal.get_palette():
+        color = entry[0] | (entry[1] << 5) | (entry[2] << 10)
         palette.extend([color & 0xFF, color >> 8])
 
     # Generate texture
@@ -164,7 +130,7 @@ def convert_pal16(img):
         if a < 255:
             temp_texture.append(0)
         else:
-            temp_texture.append(pal.get_index(r, g, b))
+            temp_texture.append(pal.get_index(r >> 3, g >> 3, b >> 3))
 
     for i in range(0, len(temp_texture), 2):
         index0 = temp_texture[i + 0]
@@ -193,7 +159,7 @@ def convert_pal4(img):
         if a < 255:
             pal.set_color_0_transparent()
         else:
-            pal.add_color(r, g, b)
+            pal.add_color(r >> 3, g >> 3, b >> 3)
 
     num_colors = len(pal.get_palette())
 
@@ -202,7 +168,8 @@ def convert_pal4(img):
     if num_colors > 4:
         raise Exception(f"Too many colors: {num_colors} > 4")
 
-    for color in pal.get_palette():
+    for entry in pal.get_palette():
+        color = entry[0] | (entry[1] << 5) | (entry[2] << 10)
         palette.extend([color & 0xFF, color >> 8])
 
     # Generate texture
@@ -212,7 +179,7 @@ def convert_pal4(img):
         if a < 255:
             temp_texture.append(0)
         else:
-            temp_texture.append(pal.get_index(r, g, b))
+            temp_texture.append(pal.get_index(r >> 3, g >> 3, b >> 3))
 
     for i in range(0, len(temp_texture), 4):
         index0 = temp_texture[i + 0]
@@ -239,7 +206,7 @@ def convert_a3pal32(img):
         r, g, b, a = pixel
         alpha = a >> 5
         if alpha > 0:
-            pal.add_color(r, g, b)
+            pal.add_color(r >> 3, g >> 3, b >> 3)
 
     num_colors = len(pal.get_palette())
 
@@ -248,7 +215,8 @@ def convert_a3pal32(img):
     if num_colors > 32:
         raise Exception(f"Too many colors: {num_colors} > 32")
 
-    for color in pal.get_palette():
+    for entry in pal.get_palette():
+        color = entry[0] | (entry[1] << 5) | (entry[2] << 10)
         palette.extend([color & 0xFF, color >> 8])
 
     # Generate texture
@@ -260,7 +228,7 @@ def convert_a3pal32(img):
             # The index doesn't matter if the alpha value is 0
             texture.append(0)
         else:
-            index = pal.get_index(r, g, b)
+            index = pal.get_index(r >> 3, g >> 3, b >> 3)
             texture.append(index | (alpha << 5))
 
     return texture, palette
@@ -280,7 +248,7 @@ def convert_a5pal8(img):
         r, g, b, a = pixel
         alpha = a >> 3
         if alpha > 0:
-            pal.add_color(r, g, b)
+            pal.add_color(r >> 3, g >> 3, b >> 3)
 
     num_colors = len(pal.get_palette())
 
@@ -289,7 +257,8 @@ def convert_a5pal8(img):
     if num_colors > 8:
         raise Exception(f"Too many colors: {num_colors} > 8")
 
-    for color in pal.get_palette():
+    for entry in pal.get_palette():
+        color = entry[0] | (entry[1] << 5) | (entry[2] << 10)
         palette.extend([color & 0xFF, color >> 8])
 
     # Generate texture
@@ -301,7 +270,7 @@ def convert_a5pal8(img):
             # The index doesn't matter if the alpha value is 0
             texture.append(0)
         else:
-            index = pal.get_index(r, g, b)
+            index = pal.get_index(r >> 3, g >> 3, b >> 3)
             texture.append(index | (alpha << 3))
 
     return texture, palette
