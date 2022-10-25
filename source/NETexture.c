@@ -406,7 +406,7 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
               "No texture asigned to source material");
     // Increase count of materials using this texture
     NE_Texture[source->texindex].uses++;
-    dest->texindex = source->texindex;
+    memcpy(dest, source, sizeof(NE_Material));
 }
 
 void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
