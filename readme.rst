@@ -66,7 +66,7 @@ Screenshots of some of the examples included with Nitro Engine:
 .. |animated_model| image:: screenshots/animated_model.png
 .. |box_tower| image:: screenshots/box_tower.png
 .. |fog| image:: screenshots/fog.png
-.. |multiple_models| image:: screenshots/multiple_models.png
+.. |specular_material| image:: screenshots/specular_material.png
 .. |screen_effects| image:: screenshots/screen_effects.png
 .. |sprites| image:: screenshots/sprites.png
 
@@ -76,11 +76,11 @@ Screenshots of some of the examples included with Nitro Engine:
 | |animated_model| | |box_tower|       |
 +------------------+-------------------+
 
-+------------------+-------------------+
-| Hardware fog     | Multiple models   |
-+------------------+-------------------+
-| |fog|            | |multiple_models| |
-+------------------+-------------------+
++------------------+---------------------+
+| Hardware fog     | Specular material   |
++------------------+---------------------+
+| |fog|            | |specular_material| |
++------------------+---------------------+
 
 +------------------+-------------------+
 | Screen effects   | 2D sprites        |
