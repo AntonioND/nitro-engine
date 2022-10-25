@@ -72,8 +72,8 @@ int main(void)
     NE_PaletteLoadFAT(PaletteBlue, "spiral_blue_pal32_pal.bin", NE_A3PAL32);
     NE_PaletteLoadFAT(PaletteRed, "spiral_red_pal32_pal.bin", NE_A3PAL32);
 
-    NE_MaterialTexSetPal(MaterialBlue, PaletteBlue);
-    NE_MaterialTexSetPal(MaterialRed, PaletteRed);
+    NE_MaterialSetPalette(MaterialBlue, PaletteBlue);
+    NE_MaterialSetPalette(MaterialRed, PaletteRed);
 
     // Assign material to model
     NE_ModelSetMaterial(Model, MaterialBlue);

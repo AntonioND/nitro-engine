@@ -60,8 +60,8 @@ int main(void)
     NE_PaletteLoad(Palette1, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
     NE_PaletteLoad(Palette2, (u16 *)a5pal8_pal_bin, 32, NE_A5PAL8);
 
-    NE_MaterialTexSetPal(Material1, Palette1);
-    NE_MaterialTexSetPal(Material2, Palette2);
+    NE_MaterialSetPalette(Material1, Palette1);
+    NE_MaterialSetPalette(Material2, Palette2);
 
     while (1)
     {

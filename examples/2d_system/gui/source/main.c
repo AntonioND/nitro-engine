@@ -52,19 +52,19 @@ int main(void)
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)button_tex_bin);
     NE_PaletteLoad(ButtonPal, (void *)button_pal_bin, 256, NE_PAL256);
-    NE_MaterialTexSetPal(ButtonImg, ButtonPal);
+    NE_MaterialSetPalette(ButtonImg, ButtonPal);
 
     NE_MaterialTexLoad(EmptyImg, NE_PAL256, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)empty_tex_bin);
     NE_PaletteLoad(EmptyPal, (void *)empty_pal_bin, 256, NE_PAL256);
-    NE_MaterialTexSetPal(EmptyImg, EmptyPal);
+    NE_MaterialSetPalette(EmptyImg, EmptyPal);
 
     NE_MaterialTexLoad(TrueImg, NE_PAL256, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
                        (void *)true_tex_bin);
     NE_PaletteLoad(TruePal, (void *)true_pal_bin, 256, NE_PAL256);
-    NE_MaterialTexSetPal(TrueImg, TruePal);
+    NE_MaterialSetPalette(TrueImg, TruePal);
 
 
     // Create one button
