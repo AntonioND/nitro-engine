@@ -370,6 +370,6 @@ int NE_MaterialTexLoadBMPtoRGB256(NE_Material *tex, NE_Palette *pal,
         return 0;
     }
 
-    NE_MaterialTexSetPal(tex, pal);
+    NE_MaterialSetPalette(tex, pal);
     return 1;
 }

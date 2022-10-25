@@ -128,13 +128,25 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
 ///
 /// @param source Source.
 /// @param dest Destination.
-void NE_MaterialTexClone(NE_Material *source, NE_Material *dest);
+void NE_MaterialClone(NE_Material *source, NE_Material *dest);
 
-/// Assign a palette to a material.
+/// Alias of NE_MaterialClone
+///
+/// @deprecated This definition is only present for backwards compatibility and
+/// it will be removed.
+#define NE_MaterialTexClone NE_MaterialClone
+
+/// Assigns a palette to a material.
 ///
 /// @param tex Material.
 /// @param pal Palette.
-void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal);
+void NE_MaterialSetPalette(NE_Material *tex, NE_Palette *pal);
+
+/// Alias of NE_MaterialSetPalette().
+///
+/// @deprecated This definition is only present for backwards compatibility and
+/// it will be removed.
+#define NE_MaterialTexSetPal NE_MaterialSetPalette
 
 /// Set active material to use when drawing polygons.
 ///

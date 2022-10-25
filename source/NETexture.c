@@ -398,7 +398,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     return 1;
 }
 
-void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
+void NE_MaterialClone(NE_Material *source, NE_Material *dest)
 {
     NE_AssertPointer(source, "NULL source pointer");
     NE_AssertPointer(dest, "NULL dest pointer");
@@ -409,7 +409,7 @@ void NE_MaterialTexClone(NE_Material *source, NE_Material *dest)
     memcpy(dest, source, sizeof(NE_Material));
 }
 
-void NE_MaterialTexSetPal(NE_Material *tex, NE_Palette *pal)
+void NE_MaterialSetPalette(NE_Material *tex, NE_Palette *pal)
 {
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(pal, "NULL palette pointer");
