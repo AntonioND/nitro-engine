@@ -116,7 +116,7 @@ int main(void)
 
         if (keys_down & KEY_L)
         {
-            if (shininess > NE_SHININESS_NONE)
+            if (shininess > NE_SHININESS_LINEAR)
                 shininess--;
         }
         if (keys_down & KEY_R)
