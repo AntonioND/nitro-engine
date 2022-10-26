@@ -344,7 +344,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     if (!invalidwidth)
         size = (sizeX * sizeY << 1) >> __NE_TextureSizeShift[fmt];
 
-    u32 *addr = (u32 *) NE_Alloc(NE_TexAllocList, size, 8);
+    u32 *addr = (u32 *) NE_Alloc(NE_TexAllocList, size); // Aligned to 8 bytes
 
     if (!addr)
     {
@@ -464,10 +464,10 @@ void NE_TextureSystemReset(int max_textures, int max_palettes,
     // four banks of VRAM. It is needed to allocate one chunk for each and
     // lock the ones that aren't allowed to be used by Nitro Engine.
 
-    NE_Alloc(NE_TexAllocList, 128 * 1024, 0); // VRAM_A
-    NE_Alloc(NE_TexAllocList, 128 * 1024, 0); // VRAM_B
-    NE_Alloc(NE_TexAllocList, 128 * 1024, 0); // VRAM_C
-    NE_Alloc(NE_TexAllocList, 128 * 1024, 0); // VRAM_D
+    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_A
+    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_B
+    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_C
+    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_D
 
     if (bank_flags & NE_VRAM_A)
     {
@@ -559,10 +559,10 @@ int NE_TextureFreeMem(void)
     if (!ne_texture_system_inited)
         return 0;
 
-    NEMemInfo Info;
-    NE_MemGetInformation(NE_TexAllocList, &Info);
+    NEMemInfo info;
+    NE_MemGetInformation(NE_TexAllocList, &info);
 
-    return Info.Free;
+    return info.free;
 }
 
 int NE_TextureFreeMemPercent(void)
@@ -570,10 +570,10 @@ int NE_TextureFreeMemPercent(void)
     if (!ne_texture_system_inited)
         return 0;
 
-    NEMemInfo Info;
-    NE_MemGetInformation(NE_TexAllocList, &Info);
+    NEMemInfo info;
+    NE_MemGetInformation(NE_TexAllocList, &info);
 
-    return Info.FreePercent;
+    return info.free_percent;
 }
 
 void NE_TextureDefragMem(void)
@@ -598,7 +598,8 @@ void NE_TextureDefragMem(void)
         {
             int size = NE_GetSize(NE_TexAllocList, (void*)NE_Texture[i].adress);
             NE_Free(NE_TexAllocList,(void*)NE_Texture[i].adress);
-            void *pointer = NE_Alloc(NE_TexAllocList, size, 8);
+            void *pointer = NE_Alloc(NE_TexAllocList, size);
+            // Aligned to 8 bytes
 
             NE_AssertPointer(pointer, "Couldn't reallocate texture");
 
@@ -621,7 +622,7 @@ void NE_TextureSystemEnd(void)
     if (!ne_texture_system_inited)
         return;
 
-    NE_AllocEnd(NE_TexAllocList);
+    NE_AllocEnd(&NE_TexAllocList);
 
     free(NE_Texture);
 

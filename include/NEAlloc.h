@@ -18,29 +18,35 @@ typedef enum {
     NE_STATE_LOCKED
 } ne_chunk_state;
 
-typedef struct {
-    void *previous, *next; // Pointers to other chunks, NULL if start or end
-
-    ne_chunk_state status; // Used, free or locked
-    void *start, *end;     // Pointers to the start and end of the pool
+typedef struct NEChunk {
+    struct NEChunk *previous; // Pointer to previous chunk. NULL if this is the first one
+    struct NEChunk *next;     // Pointer to next chunk. NULL if this is the last one
+    ne_chunk_state state;     // Used, free or locked
+    void *start, *end;        // Pointers to the start and end of this memory chunk
 } NEChunk;
 
 typedef struct {
     // Values in bytes. Total memory does not include locked memory
-    size_t Free, Used, Total, Locked;
-    unsigned int FreePercent; // Locked memory doesn't count
+    size_t free, used, total, locked;
+    unsigned int free_percent; // Locked memory doesn't count
 } NEMemInfo;
 
-void NE_AllocInit(NEChunk **first_element, void *start, void *end);
-void NE_AllocEnd(NEChunk *first_element);
+#define NE_ALLOC_MIN_SIZE (16)
 
-void *NE_Alloc(NEChunk *first_element, size_t size, unsigned int align);
-void NE_Free(NEChunk *first_element, void *pointer);
+// They return 0 on success. On error, they returns a negative number.
+int NE_AllocInit(NEChunk **first_element, void *start, void *end);
+int NE_AllocEnd(NEChunk **first_element);
 
-void NE_Lock(NEChunk *first_element, void *pointer);
-void NE_Unlock(NEChunk *first_element, void *pointer);
+// Returns NULL on error, or a valid pointer on success.
+void *NE_Alloc(NEChunk *first_element, size_t size);
+// Returns 0 on success. On error, it returns a negative number.
+int NE_Free(NEChunk *first_element, void *pointer);
 
-//int NE_GetSize(NEChunk *first_chunk, void *pointer);
-void NE_MemGetInformation(NEChunk *first_element, NEMemInfo *info);
+// They return 0 on success. On error, they returns a negative number.
+int NE_Lock(NEChunk *first_element, void *pointer);
+int NE_Unlock(NEChunk *first_element, void *pointer);
+
+// Returns 0 on success. On error, it returns a negative number.
+int NE_MemGetInformation(NEChunk *first_element, NEMemInfo *info);
 
 #endif // NE_ALLOC_H__

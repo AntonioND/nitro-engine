@@ -98,8 +98,9 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
         return 0;
     }
 
-    NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList, numcolor << 1,
-                                        1 << (4 - (format == NE_PAL4)));
+    NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList, numcolor << 1);
+    // Aligned to 16 bytes (except 8 bytes for NE_PAL4).
+
     if (NE_PalInfo[slot].pointer == NULL)
     {
         NE_DebugPrint("Not enough memory");
@@ -183,10 +184,10 @@ int NE_PaletteFreeMem(void)
     if (!ne_palette_system_inited)
         return 0;
 
-    NEMemInfo Info;
-    NE_MemGetInformation(NE_PalAllocList, &Info);
+    NEMemInfo info;
+    NE_MemGetInformation(NE_PalAllocList, &info);
 
-    return Info.Free;
+    return info.free;
 }
 
 int NE_PaletteFreeMemPercent(void)
@@ -194,10 +195,10 @@ int NE_PaletteFreeMemPercent(void)
     if (!ne_palette_system_inited)
         return 0;
 
-    NEMemInfo Info;
-    NE_MemGetInformation(NE_PalAllocList, &Info);
+    NEMemInfo info;
+    NE_MemGetInformation(NE_PalAllocList, &info);
 
-    return Info.FreePercent;
+    return info.free_percent;
 }
 
 void NE_PaletteDefragMem(void)
@@ -221,8 +222,8 @@ void NE_PaletteDefragMem(void)
             int size = NE_GetSize(NE_PalAllocList, (void*)NE_PalInfo[i].pointer);
 
             NE_Free(NE_PalAllocList, (void*)NE_PalInfo[i].pointer);
-            void *pointer = NE_Alloc(NE_PalAllocList, size,
-                                     1 << (4 - (NE_PalInfo[i].format == NE_PAL4)));
+            void *pointer = NE_Alloc(NE_PalAllocList, size);
+            // Aligned to 16 bytes (except 8 bytes for NE_PAL4).
 
             NE_AssertPointer(pointer, "Couldn't reallocate palette");
 
@@ -244,7 +245,7 @@ void NE_PaletteSystemEnd(void)
     if (!ne_palette_system_inited)
         return;
 
-    NE_AllocEnd(NE_PalAllocList);
+    NE_AllocEnd(&NE_PalAllocList);
 
     free(NE_PalInfo);
 
