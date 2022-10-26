@@ -87,7 +87,6 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
     {
         if (NE_PalInfo[i].pointer == NULL)
         {
-            pal->index = i;
             slot = i;
             break;
         }
@@ -109,10 +108,11 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
 
     NE_PalInfo[slot].format = format;
 
+    pal->index = slot;
+
     // Allow CPU writes to VRAM_E
     vramSetBankE(VRAM_E_LCD);
-    swiCopy(pointer, NE_PalInfo[slot].pointer,
-            (numcolor >> 1) | COPY_MODE_WORD);
+    swiCopy(pointer, NE_PalInfo[slot].pointer, (numcolor / 2) | COPY_MODE_WORD);
     vramSetBankE(VRAM_E_TEX_PALETTE);
 
     return 1;
