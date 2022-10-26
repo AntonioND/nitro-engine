@@ -27,14 +27,10 @@
 
 /// Holds information of one material.
 typedef struct {
-    int texindex;      ///< Index to internal texture object
-    u32 color;         ///< Color of this material
-    u32 diffuse;       ///< Diffuse lighting material color
-    u32 ambient;       ///< Ambient lighting material color
-    u32 specular;      ///< Specular lighting material color
-    u32 emission;      ///< Emission lighting material color
-    bool vtxcolor;     ///< Set Diffuse Reflection Color as Vertex Color
-    bool useshininess; ///< Use shininess table
+    int texindex;           ///< Index to internal texture object
+    u32 color;              ///< Color of this material when lights aren't used
+    u32 diffuse_ambient;    ///< Diffuse and ambient lighting material color
+    u32 specular_emission;  ///< Specular and emission lighting material color
 } NE_Material;
 
 /// Supported texture formats

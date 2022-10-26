@@ -27,9 +27,8 @@ static bool ne_texture_system_inited = false;
 static int NE_MAX_TEXTURES;
 
 // Default material propierties
-static u32 ne_defaultdiffuse, ne_defaultambient;
-static u32 ne_defaultspecular, ne_defaultemission;
-static bool ne_defaultvtxcolor, ne_defaultuseshininess;
+static u32 ne_default_diffuse_ambient;
+static u32 ne_default_specular_emission;
 
 static int __NE_GetValidSize(int size)
 {
@@ -81,12 +80,8 @@ NE_Material *NE_MaterialCreate(void)
         NE_UserMaterials[i] = mat;
         mat->texindex = NE_NO_TEXTURE;
         mat->color = NE_White;
-        mat->diffuse = ne_defaultdiffuse;
-        mat->ambient = ne_defaultambient;
-        mat->specular = ne_defaultspecular;
-        mat->emission = ne_defaultemission;
-        mat->vtxcolor = ne_defaultvtxcolor;
-        mat->useshininess = ne_defaultuseshininess;
+        mat->diffuse_ambient = ne_default_diffuse_ambient;
+        mat->specular_emission = ne_default_specular_emission;
 
         return mat;
     }
@@ -423,27 +418,20 @@ void NE_MaterialUse(const NE_Material *tex)
     {
         GFX_TEX_FORMAT = 0;
         GFX_COLOR = NE_White;
-        GFX_DIFFUSE_AMBIENT = ne_defaultdiffuse
-                            | (ne_defaultambient << 16)
-                            | (ne_defaultvtxcolor << 15);
-        GFX_SPECULAR_EMISSION = ne_defaultspecular
-                              | (ne_defaultemission << 16)
-                              | (ne_defaultuseshininess << 15);
+        GFX_DIFFUSE_AMBIENT = ne_default_diffuse_ambient;
+        GFX_SPECULAR_EMISSION = ne_default_specular_emission;
         return;
     }
 
-    GFX_DIFFUSE_AMBIENT = tex->diffuse | (tex->ambient << 16)
-                        | (tex->vtxcolor << 15);
-    GFX_SPECULAR_EMISSION = tex->specular | (tex->emission << 16)
-                          | (tex->useshininess << 15);
+    GFX_DIFFUSE_AMBIENT = tex->diffuse_ambient;
+    GFX_SPECULAR_EMISSION = tex->specular_emission;
 
-    NE_Assert(tex->texindex != NE_NO_TEXTURE,
-          "No texture asigned to material");
+    NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
 
     if (NE_Texture[tex->texindex].palette)
         NE_PaletteUse(NE_Texture[tex->texindex].palette);
 
-    GFX_COLOR = (u32) tex->color;
+    GFX_COLOR = tex->color;
     GFX_TEX_FORMAT = NE_Texture[tex->texindex].param;
 }
 
@@ -702,28 +690,20 @@ void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
                                bool vtxcolor, bool useshininess)
 {
     NE_AssertPointer(tex, "NULL pointer");
-    tex->diffuse = diffuse;
-    tex->ambient = ambient;
-    tex->specular = specular;
-    tex->emission = emission;
-    tex->vtxcolor = vtxcolor;
-    tex->useshininess = useshininess;
+    tex->diffuse_ambient = diffuse | (ambient << 16) | (vtxcolor << 15);
+    tex->specular_emission = specular | (emission << 16) | (useshininess << 15);
 }
 
 void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
                                       u32 specular, u32 emission,
                                       bool vtxcolor, bool useshininess)
 {
-    ne_defaultdiffuse = diffuse;
-    ne_defaultambient = ambient;
-    ne_defaultspecular = specular;
-    ne_defaultemission = emission;
-    ne_defaultvtxcolor = vtxcolor;
-    ne_defaultuseshininess = useshininess;
-    GFX_DIFFUSE_AMBIENT = ne_defaultdiffuse | (ne_defaultambient << 16)
-                        | (ne_defaultvtxcolor << 15);
-    GFX_SPECULAR_EMISSION = ne_defaultspecular | (ne_defaultemission << 16)
-                          | (ne_defaultuseshininess << 15);
+    ne_default_diffuse_ambient = diffuse | (ambient << 16) | (vtxcolor << 15);
+    ne_default_specular_emission = specular | (emission << 16)
+                                 | (useshininess << 15);
+
+    GFX_DIFFUSE_AMBIENT = ne_default_diffuse_ambient;
+    GFX_SPECULAR_EMISSION = ne_default_specular_emission;
 }
 
 static u16 *drawingtexture_adress = NULL;
