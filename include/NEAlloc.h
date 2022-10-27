@@ -42,6 +42,11 @@ void *NE_Alloc(NEChunk *first_element, size_t size);
 // Returns 0 on success. On error, it returns a negative number.
 int NE_Free(NEChunk *first_element, void *pointer);
 
+// Only an allocated chunk of memory can be locked. After it is locked, it stops
+// counting towards the total memory reported by NE_MemGetInformation(). When it
+// is unlocked, it is considered to still be allocated, and it needs to be freed
+// manually.
+//
 // They return 0 on success. On error, they returns a negative number.
 int NE_Lock(NEChunk *first_element, void *pointer);
 int NE_Unlock(NEChunk *first_element, void *pointer);
