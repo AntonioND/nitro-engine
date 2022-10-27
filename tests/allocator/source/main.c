@@ -1,0 +1,501 @@
+// SPDX-License-Identifier: CC0-1.0
+//
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+//
+// This file is part of Nitro Engine
+
+// Nitro Engine comes with a general-purpose memory allocator. This file
+// contains several tests for it.
+
+#include <stdio.h>
+
+#include <nds.h>
+
+#include <NEAlloc.h>
+
+#define POOL_START_ADDR     0x1000000
+#define POOL_END_ADDR       0x2000000
+#define POOL_SIZE           (POOL_END_ADDR - POOL_START_ADDR)
+
+#define POOL_START          (void *)POOL_START_ADDR
+#define POOL_END            (void *)POOL_END_ADDR
+
+#define POOL_INITIALIZE()                           \
+    NEChunk *alloc;                                 \
+    NE_AllocInit(&alloc, POOL_START, POOL_END);
+
+#define POOL_DEINITIALIZE()                         \
+    NE_AllocEnd(&alloc);
+
+#define ASSERT(cond)                                \
+    if (!(cond)) {                                  \
+        printf("Line %d\n", __LINE__);              \
+    }
+
+#define ASSERT_MSG(cond, msg)                       \
+    if (!(cond)) {                                  \
+        printf("Line %d: %s\n", __LINE__, msg);     \
+    }
+
+// Pointer to address
+#define A(p) ((uintptr_t)p)
+// Address to pointer
+#define P(a) ((void *)a)
+
+// Test that the pointer advances as expected when allocating memory, and that
+// chunks that are too small are aligned to 16 bytes.
+void test_alloc_align(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_START_ADDR;
+    void *ptr;
+
+    ptr = NE_Alloc(alloc, 64);
+    ASSERT(A(ptr) == addr);
+    addr += 64;
+
+    ptr = NE_Alloc(alloc, 32);
+    ASSERT(A(ptr) == addr);
+    addr += 32;
+
+    ptr = NE_Alloc(alloc, 16);
+    ASSERT(A(ptr) == addr);
+    addr += 16;
+
+    ASSERT_MSG(16 == NE_ALLOC_MIN_SIZE, "Unexpected NE_ALLOC_MIN_SIZE");
+
+    ptr = NE_Alloc(alloc, 8);
+    ASSERT(A(ptr) == addr);
+    addr += NE_ALLOC_MIN_SIZE;
+
+    ptr = NE_Alloc(alloc, 4);
+    ASSERT(A(ptr) == addr);
+    addr += NE_ALLOC_MIN_SIZE;
+
+    POOL_DEINITIALIZE();
+}
+
+// Test that a freed chunk can be reused
+void test_free(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_START_ADDR;
+
+    void *ptr1 = NE_Alloc(alloc, 256);
+    ASSERT(A(ptr1) == addr);
+    addr += 256;
+
+    void *ptr2 = NE_Alloc(alloc, 256);
+    ASSERT(A(ptr2) == addr);
+
+    // Free the first chunk
+    int ret = NE_Free(alloc, ptr1);
+    ASSERT(ret == 0);
+
+    void *ptr3 = NE_Alloc(alloc, 256);
+    ASSERT(A(ptr3) == A(ptr1));
+
+    POOL_DEINITIALIZE();
+}
+
+// Several tests to lock and unlock chunks
+void test_lock_unlock(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_START_ADDR;
+    int ret;
+
+    // Try locking a chunk that is used
+
+    void *ptr = NE_Alloc(alloc, 256);
+    ASSERT(A(ptr) == addr);
+
+    ret = NE_Lock(alloc, ptr);
+    ASSERT(ret == 0);
+
+    // Try to free a locked chunk
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == -3);
+
+    // Unlock a chunk that is locked
+
+    ret = NE_Unlock(alloc, ptr);
+    ASSERT(ret == 0);
+
+    // Try unlocking a chunk that is used
+
+    ret = NE_Unlock(alloc, ptr);
+    ASSERT(ret == -2);
+
+    // Try unlocking a chunk that has just been freed
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
+    ret = NE_Unlock(alloc, ptr);
+    ASSERT(ret == -2);
+
+    // Try locking a chunk that has just been freed
+
+    ret = NE_Lock(alloc, ptr);
+    ASSERT(ret == -2);
+
+    // Now, allocate a new chunk that uses half of the memory and lock it. Then,
+    // try to allocate more than half of memory and check it fails.
+
+    ptr = NE_Alloc(alloc, POOL_SIZE / 2);
+    ASSERT(A(ptr) == POOL_START_ADDR);
+
+    ret = NE_Lock(alloc, ptr);
+    ASSERT(ret == 0);
+
+    void *fail = NE_Alloc(alloc, (POOL_SIZE / 2) + 1024);
+    ASSERT(fail == NULL);
+
+    ret = NE_Unlock(alloc, ptr);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
+    POOL_DEINITIALIZE();
+}
+
+// Tests to verify that allocation fails under some conditions
+void test_alloc_fail(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_START_ADDR;
+    int ret;
+    void *ptr;
+
+    // Try to allocate zero bytes
+
+    ptr = NE_Alloc(alloc, 0);
+    ASSERT(ptr == NULL);
+
+    // Try to allocate the maximum size
+
+    ptr = NE_Alloc(alloc, POOL_SIZE);
+    ASSERT(A(ptr) == addr);
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
+    // Try to allocate more than the limit
+
+    void *fail = NE_Alloc(alloc, POOL_SIZE + 1);
+    ASSERT(fail == NULL);
+
+    // Fragment the memory pool and try to allocate the remaining space, which
+    // should fail.
+
+    ptr = NE_Alloc(alloc, POOL_SIZE / 4);
+    ASSERT(A(ptr) == addr);
+
+    void *ptr2 = NE_Alloc(alloc, POOL_SIZE / 2);
+    ASSERT(A(ptr2) == (addr + (POOL_SIZE / 4)));
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
+    NEMemInfo info; // Get information about the remaining free memory
+    ret = NE_MemGetInformation(alloc, &info);
+    ASSERT(ret == 0);
+
+    ASSERT(info.free == (POOL_SIZE / 2));
+
+    fail = NE_Alloc(alloc, info.free);
+    ASSERT(fail == NULL);
+
+    POOL_DEINITIALIZE();
+}
+
+// Test statistics calculation
+void test_statistics(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_START_ADDR;
+    int ret;
+
+    const size_t size = POOL_SIZE / 8;
+
+    // Allocate a few chunks
+
+    void *ptr1 = NE_Alloc(alloc, size);
+    ASSERT(A(ptr1) == addr);
+    addr += size;
+
+    void *ptr2 = NE_Alloc(alloc, size);
+    ASSERT(A(ptr2) == addr);
+    addr += size;
+
+    void *ptr3 = NE_Alloc(alloc, size);
+    ASSERT(A(ptr3) == addr);
+    addr += size;
+
+    void *ptr4 = NE_Alloc(alloc, size);
+    ASSERT(A(ptr4) == addr);
+
+    // Free one of them
+
+    ret = NE_Free(alloc, ptr2);
+    ASSERT(ret == 0);
+
+    // Lock one of them
+
+    ret = NE_Lock(alloc, ptr4);
+    ASSERT(ret == 0);
+
+    // Get statistics
+
+    NEMemInfo info;
+    ret = NE_MemGetInformation(alloc, &info);
+    ASSERT(ret == 0);
+
+    ASSERT(info.free == (5 * POOL_SIZE / 8));
+    ASSERT(info.used == (2 * POOL_SIZE / 8));
+    // Note: Locked memory isn't added to the total
+    ASSERT(info.locked == (1 * POOL_SIZE / 8));
+    ASSERT(info.total == (7 * POOL_SIZE / 8));
+
+    ASSERT(info.free_percent == (100 * 5 / 7));
+
+    POOL_DEINITIALIZE();
+}
+
+int count_num_chunks(NEChunk *list)
+{
+    int count = 0;
+
+    for ( ;list != NULL; list = list->next)
+        count++;
+
+    return count;
+}
+
+int verify_consistency(NEChunk *list, void *start, void *end)
+{
+    if (list == NULL)
+        return 0;
+
+    // The first chunk should start at the start of the memory pool
+    if (list->start != start)
+        return -1;
+
+    for ( ; list->next != NULL; list = list->next)
+    {
+        // The end of a chunk should be the start of the next one
+        if (list->end != list->next->start)
+            return -2;
+    }
+
+    // The last chunk should end at the end of the memory pool
+    if (list->end != end)
+        return -3;
+
+    return 0;
+}
+
+// Test that the internal linked list is in the expected state
+void test_internal_list_state(void)
+{
+    NEChunk *alloc;
+    int ret, count;
+
+    // Test with invalid linked list
+
+    ret = NE_AllocInit(NULL, POOL_START, POOL_END);
+    ASSERT(ret == -1);
+
+    // Test with switched start and end
+
+    ret = NE_AllocInit(&alloc, POOL_END, POOL_START);
+    ASSERT(ret == -2);
+
+    // Initialize a valid list
+
+    ret = NE_AllocInit(&alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    // Allocate a few chunks
+
+    void *ptr[10];
+    for (int i = 0; i < 10; i++)
+    {
+        ptr[i] = NE_Alloc(alloc, 1024);
+        ASSERT(A(ptr[i]) == POOL_START_ADDR + (1024 * i));
+    }
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 11); // 10 chunks + chunk with all remaining memory
+
+    // Free the first chunk and then the second one so that it is merged with
+    // the first one.
+
+    ret = NE_Free(alloc, ptr[0]);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 11);
+
+    ret = NE_Free(alloc, ptr[1]);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 10);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Free the last chunk so that it is merged with the remaining free memory
+
+    ret = NE_Free(alloc, ptr[9]);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 9);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, ptr[8]); // Do it again to test it
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 8);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Free two chunks with one chunk the middle. Then, free that chunk and see
+    // if the three chunks are merged into one.
+
+    ret = NE_Free(alloc, ptr[3]);
+    ASSERT(ret == 0);
+    ret = NE_Free(alloc, ptr[5]);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 8);
+
+    ret = NE_Free(alloc, ptr[4]);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 6);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Deallocate invalid list
+
+    ret = NE_AllocEnd(NULL);
+    ASSERT(ret == -1);
+
+    // Deallocate list correctly
+
+    ret = NE_AllocEnd(&alloc);
+    ASSERT(ret == 0);
+}
+
+// Known random number generator to always generate the same sequence of numbers
+// and make this test reproducible.
+int rand(void)
+{
+    static unsigned long int next = 1;
+    next = next * 1103515245 + 12345;
+    return (unsigned int)(next / 65536) % 32768;
+}
+
+// Stress test
+void test_stress(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+#define NUM_PTRS 32
+
+    int ret;
+    void *ptr[NUM_PTRS];
+
+    for (int i = 0; i < NUM_PTRS; i++)
+        ptr[i] = NULL;
+
+    for (int i = 0; i < 300000; i++)
+    {
+        unsigned int selected = rand() % NUM_PTRS;
+
+        if (ptr[selected] == NULL)
+        {
+            // Unallocated pointer. Allocate it. The number of chunks is too
+            // small to ever fill the memory with this chunk size, so it should
+            // always be allocated.
+
+            size_t size = (rand() & 0x3FFF) + 1;
+
+            void *p = NE_Alloc(alloc, size);
+            ASSERT(p != NULL);
+
+            ptr[selected] = p;
+        }
+        else
+        {
+            // Allocated pointer. Deallocate it.
+            ret = NE_Free(alloc, ptr[selected]);
+            ASSERT(ret == 0);
+            ptr[selected] = NULL;
+        }
+
+        // Verify list every now and then
+        if ((i % 64) == 0)
+        {
+            ret = verify_consistency(alloc, POOL_START, POOL_END);
+            ASSERT(ret == 0);
+        }
+    }
+
+    POOL_DEINITIALIZE();
+}
+
+int main(void)
+{
+    // This test doesn't use Nitro Engine at all. Initialize the default console
+    // of libnds to print the results of the tests.
+    consoleDemoInit();
+
+    test_alloc_align();
+    test_free();
+    test_lock_unlock();
+    test_alloc_fail();
+    test_statistics();
+    test_internal_list_state();
+    test_stress();
+
+    printf("Done!");
+
+    while (1)
+        swiWaitForVBlank();
+
+    return 0;
+}
