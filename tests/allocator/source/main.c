@@ -30,6 +30,7 @@
 #define ASSERT(cond)                                \
     if (!(cond)) {                                  \
         printf("Line %d\n", __LINE__);              \
+        while (1);                                  \
     }
 
 #define ASSERT_MSG(cond, msg)                       \
@@ -78,6 +79,42 @@ void test_alloc_align(void)
     POOL_DEINITIALIZE();
 }
 
+// Test that the pointer advances as expected when allocating memory from the
+// end of the pool, and that chunks that are too small are aligned to 16 bytes.
+void test_alloc_from_end_align(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_END_ADDR;
+    void *ptr;
+
+    addr -= 64;
+    ptr = NE_AllocFromEnd(alloc, 64);
+    ASSERT(A(ptr) == addr);
+
+    addr -= 32;
+    ptr = NE_AllocFromEnd(alloc, 32);
+    ASSERT(A(ptr) == addr);
+
+    addr -= 16;
+    ptr = NE_AllocFromEnd(alloc, 16);
+    ASSERT(A(ptr) == addr);
+
+    ASSERT_MSG(16 == NE_ALLOC_MIN_SIZE, "Unexpected NE_ALLOC_MIN_SIZE");
+
+    addr -= NE_ALLOC_MIN_SIZE;
+    ptr = NE_AllocFromEnd(alloc, 8);
+    ASSERT(A(ptr) == addr);
+
+    addr -= NE_ALLOC_MIN_SIZE;
+    ptr = NE_AllocFromEnd(alloc, 4);
+    ASSERT(A(ptr) == addr);
+
+    POOL_DEINITIALIZE();
+}
+
 // Test that a freed chunk can be reused
 void test_free(void)
 {
@@ -99,6 +136,33 @@ void test_free(void)
     ASSERT(ret == 0);
 
     void *ptr3 = NE_Alloc(alloc, 256);
+    ASSERT(A(ptr3) == A(ptr1));
+
+    POOL_DEINITIALIZE();
+}
+
+// Test that a freed chunk can be reused
+void test_free_from_end(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    uintptr_t addr = POOL_END_ADDR;
+
+    addr -= 256;
+    void *ptr1 = NE_AllocFromEnd(alloc, 256);
+    ASSERT(A(ptr1) == addr);
+
+    addr -= 256;
+    void *ptr2 = NE_AllocFromEnd(alloc, 256);
+    ASSERT(A(ptr2) == addr);
+
+    // Free the first chunk
+    int ret = NE_Free(alloc, ptr1);
+    ASSERT(ret == 0);
+
+    void *ptr3 = NE_AllocFromEnd(alloc, 256);
     ASSERT(A(ptr3) == A(ptr1));
 
     POOL_DEINITIALIZE();
@@ -187,6 +251,9 @@ void test_alloc_fail(void)
     ptr = NE_Alloc(alloc, 0);
     ASSERT(ptr == NULL);
 
+    ptr = NE_AllocFromEnd(alloc, 0);
+    ASSERT(ptr == NULL);
+
     // Try to allocate the maximum size
 
     ptr = NE_Alloc(alloc, POOL_SIZE);
@@ -195,9 +262,18 @@ void test_alloc_fail(void)
     ret = NE_Free(alloc, ptr);
     ASSERT(ret == 0);
 
+    ptr = NE_AllocFromEnd(alloc, POOL_SIZE);
+    ASSERT(A(ptr) == addr);
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
     // Try to allocate more than the limit
 
     void *fail = NE_Alloc(alloc, POOL_SIZE + 1);
+    ASSERT(fail == NULL);
+
+    fail = NE_AllocFromEnd(alloc, POOL_SIZE + 1);
     ASSERT(fail == NULL);
 
     // Fragment the memory pool and try to allocate the remaining space, which
@@ -219,6 +295,9 @@ void test_alloc_fail(void)
     ASSERT(info.free == (POOL_SIZE / 2));
 
     fail = NE_Alloc(alloc, info.free);
+    ASSERT(fail == NULL);
+
+    fail = NE_AllocFromEnd(alloc, info.free);
     ASSERT(fail == NULL);
 
     POOL_DEINITIALIZE();
@@ -250,8 +329,8 @@ void test_statistics(void)
     ASSERT(A(ptr3) == addr);
     addr += size;
 
-    void *ptr4 = NE_Alloc(alloc, size);
-    ASSERT(A(ptr4) == addr);
+    void *ptr4 = NE_AllocFromEnd(alloc, size);
+    ASSERT(A(ptr4) == POOL_END_ADDR - size);
 
     // Free one of them
 
@@ -315,6 +394,21 @@ int verify_consistency(NEChunk *list, void *start, void *end)
         return -4;
 
     return 0;
+}
+
+void print_list(NEChunk *list)
+{
+    if (list == NULL)
+    {
+        printf("NULL\n");
+        return;
+    }
+
+    for ( ; list != NULL; list = list->next)
+    {
+        printf("%p-%p (%zu)\n", list->start, list->end,
+               (size_t)(A(list->end) - A(list->start)));
+    }
 }
 
 // Test that the internal linked list is in the expected state
@@ -446,7 +540,7 @@ void test_stress(void)
     for (int i = 0; i < NUM_PTRS; i++)
         ptr[i] = NULL;
 
-    for (int i = 0; i < 300000; i++)
+    for (int i = 0; i < 500000; i++)
     {
         unsigned int selected = rand() % NUM_PTRS;
 
@@ -458,7 +552,13 @@ void test_stress(void)
 
             size_t size = (rand() & 0x3FFF) + 1;
 
-            void *p = NE_Alloc(alloc, size);
+            void *p;
+
+            if (size & 1)
+                p = NE_Alloc(alloc, size);
+            else
+                p = NE_AllocFromEnd(alloc, size);
+
             ASSERT(p != NULL);
 
             ptr[selected] = p;
@@ -471,11 +571,13 @@ void test_stress(void)
             ptr[selected] = NULL;
         }
 
-        // Verify list every now and then
-        if ((i % 64) == 0)
+        // Verify consistency of the list
+        ret = verify_consistency(alloc, POOL_START, POOL_END);
+        if (ret != 0)
         {
-            ret = verify_consistency(alloc, POOL_START, POOL_END);
-            ASSERT(ret == 0);
+            printf("ret = %d", ret);
+            print_list(alloc);
+            while (1);
         }
     }
 
@@ -489,7 +591,9 @@ int main(void)
     consoleDemoInit();
 
     test_alloc_align();
+    test_alloc_from_end_align();
     test_free();
+    test_free_from_end();
     test_lock_unlock();
     test_alloc_fail();
     test_statistics();

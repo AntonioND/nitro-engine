@@ -37,8 +37,14 @@ typedef struct {
 int NE_AllocInit(NEChunk **first_element, void *start, void *end);
 int NE_AllocEnd(NEChunk **first_element);
 
-// Returns NULL on error, or a valid pointer on success.
+// Allocates data at the first available space starting from the start of the
+// memory pool. Returns NULL on error, or a valid pointer on success.
 void *NE_Alloc(NEChunk *first_element, size_t size);
+
+// Allocates data at the first available space starting from the end of the
+// memory pool. Returns NULL on error, or a valid pointer on success.
+void *NE_AllocFromEnd(NEChunk *first_element, size_t size);
+
 // Returns 0 on success. On error, it returns a negative number.
 int NE_Free(NEChunk *first_element, void *pointer);
 
