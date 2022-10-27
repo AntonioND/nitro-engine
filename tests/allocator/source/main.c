@@ -304,11 +304,15 @@ int verify_consistency(NEChunk *list, void *start, void *end)
         // The end of a chunk should be the start of the next one
         if (list->end != list->next->start)
             return -2;
+
+        // Two free chunks should never be together
+        if ((list->state == NE_STATE_FREE) && (list->next->state == NE_STATE_FREE))
+            return -3;
     }
 
     // The last chunk should end at the end of the memory pool
     if (list->end != end)
-        return -3;
+        return -4;
 
     return 0;
 }
