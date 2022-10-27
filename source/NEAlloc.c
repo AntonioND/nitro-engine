@@ -47,6 +47,58 @@ int NE_AllocEnd(NEChunk **first_chunk)
     return 0;
 }
 
+// The function resizes this chunk to the provided size, and creates a new chunk
+// with the remaining size.
+//
+// +-----------------+------+
+// |      THIS       | NEXT |  Before
+// +-----------------+------+
+//
+// +------+----------+------+
+// | THIS |   NEW    | NEXT |  After
+// +------+----------+------+
+//
+// It returns a pointer to the new chunk.
+static NEChunk *ne_split_chunk(NEChunk *this, size_t this_size)
+{
+    // Get next chunk and create a new one.
+
+    NEChunk *next = this->next;
+
+    NEChunk *new = malloc(sizeof(NEChunk));
+    NE_AssertPointer(new, "Couldn't allocate chunk metadata.");
+
+    // Update pointers in the linked list
+    // ----------------------------------
+
+    new->previous = this;
+    this->next = new;
+
+    if (next == NULL)
+    {
+        new->next = NULL;
+    }
+    else
+    {
+        new->next = next;
+        next->previous = new;
+
+        // It shouldn't be free because deallocating a chunk should merge it
+        // with any free chunk next to it.
+        NE_Assert(next->state != NE_STATE_FREE,
+                    "Possible list corruption");
+    }
+
+    // Update pointers to start and end of this chunk and the new chunk
+    // ----------------------------------------------------------------
+
+    new->end = this->end;
+    this->end = (void *)((uintptr_t)this->start + this_size);
+    new->start = this->end;
+
+    return new;
+}
+
 void *NE_Alloc(NEChunk *first_chunk, size_t size)
 {
     if ((first_chunk == NULL) || (size == 0))
@@ -65,10 +117,7 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size)
         if (this->state != NE_STATE_FREE)
             continue;
 
-        uintptr_t this_start = (uintptr_t)this->start;
-        uintptr_t this_end = (uintptr_t)this->end;
-
-        size_t this_size = this_end - this_start;
+        size_t this_size = (size_t)this->end - (size_t)this->start;
 
         // If this chunk doesn't have enough space, simply skip it.
         if (this_size < size)
@@ -91,45 +140,11 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size)
         // +------+----------+------+  After
         // | USED | NOT USED | USED |
 
-        // Get next chunk and create a new one.
+        NEChunk *new = ne_split_chunk(this, size);
 
-        NEChunk *next = this->next;
-
-        NEChunk *new = malloc(sizeof(NEChunk));
-        NE_AssertPointer(new, "Couldn't allocate chunk metadata.");
-
-        // Flag the new chunk as free and this one as used
-
-        new->state = NE_STATE_FREE;
+        // Flag this chunk as used and the new one as free
         this->state = NE_STATE_USED;
-
-        // Update pointers in the linked list
-        // ----------------------------------
-
-        new->previous = this;
-        this->next = new;
-
-        if (next == NULL)
-        {
-            new->next = NULL;
-        }
-        else
-        {
-            new->next = next;
-            next->previous = new;
-
-            // It shouldn't be free because deallocating a chunk should merge it
-            // with any free chunk next to it.
-            NE_Assert(next->state != NE_STATE_FREE,
-                      "Possible list corruption");
-        }
-
-        // Update pointers to start and end of this chunk and the new chunk
-        // ----------------------------------------------------------------
-
-        new->end = this->end;
-        this->end = (void *)(this_start + size);
-        new->start = this->end;
+        new->state = NE_STATE_FREE;
 
         return this->start;
     }
@@ -160,10 +175,7 @@ void *NE_AllocFromEnd(NEChunk *first_chunk, size_t size)
         if (this->state != NE_STATE_FREE)
             continue;
 
-        uintptr_t this_start = (uintptr_t)this->start;
-        uintptr_t this_end = (uintptr_t)this->end;
-
-        size_t this_size = this_end - this_start;
+        size_t this_size = (size_t)this->end - (size_t)this->start;
 
         // If this chunk doesn't have enough space, simply skip it.
         if (this_size < size)
@@ -186,44 +198,12 @@ void *NE_AllocFromEnd(NEChunk *first_chunk, size_t size)
         // +-----------+------+------+  After
         // |  NOT USED | USED | USED |
 
-        // Get next chunk and create a new one.
-
-        NEChunk *new = malloc(sizeof(NEChunk));
-        NE_AssertPointer(new, "Couldn't allocate chunk metadata.");
-
-        NEChunk *next = this->next;
+        // The size of this chunk has to be the current one minus the requested
+        // size for the new chunk.
+        NEChunk *new = ne_split_chunk(this, this_size - size);
 
         // Flag the new chunk as used
-
         new->state = NE_STATE_USED;
-
-        // Update pointers in the linked list
-        // ----------------------------------
-
-        this->next = new;
-        new->previous = this;
-
-        if (next == NULL)
-        {
-            new->next = NULL;
-        }
-        else
-        {
-            new->next = next;
-            next->previous = new;
-
-            // It shouldn't be free because deallocating a chunk should merge it
-            // with any free chunk next to it.
-            NE_Assert(next->state != NE_STATE_FREE,
-                      "Possible list corruption");
-        }
-
-        // Update pointers to start and end of this chunk and the new chunk
-        // ----------------------------------------------------------------
-
-        new->end = this->end;
-        new->start = (void *)(this_end - size);
-        this->end = new->start;
 
         return new->start;
     }
