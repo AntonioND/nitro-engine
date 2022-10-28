@@ -43,10 +43,9 @@ typedef enum {
 
 /// Holds information of a model.
 typedef struct {
-    bool meshfromfat;         ///< True if the mesh has been loaded from storage
-    bool iscloned;            ///< True if the model has been cloned
     NE_ModelType modeltype;   ///< Model type (static or animated)
     const u32 *meshdata;      ///< Display list / DSM file
+    bool free_mesh;           ///< True if the mesh has to be freed by NE
     NE_AnimInfo *animinfo[2]; ///< Animation information (two can be blended)
     int32_t anim_blend;       ///< Animation blend factor
     NE_Material *texture;     ///< Material used by this model

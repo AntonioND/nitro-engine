@@ -45,6 +45,7 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 
     model->modeltype = type;
     model->meshdata = NULL;
+    model->free_mesh = false;
 
     if (type == NE_Animated)
     {
@@ -82,7 +83,7 @@ void NE_ModelDelete(NE_Model *model)
         i++;
     }
 
-    if (!model->iscloned && model->meshfromfat)
+    if (model->free_mesh)
         free((void *)model->meshdata);
 
     if (model->modeltype == NE_Animated)
@@ -102,22 +103,17 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path)
     NE_AssertPointer(model, "NULL model pointer");
     NE_AssertPointer(path, "NULL path pointer");
     NE_Assert(model->modeltype == NE_Static, "Not a static model");
-    NE_Assert(!model->iscloned, "Can't load a mesh to a cloned model");
 
-    // Free previous data...
-    if (model->meshfromfat && model->meshdata != NULL)
-    {
-        free((void *)model->meshdata);
-        model->meshdata = NULL;
-    }
-
-    model->meshdata = (u32 *) NE_FATLoadData(path);
-    NE_AssertPointer(model->meshdata, "Couldn't load file from FAT");
-
-    if (model->meshdata == NULL)
+    void *pointer = NE_FATLoadData(path);
+    if (pointer == NULL)
         return 0;
 
-    model->meshfromfat = true;
+    // Free previous data...
+    if (model->free_mesh)
+        free((void *)model->meshdata);
+
+    model->meshdata = pointer;
+    model->free_mesh = true;
 
     return 1;
 }
@@ -130,17 +126,14 @@ int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer)
     NE_AssertPointer(model, "NULL model pointer");
     NE_AssertPointer(pointer, "NULL data pointer");
     NE_Assert(model->modeltype == NE_Static, "Not a static model");
-    NE_Assert(!model->iscloned, "Can't load a mesh to a cloned model");
 
     // Free previous data...
-    if (model->meshfromfat && model->meshdata != NULL)
-    {
+    if (model->free_mesh)
         free((void *)model->meshdata);
-        model->meshdata = NULL;
-    }
 
     model->meshdata = pointer;
-    model->meshfromfat = false;
+    model->free_mesh = false;
+
     return 1;
 }
 
@@ -257,15 +250,12 @@ void NE_ModelClone(NE_Model *dest, NE_Model *source)
     {
         memcpy(dest->animinfo[0], source->animinfo[0], sizeof(NE_AnimInfo));
         memcpy(dest->animinfo[1], source->animinfo[1], sizeof(NE_AnimInfo));
-        dest->iscloned = true;
-        dest->texture = source->texture;
     }
-    else
-    {
-        dest->iscloned = true;
-        dest->meshdata = source->meshdata;
-        dest->texture = source->texture;
-    }
+
+    dest->meshdata = source->meshdata;
+    dest->texture = source->texture;
+
+    dest->free_mesh = false;
 }
 
 void NE_ModelScaleI(NE_Model *model, int x, int y, int z)
@@ -452,16 +442,15 @@ int NE_ModelLoadDSMFAT(NE_Model *model, const char *path)
     NE_AssertPointer(path, "NULL path pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
-    if (model->meshfromfat)
+    void *pointer = NE_FATLoadData(path);
+    if (pointer == NULL)
+        return 1;
+
+    if (model->free_mesh)
         free((void *)model->meshdata);
 
-    model->iscloned = 0;
-    model->meshfromfat = true;
-
-    void *pointer = (void *)NE_FATLoadData(path);
-    NE_AssertPointer(pointer, "Couldn't load file from FAT");
-
     model->meshdata = (void *)pointer;
+    model->free_mesh = true;
 
     return 1;
 }
@@ -475,11 +464,10 @@ int NE_ModelLoadDSM(NE_Model *model, const void *pointer)
     NE_AssertPointer(pointer, "NULL data pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
-    if (model->meshfromfat)
+    if (model->free_mesh)
         free((void *)model->meshdata);
 
-    model->iscloned = 0;
-    model->meshfromfat = false;
+    model->free_mesh = false;
     model->meshdata = pointer;
 
     return 1;
