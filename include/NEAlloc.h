@@ -33,9 +33,12 @@ typedef struct {
 
 #define NE_ALLOC_MIN_SIZE (16)
 
-// They return 0 on success. On error, they returns a negative number.
+// They return 0 on success. On error, they return a negative number.
 int NE_AllocInit(NEChunk **first_element, void *start, void *end);
 int NE_AllocEnd(NEChunk **first_element);
+
+// It returns 0 on success. On error, it returns a negative number.
+int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size);
 
 // Allocates data at the first available space starting from the start of the
 // memory pool. Returns NULL on error, or a valid pointer on success.

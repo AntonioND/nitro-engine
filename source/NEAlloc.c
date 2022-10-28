@@ -99,6 +99,123 @@ static NEChunk *ne_split_chunk(NEChunk *this, size_t this_size)
     return new;
 }
 
+// This returns a pointer to the chunk that contains the provided address.
+// The start address of the chunk is considered to be part of that chunk, but
+// the end address isn't considered part of that chunk.
+static NEChunk *ne_search_address(NEChunk *first_chunk, void *address)
+{
+    NEChunk *this = first_chunk;
+
+    uintptr_t addr = (uintptr_t)address;
+
+    for ( ; this != NULL; this = this->next)
+    {
+        uintptr_t start = (uintptr_t)this->start;
+        uintptr_t end = (uintptr_t)this->end;
+
+        // We've gone too far. This pointer was likely before the allocated
+        // memory pool.
+        if (addr < start)
+            return NULL;
+
+        if (addr < end)
+            return this;
+    }
+
+    return NULL;
+}
+
+// This function searches the list and returns a chunk that contains the
+// specified range of memory (address, address + size) if it is free.
+static NEChunk *ne_search_free_range_chunk(NEChunk *first_chunk,
+                                           void *address, size_t size)
+{
+    // If that range of memory is free, it should be in one single chunk. Look
+    // for the chunk that contains the base address, and check if the end
+    // address is also part of that chunk.
+
+    NEChunk *chunk = ne_search_address(first_chunk, address);
+    if (chunk == NULL)
+        return NULL;
+
+    uintptr_t end_address = (uintptr_t)address + size;
+    uintptr_t chunk_end = (uintptr_t)chunk->end;
+
+    if (end_address > chunk_end)
+        return NULL;
+
+    if (chunk->state != NE_STATE_FREE)
+        return NULL;
+
+    return chunk;
+}
+
+int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
+{
+    if ((first_chunk == NULL) || (address == NULL) || (size == 0))
+        return -1;
+
+    // Force sizes multiple of NE_ALLOC_MIN_SIZE
+    const size_t mask = NE_ALLOC_MIN_SIZE - 1;
+    if ((size & mask) != 0)
+        size += NE_ALLOC_MIN_SIZE - (size & mask);
+
+    // Get a free chunk that contains this range of memory. This function
+    // returns NULL if there is no chunk that contains this range entirely.
+    // It also returns NULL if it isn't free.
+    NEChunk *this = ne_search_free_range_chunk(first_chunk, address, size);
+    if (this == NULL)
+        return -2;
+
+    uintptr_t alloc_start = (uintptr_t)address;
+    uintptr_t alloc_end = alloc_start + size;
+
+    uintptr_t this_start = (uintptr_t)this->start;
+    uintptr_t this_end = (uintptr_t)this->end;
+
+    // If this point is reached we have a free chunk such that:
+    //
+    //     this_start <= alloc_start  &&  alloc_end <= this_end
+    //
+    // - If the start address isn't the same, we need to create a new chunk.
+    //
+    // - If the end address isn't the same, we need to create another chunk.
+    //
+    // Finally, return the chunk that stays in the middle.
+
+    if (this_start < alloc_start)
+    {
+        // Split this chunk into two, ignore the first one and get the second
+        // one (which contains the start address)
+        this = ne_split_chunk(this, alloc_start - this_start);
+
+        // Only the start has changed
+        this_start = (uintptr_t)this->start;
+
+        NE_Assert(this_end == (uintptr_t)this->end, "Unexpected error");
+    }
+
+    if (alloc_end < this_end)
+    {
+        // Split this chunk into two as well. The first one is the final desired
+        // chunk, the second one is more free space.
+        NEChunk *next = ne_split_chunk(this, size);
+        next->state = NE_STATE_FREE;
+
+        // Only the end has changed
+        this_end = (uintptr_t)this->end;
+
+        NE_Assert(this_start == (uintptr_t)this->start, "Unexpected error");
+    }
+
+    this->state = NE_STATE_USED;
+
+    NE_Assert(size == (this_end - this_start), "Unexpected error");
+    NE_Assert(this->start == address, "Unexpected error");
+
+    return 0;
+}
+
 void *NE_Alloc(NEChunk *first_chunk, size_t size)
 {
     if ((first_chunk == NULL) || (size == 0))
