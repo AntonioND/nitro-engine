@@ -70,17 +70,19 @@ void NE_PhysicsDelete(NE_Physics *pointer)
     while (1)
     {
         if (i == NE_MAX_PHYSICS)
-            break;
+        {
+            NE_DebugPrint("Object not found");
+            return;
+        }
+
         if (NE_PhysicsPointers[i] == pointer)
         {
             NE_PhysicsPointers[i] = NULL;
             free(pointer);
-            break;
+            return;
         }
         i++;
     }
-
-    NE_DebugPrint("Object not found");
 }
 
 void NE_PhysicsDeleteAll(void)
@@ -373,7 +375,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
         }
     }
 
-    //Now, we get the module of speed in order to apply friction.
+    // Now, we get the module of speed in order to apply friction.
     if (pointer->friction != 0)
     {
         pointer->xspeed <<= 10;
@@ -384,7 +386,7 @@ void NE_PhysicsUpdate(NE_Physics *pointer)
         _mod_ += mulf32(pointer->zspeed, pointer->zspeed);
         _mod_ = sqrtf32(_mod_);
 
-        //check if module is very small -> speed = 0
+        // Check if module is very small -> speed = 0
         if (_mod_ < pointer->friction)
         {
             pointer->xspeed = pointer->yspeed = pointer->zspeed = 0;
@@ -412,7 +414,7 @@ bool NE_PhysicsCheckCollision(const NE_Physics *pointer1,
     NE_AssertPointer(pointer2, "NULL pointer 2");
     NE_Assert(pointer1 != pointer2, "Both objects are the same one");
 
-    //Get coordinates
+    // Get coordinates
     int posx = 0, posy = 0, posz = 0;
 
     NE_Model *model = pointer1->model;
