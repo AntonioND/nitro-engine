@@ -36,6 +36,7 @@
 #define ASSERT_MSG(cond, msg)                       \
     if (!(cond)) {                                  \
         printf("Line %d: %s\n", __LINE__, msg);     \
+        while (1);                                  \
     }
 
 // Pointer to address
@@ -516,6 +517,186 @@ void test_internal_list_state(void)
     ASSERT(ret == 0);
 }
 
+// Try to allocate chunks at specified addresses
+void test_alloc_range(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    int ret;
+    int count;
+
+    // Try to allocate with invalid list
+
+    ret = NE_AllocAddress(NULL, POOL_START, 1024);
+    ASSERT(ret == -1);
+
+    // Try to allocate invalid addresses
+
+    ret = NE_AllocAddress(alloc, NULL, 1024);
+    ASSERT(ret == -1);
+
+    ret = NE_AllocAddress(alloc, (void *)(POOL_START_ADDR - 1), 1024);
+    ASSERT(ret == -2);
+
+    ret = NE_AllocAddress(alloc, POOL_END, 1024);
+    ASSERT(ret == -2);
+
+    // Try to allocate zero bytes
+
+    ret = NE_AllocAddress(alloc, POOL_START, 0);
+    ASSERT(ret == -1);
+
+    // Try to allocate too many bytes
+
+    ret = NE_AllocAddress(alloc, POOL_START, POOL_SIZE + 1);
+    ASSERT(ret == -2);
+
+    // Try to allocate the maximum size, ensure that the list is one chunk long
+    // (it isn't needed to split it).
+
+    ret = NE_AllocAddress(alloc, POOL_START, POOL_SIZE);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, POOL_START);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Try to allocate a chunk that leaves free space after the chunk
+
+    ret = NE_AllocAddress(alloc, POOL_START, POOL_SIZE / 2);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 2);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, POOL_START);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Try to allocate a chunk that leaves free space before the chunk
+
+    void *half = (void *)(POOL_START_ADDR + (POOL_SIZE / 2));
+    ret = NE_AllocAddress(alloc, half, POOL_SIZE / 2);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 2);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, half);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Try to allocate a chunk that leaves free space before and after the chunk
+
+    void *quarter = (void *)(POOL_START_ADDR + (POOL_SIZE / 4));
+
+    ret = NE_AllocAddress(alloc, quarter, POOL_SIZE / 2);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 3);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, quarter);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Try to allocate in a chunk that is used
+
+    void *ptr = NE_Alloc(alloc, POOL_SIZE / 2);
+    ASSERT(ptr == POOL_START);
+
+    ret = NE_AllocAddress(alloc, POOL_START, POOL_SIZE / 4);
+    ASSERT(ret == -2);
+
+    ret = NE_Free(alloc, ptr);
+    ASSERT(ret == 0);
+
+    // Try to allocate in a chunk that is free, but small
+
+    ptr = NE_AllocFromEnd(alloc, POOL_SIZE / 2);
+    ASSERT(ptr == half);
+
+    ret = NE_AllocAddress(alloc, POOL_START, 3 * POOL_SIZE / 4);
+    ASSERT(ret == -2);
+
+    ret = NE_Free(alloc, half);
+    ASSERT(ret == 0);
+
+    // Try to allocate in a free chunk surrounded by used chunks, to verify that
+    // all links between chunks are correct.
+
+    void *three_quarters = (void *)(POOL_START_ADDR + (3 * POOL_SIZE / 4));
+
+    ptr = NE_Alloc(alloc, POOL_SIZE / 4);
+    ASSERT(ptr == POOL_START);
+
+    ptr = NE_AllocFromEnd(alloc, POOL_SIZE / 4);
+    ASSERT(ptr == three_quarters);
+
+    ret = NE_AllocAddress(alloc, half, POOL_SIZE / 8);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 5);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, half);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, POOL_START);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, three_quarters);
+    ASSERT(ret == 0);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    POOL_DEINITIALIZE();
+}
+
 // Known random number generator to always generate the same sequence of numbers
 // and make this test reproducible.
 int rand(void)
@@ -598,6 +779,7 @@ int main(void)
     test_alloc_fail();
     test_statistics();
     test_internal_list_state();
+    test_alloc_range();
     test_stress();
 
     printf("Done!");
