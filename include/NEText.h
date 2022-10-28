@@ -59,6 +59,23 @@ void NE_TextResetSystem(void);
 /// @return Returns the number of characters printed.
 int NE_TextPrint(int slot, int x, int y, u32 color, const char *text);
 
+/// Prints text in 3D mode.
+///
+/// '\n' is supported. '%d', '%s', etc aren't supported.
+///
+/// @param slot Text font slot to use.
+/// @param x X position.
+/// @param y Y position.
+/// @param z Z position.
+/// @param xAngle X angle.
+/// @param yAngle Y angle.
+/// @param zAngle Z angle.
+/// @param scale Text scale.
+/// @param color Text color.
+/// @param text Text to print.
+/// @return Returns the number of characters printed.
+int NE_TextPrint3D(int slot, float x, float y, float z, float xAngle, float yAngle, float zAngle, float scale, u32 color, const char *text);
+
 /// Prints text within the limits of a rectangle.
 ///
 /// '\n' is supported. '%d', '%s', etc aren't supported.
