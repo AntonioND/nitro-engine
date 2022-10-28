@@ -517,6 +517,87 @@ void test_internal_list_state(void)
     ASSERT(ret == 0);
 }
 
+// Tests to verify that a list can be filled with blocks
+void test_alloc_fill(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    int ret;
+    int count;
+    size_t size = POOL_SIZE / 32;
+    NEMemInfo info;
+
+    // Allocate forwards
+
+    for (int i = 0; i < 32; i++)
+    {
+        uintptr_t addr = POOL_START_ADDR + size * i;
+        void *ptr = NE_Alloc(alloc, size);
+        ASSERT(ptr == (void *)addr);
+    }
+
+    ret = NE_MemGetInformation(alloc, &info);
+    ASSERT(ret == 0);
+    ASSERT(info.free == 0);
+    ASSERT(info.used == POOL_SIZE);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 32);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    for (int i = 0; i < 32; i++)
+    {
+        uintptr_t addr = POOL_START_ADDR + size * i;
+        ret = NE_Free(alloc, (void *)addr);
+        ASSERT(ret == 0);
+    }
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    // Allocate backwards
+
+    for (int i = 0; i < 32; i++)
+    {
+        uintptr_t addr = POOL_START_ADDR + size * (31 - i);
+        void *ptr = NE_AllocFromEnd(alloc, size);
+        ASSERT(ptr == (void *)addr);
+    }
+
+    ret = NE_MemGetInformation(alloc, &info);
+    ASSERT(ret == 0);
+    ASSERT(info.free == 0);
+    ASSERT(info.used == POOL_SIZE);
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 32);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    for (int i = 0; i < 32; i++)
+    {
+        uintptr_t addr = POOL_START_ADDR + size * i;
+        ret = NE_Free(alloc, (void *)addr);
+        ASSERT(ret == 0);
+    }
+
+    count = count_num_chunks(alloc);
+    ASSERT(count == 1);
+
+    ret = verify_consistency(alloc, POOL_START, POOL_END);
+    ASSERT(ret == 0);
+
+    POOL_DEINITIALIZE();
+}
+
 // Try to allocate chunks at specified addresses
 void test_alloc_range(void)
 {
@@ -779,6 +860,7 @@ int main(void)
     test_alloc_fail();
     test_statistics();
     test_internal_list_state();
+    test_alloc_fill();
     test_alloc_range();
     test_stress();
 
