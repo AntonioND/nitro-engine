@@ -37,6 +37,12 @@ typedef struct {
 int NE_AllocInit(NEChunk **first_element, void *start, void *end);
 int NE_AllocEnd(NEChunk **first_element);
 
+// This function takes a memory range defined by ["start", "end"] and tries to
+// look a chunk of free memory that is at least as big as "size". It doesn't
+// allocate it, that needs to be done with NE_AllocAddress(). On error, this
+// function returns NULL.
+void *NE_AllocFindInRange(NEChunk *first_chunk, void *start, void *end, size_t size);
+
 // It returns 0 on success. On error, it returns a negative number.
 int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size);
 

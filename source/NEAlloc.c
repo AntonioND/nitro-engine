@@ -125,6 +125,56 @@ static NEChunk *ne_search_address(NEChunk *first_chunk, void *address)
     return NULL;
 }
 
+void *NE_AllocFindInRange(NEChunk *first_chunk, void *start, void *end, size_t size)
+{
+    if ((first_chunk == NULL) || (start == NULL) || (end == NULL) || (size == 0))
+        return NULL;
+
+    // Get the chunk that contains the first address. If the start address of
+    // the first chunk is after the provided start, get the first chunk.
+    NEChunk *this;
+    if (start < first_chunk->start)
+        this = first_chunk;
+    else
+        this = ne_search_address(first_chunk, start);
+
+    uintptr_t range_end = (uintptr_t)end;
+
+    for ( ; this != NULL; this = this->next)
+    {
+        // Is this free?
+        if (this->state != NE_STATE_FREE)
+            continue;
+
+        // "start" is inside "this", but "this->start" may be before "start". In
+        // that case, we need to calculate the size actually inside the range
+        // provided by the user.
+        uintptr_t real_start;
+        if (this->start < start)
+            real_start = (uintptr_t)start;
+        else
+            real_start = (uintptr_t)this->start;
+
+        uintptr_t this_end = (uintptr_t)this->end;
+        size_t this_size = this_end - real_start;
+
+        // Check if the requested chunk would fit here
+        if (this_size < size)
+            continue;
+
+        // Check if the expected end of the allocated chunk is within the limits
+        // provided by the user. If so, we've gone over the limit, there is no
+        // need to keep searching.
+        uintptr_t expected_end = real_start + size;
+        if (expected_end > range_end)
+            return NULL;
+
+        return (void *)real_start;
+    }
+
+    return NULL;
+}
+
 // This function searches the list and returns a chunk that contains the
 // specified range of memory (address, address + size) if it is free.
 static NEChunk *ne_search_free_range_chunk(NEChunk *first_chunk,

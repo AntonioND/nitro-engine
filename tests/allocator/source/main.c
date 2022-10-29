@@ -360,6 +360,7 @@ void test_statistics(void)
     POOL_DEINITIALIZE();
 }
 
+// Count the number of chunks present in the linked list.
 int count_num_chunks(NEChunk *list)
 {
     int count = 0;
@@ -370,6 +371,7 @@ int count_num_chunks(NEChunk *list)
     return count;
 }
 
+// Verify that the linked list of chunks has consistent start and end addresses.
 int verify_consistency(NEChunk *list, void *start, void *end)
 {
     if (list == NULL)
@@ -778,9 +780,157 @@ void test_alloc_range(void)
     POOL_DEINITIALIZE();
 }
 
+// Tests for NE_AllocFindInRange()
+void test_find_range(void)
+{
+    printf("%s\n", __func__);
+
+    POOL_INITIALIZE();
+
+    int ret;
+    void *found;
+
+    void *half = (void *)(POOL_START_ADDR + POOL_SIZE / 2);
+
+    // Invalid arguments
+
+    found = NE_AllocFindInRange(NULL, POOL_START, POOL_END, 1024);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, NULL, POOL_END, 1024);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, NULL, 1024);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, 0);
+    ASSERT(found == NULL);
+
+    // A few tests with a completely empty pool
+    // ----------------------------------------
+
+    // Get memory from the start of a chunk
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, 1024);
+    ASSERT(found == POOL_START);
+
+    // Get memory from the middle of a chunk
+
+    found = NE_AllocFindInRange(alloc, half, POOL_END, 1024);
+    ASSERT(found == half);
+
+    // Ask for too much memory with an empty pool
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, POOL_SIZE + 1);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, half, POOL_END, POOL_SIZE);
+    ASSERT(found == NULL);
+
+    // The user requests to search in a range that starts before the memory pool
+
+    void *before_start = (void *)(POOL_START_ADDR - 1024);
+
+    found = NE_AllocFindInRange(alloc, before_start, POOL_END, POOL_SIZE);
+    ASSERT(found == POOL_START);
+
+    // The range requested by the user ends before the memory pool
+
+    found = NE_AllocFindInRange(alloc, before_start, POOL_START, 64);
+    ASSERT(found == NULL);
+
+    // The range requested by the user starts after the memory pool
+
+    void *after_end = (void *)(POOL_END_ADDR + 1024);
+
+    found = NE_AllocFindInRange(alloc, POOL_END, after_end, 64);
+    ASSERT(found == NULL);
+
+    // Now, fill the memory pool with a few chunks of data and run more tests
+    // ----------------------------------------------------------------------
+
+    void *one_eight = (void *)(POOL_START_ADDR + (POOL_SIZE / 8));
+    void *one_quarter = (void *)(POOL_START_ADDR + (POOL_SIZE / 4));
+    void *three_eights = (void *)(POOL_START_ADDR + (3 * POOL_SIZE / 8));
+    void *three_quarters = (void *)(POOL_START_ADDR + (3 * POOL_SIZE / 4));
+    void *five_eights = (void *)(POOL_START_ADDR + (5 * POOL_SIZE / 8));
+
+    size_t quarter = POOL_SIZE / 4;
+
+    // +-----------------+-----------------+-----------------+-----------------+
+    // |                 |      USED       |                 |      USED       |
+    // +-----------------+-----------------+-----------------+-----------------+
+
+    ret = NE_AllocAddress(alloc, one_quarter, quarter);
+    ASSERT(ret == 0);
+
+    ret = NE_AllocAddress(alloc, three_quarters, quarter);
+    ASSERT(ret == 0);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, quarter);
+    ASSERT(found == POOL_START);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, POOL_SIZE / 2);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, one_eight, POOL_END, quarter);
+    ASSERT(found == half);
+
+    found = NE_AllocFindInRange(alloc, three_eights, POOL_END, quarter);
+    ASSERT(found == half);
+
+    found = NE_AllocFindInRange(alloc, three_eights, POOL_END, POOL_SIZE / 2);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, five_eights, POOL_END, quarter);
+    ASSERT(found == NULL);
+
+    ret = NE_Free(alloc, one_quarter);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, three_quarters);
+    ASSERT(ret == 0);
+
+    // +-----------------+-----------------+-----------------+-----------------+
+    // |      USED       |                 |      USED       |                 |
+    // +-----------------+-----------------+-----------------+-----------------+
+
+    ret = NE_AllocAddress(alloc, POOL_START, quarter);
+    ASSERT(ret == 0);
+
+    ret = NE_AllocAddress(alloc, half, quarter);
+    ASSERT(ret == 0);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, quarter);
+    ASSERT(found == one_quarter);
+
+    found = NE_AllocFindInRange(alloc, POOL_START, POOL_END, POOL_SIZE / 2);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, one_eight, POOL_END, quarter);
+    ASSERT(found == one_quarter);
+
+    found = NE_AllocFindInRange(alloc, three_eights, POOL_END, quarter);
+    ASSERT(found == three_quarters);
+
+    found = NE_AllocFindInRange(alloc, three_eights, POOL_END, POOL_SIZE / 2);
+    ASSERT(found == NULL);
+
+    found = NE_AllocFindInRange(alloc, five_eights, POOL_END, quarter);
+    ASSERT(found == three_quarters);
+
+    ret = NE_Free(alloc, POOL_START);
+    ASSERT(ret == 0);
+
+    ret = NE_Free(alloc, half);
+    ASSERT(ret == 0);
+
+    POOL_DEINITIALIZE();
+}
+
 // Known random number generator to always generate the same sequence of numbers
 // and make this test reproducible.
-int rand(void)
+int my_rand(void)
 {
     static unsigned long int next = 1;
     next = next * 1103515245 + 12345;
@@ -804,7 +954,7 @@ void test_stress(void)
 
     for (int i = 0; i < 500000; i++)
     {
-        unsigned int selected = rand() % NUM_PTRS;
+        unsigned int selected = my_rand() % NUM_PTRS;
 
         if (ptr[selected] == NULL)
         {
@@ -812,7 +962,7 @@ void test_stress(void)
             // small to ever fill the memory with this chunk size, so it should
             // always be allocated.
 
-            size_t size = (rand() & 0x3FFF) + 1;
+            size_t size = (my_rand() & 0x3FFF) + 1;
 
             void *p;
 
@@ -862,6 +1012,7 @@ int main(void)
     test_internal_list_state();
     test_alloc_fill();
     test_alloc_range();
+    test_find_range();
     test_stress();
 
     printf("Done!");
