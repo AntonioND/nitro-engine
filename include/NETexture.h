@@ -79,11 +79,18 @@ void NE_MaterialColorDelete(NE_Material *tex);
 
 /// Loads a texture from the filesystem and assigns it to a material object.
 ///
-/// The sizes don't need to be a power of two, but it will be much more
-/// efficient if the width is a power of two. Textures with a non-power-of-two
-/// width need to be resized manually, and they don't save any VRAM when loaded.
-/// Textures with a non-power-of-two height don't need to be resized, and they
-/// actually save VRAM space.
+/// The height doesn't need to be a power of two, but he width must be a power
+/// of two.
+///
+/// Textures with width that isn't a power of two need to be resized manually,
+/// which is very slow, and they don't save any VRAM when loaded compared to a
+/// texture with the full width. The only advantage is that they need less
+/// storage space, but you can achieve the same effect by compressing them.
+///
+/// Textures with a height that isn't a power of two don't need to be resized,
+/// and they actually save VRAM space (you tell the GPU that the texture is
+/// bigger, but then you ignore the additional space, as it will be used by
+/// other textures).
 ///
 /// @param tex Material.
 /// @param fmt Texture format.
@@ -98,11 +105,15 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
 
 /// Loads a texture from RAM and assigns it to a material object.
 ///
-/// The sizes don't need to be a power of two, but it will be much more
-/// efficient if the width is a power of two. Textures with a non-power-of-two
-/// width need to be resized manually, and they don't save any VRAM when loaded.
-/// Textures with a non-power-of-two height don't need to be resized, and they
-/// actually save VRAM space.
+/// Textures with width that isn't a power of two need to be resized manually,
+/// which is very slow, and they don't save any VRAM when loaded compared to a
+/// texture with the full width. The only advantage is that they need less
+/// storage space, but you can achieve the same effect by compressing them.
+///
+/// Textures with a height that isn't a power of two don't need to be resized,
+/// and they actually save VRAM space (you tell the GPU that the texture is
+/// bigger, but then you ignore the additional space, as it will be used by
+/// other textures).
 ///
 /// @param tex Material.
 /// @param fmt Texture format.

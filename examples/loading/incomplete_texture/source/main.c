@@ -14,30 +14,32 @@
 NE_Material *Material, *Material2;
 NE_Palette *Palette, *Palette2;
 
-// This is an example to show how Nitro Engine can load textures of any size.
-// If the width is not a power of 2, it will take much more time than normal to
-// load. The height doesn't matter.
+// This is an example to show how Nitro Engine can load textures of any height.
+// Internally, the NDS thinks that the texture is bigger, but Nitro Engine only
+// uses the parts that the user has loaded.
 //
-// Nitro Engine resizes the width to the nearest power of two (if needed) when
-// loading a texture. This means:
+// The width needs to be a power of two because:
 //
-// - It needs more time than normal to load because it needs time to resize it.
-// - It won't save space in VRAM, the DS still needs to see the full width in
-//   VRAM. It will just save some space in the ROM.
+// - Supporting them complicates the loading code a lot.
 //
-// If the height is different it will actually save some space in VRAM (apart
-// from saving space in the ROM).
+// - Compressed textures can't really be expanded because they are composed
+//   by many 4x4 subimages.
+//
+// - They don't save space in VRAM.
+//
+// - They save space in the final ROM, but you can achieve the same effect
+//   compressing them with LZSS compression, for example.
 
 void Draw3DScene(void)
 {
     NE_2DViewInit();
 
     NE_2DDrawTexturedQuad(40, 10,
-                          40 + 50, 10 + 128,
+                          40 + 32, 10 + 100,
                           0, Material);
 
     NE_2DDrawTexturedQuad(128, 10,
-                          128 + 100, 10 + 100,
+                          128 + 64, 10 + 100,
                           0, Material2);
 }
 
@@ -56,7 +58,7 @@ int main(void)
 
     NE_MaterialTexLoad(Material,
                        NE_A3PAL32, // Texture type
-                       100, 256,   // Width, height (in pixels)
+                       64, 200,    // Width, height (in pixels)
                        NE_TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
     NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
     NE_MaterialSetPalette(Material, Palette);
@@ -65,7 +67,7 @@ int main(void)
     Material2 = NE_MaterialCreate();
     Palette2 = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material2, NE_PAL4, 100, 100, NE_TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Material2, NE_PAL4, 64, 100, NE_TEXGEN_TEXCOORD,
                        (u8 *)pal4_tex_bin);
     NE_PaletteLoad(Palette2, (u16 *)pal4_pal_bin, 4, NE_PAL4);
     NE_MaterialSetPalette(Material2, Palette2);

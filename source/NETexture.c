@@ -30,7 +30,7 @@ static int NE_MAX_TEXTURES;
 static u32 ne_default_diffuse_ambient;
 static u32 ne_default_specular_emission;
 
-static int __NE_GetValidSize(int size)
+static int ne_is_valid_tex_size(int size)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -40,7 +40,7 @@ static int __NE_GetValidSize(int size)
     return 0;
 }
 
-static int __NE_ConvertSizeRaw(int size)
+static int ne_tex_raw_size(int size)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -51,16 +51,34 @@ static int __NE_ConvertSizeRaw(int size)
     return 0;
 }
 
-static inline void NE_MaterialTexParam(NE_Material *tex, int sizeX, int sizeY,
-                                       uint32 *addr, GL_TEXTURE_TYPE_ENUM mode,
-                                       u32 param)
+static inline void ne_set_material_tex_param(NE_Material *tex,
+                            int sizeX, int sizeY, uint32 *addr,
+                            GL_TEXTURE_TYPE_ENUM mode, u32 param)
 {
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No assigned texture");
-    NE_Texture[tex->texindex].param = param
-            | (__NE_ConvertSizeRaw(sizeX) << 20)
-            | (__NE_ConvertSizeRaw(sizeY) << 23)
-            | (((uint32) addr >> 3) & 0xFFFF) | (mode << 26);
+    NE_Texture[tex->texindex].param =
+            (ne_tex_raw_size(sizeX) << 20) |
+            (ne_tex_raw_size(sizeY) << 23) |
+            (((uint32)addr >> 3) & 0xFFFF) |
+            (mode << 26) | param;
+}
+
+static void ne_texture_delete(int texture_index)
+{
+    int slot = texture_index;
+
+    // A texture may be used by several materials
+    NE_Texture[slot].uses--;
+
+    // If the number of users is zero, delete it.
+    if (NE_Texture[slot].uses == 0)
+    {
+        NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
+        NE_Texture[slot].adress = NULL;
+        NE_Texture[slot].param = 0;
+        NE_Texture[slot].palette = 0;
+    }
 }
 
 //--------------------------------------------------------------------------
@@ -124,171 +142,46 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
     return ret;
 }
 
-static int __NE_TextureResizeWidth(void *source, void *dest,
-                                   NE_TextureFormat fmt,
-                                   int height, int width, int newwidth)
-{
-    NE_AssertPointer(source, "NULL source pointer");
-    NE_AssertPointer(dest, "NULL dest pointer");
-
-    static const int __NE_TextureDepth[] = {
-        0,  // Nothing
-        8,  // NE_A3PAL32
-        2,  // NE_PAL4
-        4,  // NE_PAL16
-        8,  // NE_PAL256
-        0,  // NE_COMPRESSED
-        8,  // NE_A5PAL8
-        16, // NE_A1RGB5
-        16  // NE_RGB5
-    };
-
-    int bits = __NE_TextureDepth[fmt];
-
-    if (bits == 16)
-    {
-        // NE_A1RGB5 or NE_RGB5
-        // --------------------
-
-        // Cast to correct width
-        u16 *d = dest;
-        u16 *s = source;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < newwidth; x++)
-            {
-                if (x < width)
-                    *d = *s++;
-                d++;
-            }
-        }
-
-        return 1;
-
-    }
-    else if (bits == 8)
-    {
-        // NE_PAL256, NE_A3PAL32 or NE_A5PAL8
-        // ----------------------------------
-
-        // Cast to correct width
-        u8 *d = dest;
-        u8 *s = source;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < newwidth; x++)
-            {
-                if (x < width)
-                    *d = *s++;
-                d++;
-            }
-        }
-
-        return 1;
-    }
-    else if (bits == 4)
-    {
-        // NE_PAL16
-        // --------
-
-        // Cast to correct width
-        u8 *d = dest;
-        u8 *s = source;
-        int src_idx = 0;
-        int dst_idx = 0;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < newwidth; x++)
-            {
-                if (x < width)
-                {
-                    if (dst_idx == 0)
-                        *d = 0;
-
-                    *d |= ((*s >> (src_idx << 2)) & 0xF)
-                        << (dst_idx << 2);
-
-                    if (src_idx == 1)
-                        s++;
-                    src_idx ^= 1;
-                }
-
-                if (dst_idx == 1)
-                    d++;
-
-                dst_idx ^= 1;
-            }
-        }
-
-        return 1;
-    }
-    else if (bits == 2)
-    {
-        // NE_PAL4
-        // -------
-
-        // Cast to correct width
-        u8 *d = dest;
-        u8 *s = source;
-        int src_idx = 0;
-        int dst_idx = 0;
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < newwidth; x++)
-            {
-                if (x < width)
-                {
-                    if (dst_idx == 0)
-                        *d = 0;
-
-                    *d |= ((*s >> (src_idx << 1)) & 0x3)
-                        << (dst_idx << 1);
-
-                    if (src_idx == 3)
-                        s++;
-                    src_idx = (src_idx + 1) & 3;
-                }
-
-                if (dst_idx == 3)
-                    d++;
-                dst_idx = (dst_idx + 1) & 3;
-            }
-        }
-
-        return 1;
-    }
-
-    return 0;
-}
-
-static const int __NE_TextureSizeShift[] = {
-    0, // Nothing
-    1, // NE_A3PAL32
-    3, // NE_PAL4
-    2, // NE_PAL16
-    1, // NE_PAL256
-    0, // NE_COMPRESSED
-    1, // NE_A5PAL8
-    0, // NE_A1RGB5
-    0, // NE_RGB5
-};
-
 int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
                        int sizeX, int sizeY, NE_TextureFlags flags,
                        void *texture)
 {
+    const int size_shift[] = {
+        0, // Nothing
+        1, // NE_A3PAL32
+        3, // NE_PAL4
+        2, // NE_PAL16
+        1, // NE_PAL256
+        0, // NE_COMPRESSED (This value isn't used)
+        1, // NE_A5PAL8
+        0, // NE_A1RGB5
+        0, // NE_RGB5
+    };
+
     NE_AssertPointer(tex, "NULL material pointer");
+
+    // The width of a texture must be a power of 2. The height doesn't need to
+    // be a power of 2, but we will have to cheat later and make the DS believe
+    // it is a power of 2.
+    if (ne_is_valid_tex_size(sizeX) != sizeX)
+    {
+        NE_DebugPrint("Width of textures must be powers of 2");
+        return 0;
+    }
+
+    // Compressed textures are organized in 4x4 chunks.
+    if (fmt == NE_COMPRESSED)
+    {
+        if ((sizeY & 3) != 0)
+        {
+            NE_DebugPrint("Compressed textures need a height multiple of 4");
+            return 0;
+        }
+    }
 
     // Check if texture exists
     if (tex->texindex != NE_NO_TEXTURE)
-    {
-        NE_MaterialDelete(tex);
-        tex = NE_MaterialCreate();
-    }
+        ne_texture_delete(tex->texindex);
 
     // Get free slot
     tex->texindex = NE_NO_TEXTURE;
@@ -307,92 +200,58 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         return 0;
     }
 
-    int slot = tex->texindex;
-
-    // Save real size
-    NE_Texture[slot].sizex = sizeX;
-    NE_Texture[slot].sizey = sizeY;
-
-    u32 size = 0;
-
-    // If width is not a power of 2
-    bool invalidwidth = false;
-    if (__NE_GetValidSize(sizeX) != sizeX)
+    // TODO: Support them
+    if (fmt == NE_COMPRESSED)
     {
-        invalidwidth = true;
-        // The width must be a power of 2, but this texture has an invalid size.
-        // Let's expand the texture so that it is valid, load it to VRAM, and
-        // delete the temporary buffer used to expand it.
-
-        size = (__NE_GetValidSize(sizeX) * sizeY << 1) >>
-                __NE_TextureSizeShift[fmt];
-
-        void *newbuffer = malloc(size);
-        NE_AssertPointer(newbuffer, "Not enough memory for temporary buffer");
-
-        if (__NE_TextureResizeWidth(texture, newbuffer, fmt, sizeY, sizeX,
-                                    __NE_GetValidSize(sizeX)) == 0)
-        {
-            free(newbuffer);
-            return 0;
-        }
-        // New width
-        sizeX = __NE_GetValidSize(sizeX);
-
-        // Use new data
-        texture = newbuffer;
-    }
-
-    // The height doesn't need to be power of 2, but we will have to cheat later
-    // and make the DS believe it is a power of 2.
-    if (!invalidwidth)
-        size = (sizeX * sizeY << 1) >> __NE_TextureSizeShift[fmt];
-
-    u32 *addr = (u32 *) NE_Alloc(NE_TexAllocList, size); // Aligned to 8 bytes
-
-    if (!addr)
-    {
-        NE_DebugPrint("Not enough memory");
-        if (invalidwidth)
-            free(texture); // Free temp data
+        NE_DebugPrint("Compressed textures not supported");
         return 0;
     }
 
-    NE_Texture[slot].adress = (void *)addr;
-    // Initially only this material is using this texture
-    NE_Texture[slot].uses = 1;
+    uint32_t size = (sizeX * sizeY << 1) >> size_shift[fmt];
 
-    // unlock texture memory
+    // This pointer must be aligned to 8 bytes at least
+    void *addr = NE_AllocFromEnd(NE_TexAllocList, size);
+    if (!addr)
+    {
+        tex->texindex = NE_NO_TEXTURE;
+        NE_DebugPrint("Not enough memory");
+        return 0;
+    }
+
+    // Save information
+    int slot = tex->texindex;
+    NE_Texture[slot].sizex = sizeX;
+    NE_Texture[slot].sizey = sizeY;
+    NE_Texture[slot].adress = addr;
+    NE_Texture[slot].uses = 1; // Initially only this material uses the texture
+
+    // Unlock texture memory for writing
+    // TODO: Only unlock the banks that Nitro Engine uses.
     u32 vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
-                       VRAM_D_LCD);
+                                       VRAM_D_LCD);
 
-    // We do NE_RGB5 as NE_A1RGB5, but we set each alpha bit to 1 during the
-    // copy to VRAM.
     if (fmt == NE_RGB5)
     {
+        // Treat NE_RGB5 as NE_A1RGB5, but set each alpha bit to 1 during the
+        // copy to VRAM.
         u16 *src = (u16 *)texture;
-        u16 *dest = (u16 *)addr;
-        NE_MaterialTexParam(tex, sizeX, __NE_GetValidSize(sizeY), addr,
-                            NE_A1RGB5, flags);
-
+        u16 *dest = addr;
+        size >>= 1; // We are going to process two bytes each iteration
         while (size--)
-        {
-            *dest++ = *src | (1 << 15);
-            src++;
-        }
+            *dest++ = *src++ | (1 << 15);
+
+        fmt = NE_A1RGB5;
     }
     else
     {
         // For everything else, we do a straight copy
-        NE_MaterialTexParam(tex, sizeX, __NE_GetValidSize(sizeY), addr,
-                            fmt, flags);
-
         swiCopy((u32 *)texture, addr, (size >> 2) | COPY_MODE_WORD);
     }
 
+    int hardware_size_y = ne_is_valid_tex_size(sizeY);
+    ne_set_material_tex_param(tex, sizeX, hardware_size_y, addr, fmt, flags);
+
     vramRestorePrimaryBanks(vramTemp);
-    if (invalidwidth)
-        free(texture); // Free temp data
 
     return 1;
 }
@@ -526,19 +385,7 @@ void NE_MaterialDelete(NE_Material *tex)
 
     // If there is an asigned texture
     if (tex->texindex != NE_NO_TEXTURE)
-    {
-        int slot = tex->texindex;
-        // A texture may be used by several materials
-        NE_Texture[slot].uses--;
-        // If this is the only material to use it, delete it
-        if (NE_Texture[slot].uses == 0)
-        {
-            NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
-            NE_Texture[slot].adress = NULL;
-            NE_Texture[slot].param = 0;
-            NE_Texture[slot].palette = 0;
-        }
-    }
+        ne_texture_delete(tex->texindex);
 
     for (int i = 0; i < NE_MAX_TEXTURES; i++)
     {
