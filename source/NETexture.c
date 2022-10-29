@@ -304,7 +304,6 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     if (tex->texindex == NE_NO_TEXTURE)
     {
         NE_DebugPrint("No free slots");
-        tex->texindex = 0;
         return 0;
     }
 
