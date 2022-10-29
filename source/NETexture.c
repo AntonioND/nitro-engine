@@ -453,7 +453,7 @@ void NE_TextureSystemReset(int max_textures, int max_palettes,
     else
         NE_MAX_TEXTURES = max_textures;
 
-    NE_AllocInit(&NE_TexAllocList, (void *)VRAM_A, (void *)VRAM_E);
+    NE_AllocInit(&NE_TexAllocList, VRAM_A, VRAM_E);
 
     NE_Assert((bank_flags & 0xF) != 0, "No VRAM banks selected");
 
@@ -466,51 +466,46 @@ void NE_TextureSystemReset(int max_textures, int max_palettes,
         bank_flags &= ~NE_VRAM_CD;
 
     // Now, configure allocation system. The buffer size always sees the
-    // four banks of VRAM. It is needed to allocate one chunk for each and
-    // lock the ones that aren't allowed to be used by Nitro Engine.
-
-    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_A
-    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_B
-    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_C
-    NE_Alloc(NE_TexAllocList, 128 * 1024); // VRAM_D
+    // four banks of VRAM. It is needed to allocate and lock one chunk per bank
+    // that isn't allocated to Nitro Engine.
 
     if (bank_flags & NE_VRAM_A)
     {
         vramSetBankA(VRAM_A_TEXTURE_SLOT0);
-        NE_Free(NE_TexAllocList, VRAM_A);
     }
     else
     {
+        NE_AllocAddress(NE_TexAllocList, VRAM_A, 128 * 1024);
         NE_Lock(NE_TexAllocList, VRAM_A);
     }
 
     if (bank_flags & NE_VRAM_B)
     {
         vramSetBankB(VRAM_B_TEXTURE_SLOT1);
-        NE_Free(NE_TexAllocList, VRAM_B);
     }
     else
     {
+        NE_AllocAddress(NE_TexAllocList, VRAM_B, 128 * 1024);
         NE_Lock(NE_TexAllocList, VRAM_B);
     }
 
     if (bank_flags & NE_VRAM_C)
     {
         vramSetBankC(VRAM_C_TEXTURE_SLOT2);
-        NE_Free(NE_TexAllocList, VRAM_C);
     }
     else
     {
+        NE_AllocAddress(NE_TexAllocList, VRAM_C, 128 * 1024);
         NE_Lock(NE_TexAllocList, VRAM_C);
     }
 
     if (bank_flags & NE_VRAM_D)
     {
         vramSetBankD(VRAM_D_TEXTURE_SLOT3);
-        NE_Free(NE_TexAllocList, VRAM_D);
     }
     else
     {
+        NE_AllocAddress(NE_TexAllocList, VRAM_D, 128 * 1024);
         NE_Lock(NE_TexAllocList, VRAM_D);
     }
 
