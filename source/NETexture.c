@@ -112,10 +112,15 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
     NE_Assert(sizeX > 0 && sizeY > 0, "Size must be positive");
 
     char *ptr = NE_FATLoadData(path);
-    NE_AssertPointer(ptr, "Couldn't load file from FAT");
+    if (ptr == NULL)
+    {
+        NE_DebugPrint("Couldn't load file from FAT");
+        return 0;
+    }
 
     int ret = NE_MaterialTexLoad(tex, fmt, sizeX, sizeY, flags, (u8 *)ptr);
     free(ptr);
+
     return ret;
 }
 
