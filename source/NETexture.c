@@ -51,6 +51,34 @@ static int ne_tex_raw_size(int size)
     return 0;
 }
 
+// The provided address must be in VRAM_A
+static inline void *slot0_to_slot1(void *ptr)
+{
+    uintptr_t offset0 = (uintptr_t)ptr - (uintptr_t)VRAM_A;
+    return (void *)((uintptr_t)VRAM_B + (offset0 / 2));
+}
+
+// The provided address must be in VRAM_B
+static inline void *slot1_to_slot0(void *ptr)
+{
+    uintptr_t offset1 = (uintptr_t)ptr - (uintptr_t)VRAM_B;
+    return (void *)((uintptr_t)VRAM_A + (offset1 * 2));
+}
+
+// The provided address must be in VRAM_C
+static inline void *slot2_to_slot1(void *ptr)
+{
+    uintptr_t offset2 = (uintptr_t)ptr - (uintptr_t)VRAM_C;
+    return (void *)((uintptr_t)VRAM_B + (64 * 1024) + (offset2 / 2));
+}
+
+// The provided address must be in VRAM_B
+static inline void *slot1_to_slot2(void *ptr)
+{
+    uintptr_t offset1 = (uintptr_t)ptr - (uintptr_t)VRAM_B - (64 * 1024);
+    return (void *)((uintptr_t)VRAM_C + (offset1 * 2));
+}
+
 static inline void ne_set_material_tex_param(NE_Material *tex,
                             int sizeX, int sizeY, uint32 *addr,
                             GL_TEXTURE_TYPE_ENUM mode, u32 param)
@@ -74,7 +102,23 @@ static void ne_texture_delete(int texture_index)
     // If the number of users is zero, delete it.
     if (NE_Texture[slot].uses == 0)
     {
-        NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
+        uint32_t fmt = (NE_Texture[slot].param >> 26) & 7;
+
+        if (fmt == NE_COMPRESSED)
+        {
+            // Check if the texture is allocated in VRAM_A or VRAM_C, and
+            // calculate the corresponding address in VRAM_B.
+            void *slot02 = NE_Texture[slot].adress;
+            void *slot1 = (slot02 < (void *)VRAM_B) ?
+                          slot0_to_slot1(slot02) : slot2_to_slot1(slot02);
+            NE_Free(NE_TexAllocList, slot02);
+            NE_Free(NE_TexAllocList, slot1);
+        }
+        else
+        {
+            NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
+        }
+
         NE_Texture[slot].adress = NULL;
         NE_Texture[slot].param = 0;
         NE_Texture[slot].palette = 0;
@@ -142,23 +186,120 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
     return ret;
 }
 
+// This function takes as argument the size of the chunk of the compressed
+// texture chunk that goes into slots 0 or 2. The size that goes into slot 1 is
+// always half of this size, so it isn't needed to provide it.
+//
+// It returns 0 on success, as well as pointers to the address where both chunks
+// need to be copied.
+static int ne_alloc_compressed_tex(size_t size, void **slot02, void **slot1)
+{
+    size_t size02 = size;
+    size_t size1 = size / 2;
+
+    // First, try with slot 0 + slot 1
+    // -------------------------------
+
+    // Get the first valid range in slot 0
+    void *addr0 = NE_AllocFindInRange(NE_TexAllocList, VRAM_A, VRAM_B, size02);
+    if (addr0 != NULL)
+    {
+        // Only use the first half of slot 1 for slot 0
+        void *addr1;
+        void *addr1_end = (void *)((uintptr_t)VRAM_B + (64 * 1024));
+
+        while (1)
+        {
+            // Get the address in bank 1 assigned to the current bank 0 address
+            addr1 = slot0_to_slot1(addr0);
+
+            // Check if this address is free and has enough space
+            addr1 = NE_AllocFindInRange(NE_TexAllocList, addr1, addr1_end, size1);
+            if (addr1 == NULL)
+                break;
+
+            // If both addresses match, both of them are free
+            if (addr1 == slot0_to_slot1(addr0))
+            {
+                *slot02 = addr0;
+                *slot1 = addr1;
+                return 0;
+            }
+
+            // Get the address in bank 0 assigned to the current bank 1 address
+            addr0 = slot1_to_slot0(addr1);
+
+            // Check if this address is free and has enough space
+            addr0 = NE_AllocFindInRange(NE_TexAllocList, addr0, VRAM_B, size02);
+            if (addr0 == NULL)
+                break;
+
+            // If both addresses match, both of them are free
+            if (addr1 == slot0_to_slot1(addr0))
+            {
+                *slot02 = addr0;
+                *slot1 = addr1;
+                return 0;
+            }
+        }
+    }
+
+    // Then, try with slot 2 + slot 1
+    // ------------------------------
+
+    // Get the first valid range in slot 2
+    void *addr2 = NE_AllocFindInRange(NE_TexAllocList, VRAM_C, VRAM_D, size02);
+    if (addr2 == NULL)
+        return -1;
+
+    // Only use the second half of slot 1 for slot 2
+    void *addr1;
+    void *addr1_end = VRAM_C;
+
+    while (1)
+    {
+        // Get the address in bank 1 assigned to the current bank 2 address
+        addr1 = slot2_to_slot1(addr2);
+
+        // Check if this address is free and has enough space
+        addr1 = NE_AllocFindInRange(NE_TexAllocList, addr1, addr1_end, size1);
+        if (addr1 == NULL)
+            break;
+
+        // If both addresses match, both of them are free
+        if (addr1 == slot2_to_slot1(addr2))
+        {
+            *slot02 = addr2;
+            *slot1 = addr1;
+            return 0;
+        }
+
+        // Get the address in bank 2 assigned to the current bank 1 address
+        addr2 = slot1_to_slot2(addr1);
+
+        // Check if this address is free and has enough space
+        addr2 = NE_AllocFindInRange(NE_TexAllocList, addr2, VRAM_B, size02);
+        if (addr2 == NULL)
+            break;
+
+        // If both addresses match, both of them are free
+        if (addr1 == slot2_to_slot1(addr2))
+        {
+            *slot02 = addr2;
+            *slot1 = addr1;
+            return 0;
+        }
+    }
+
+    return -1;
+}
+
 int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
                        int sizeX, int sizeY, NE_TextureFlags flags,
                        void *texture)
 {
-    const int size_shift[] = {
-        0, // Nothing
-        1, // NE_A3PAL32
-        3, // NE_PAL4
-        2, // NE_PAL16
-        1, // NE_PAL256
-        0, // NE_COMPRESSED (This value isn't used)
-        1, // NE_A5PAL8
-        0, // NE_A1RGB5
-        0, // NE_RGB5
-    };
-
     NE_AssertPointer(tex, "NULL material pointer");
+    NE_Assert(fmt != 0, "No texture format provided");
 
     // The width of a texture must be a power of 2. The height doesn't need to
     // be a power of 2, but we will have to cheat later and make the DS believe
@@ -200,12 +341,72 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         return 0;
     }
 
-    // TODO: Support them
     if (fmt == NE_COMPRESSED)
     {
-        NE_DebugPrint("Compressed textures not supported");
-        return 0;
+        size_t size02 = (sizeX * sizeY) >> 2;
+        size_t size1 = size02 >> 1;
+
+        void *slot02, *slot1;
+        int ret = ne_alloc_compressed_tex(size02, &slot02, &slot1);
+        if (ret != 0)
+        {
+            NE_DebugPrint("Can't find space for compressed texture");
+            return 0;
+        }
+
+        ret = NE_AllocAddress(NE_TexAllocList, slot02, size02);
+        if (ret != 0)
+        {
+            NE_DebugPrint("Can't allocate slot 0/2");
+            return 0;
+        }
+
+        ret = NE_AllocAddress(NE_TexAllocList, slot1, size1);
+        if (ret != 0)
+        {
+            NE_Free(NE_TexAllocList, slot02);
+            NE_DebugPrint("Can't allocate slot 1");
+            return 0;
+        }
+
+        // Save information
+        int slot = tex->texindex;
+        NE_Texture[slot].sizex = sizeX;
+        NE_Texture[slot].sizey = sizeY;
+        NE_Texture[slot].adress = slot02;
+        NE_Texture[slot].uses = 1; // Initially only this material uses the texture
+
+        // Unlock texture memory for writing
+        // TODO: Only unlock the banks that Nitro Engine uses.
+        u32 vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
+                                           VRAM_D_LCD);
+
+        void *texture02 = texture;
+        void *texture1 = (void *)((uintptr_t)texture + size02);
+        swiCopy(texture02, slot02, (size02 >> 2) | COPY_MODE_WORD);
+        swiCopy(texture1, slot1, (size1 >> 2) | COPY_MODE_WORD);
+
+        int hardware_size_y = ne_is_valid_tex_size(sizeY);
+        ne_set_material_tex_param(tex, sizeX, hardware_size_y, slot02, fmt, flags);
+
+        vramRestorePrimaryBanks(vramTemp);
+
+        return 1;
     }
+
+    // All non-compressed texture types are handled here
+
+    const int size_shift[] = {
+        0, // Nothing
+        1, // NE_A3PAL32
+        3, // NE_PAL4
+        2, // NE_PAL16
+        1, // NE_PAL256
+        0, // NE_COMPRESSED (This value isn't used)
+        1, // NE_A5PAL8
+        0, // NE_A1RGB5
+        0, // NE_RGB5
+    };
 
     uint32_t size = (sizeX * sizeY << 1) >> size_shift[fmt];
 
