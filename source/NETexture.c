@@ -11,7 +11,10 @@
 
 typedef struct {
     u32 param;
-    char *adress;
+    // For regular textures, this is the base address in VRAM of the texture.
+    // For compressed textures, this is the address in slot 0 or 2. The address
+    // of the data in slot 1 can be calculated from it.
+    char *address;
     NE_Palette *palette;
     int uses;
     int sizex, sizey;
@@ -108,7 +111,7 @@ static void ne_texture_delete(int texture_index)
         {
             // Check if the texture is allocated in VRAM_A or VRAM_C, and
             // calculate the corresponding address in VRAM_B.
-            void *slot02 = NE_Texture[slot].adress;
+            void *slot02 = NE_Texture[slot].address;
             void *slot1 = (slot02 < (void *)VRAM_B) ?
                           slot0_to_slot1(slot02) : slot2_to_slot1(slot02);
             NE_Free(NE_TexAllocList, slot02);
@@ -116,10 +119,10 @@ static void ne_texture_delete(int texture_index)
         }
         else
         {
-            NE_Free(NE_TexAllocList, NE_Texture[slot].adress);
+            NE_Free(NE_TexAllocList, NE_Texture[slot].address);
         }
 
-        NE_Texture[slot].adress = NULL;
+        NE_Texture[slot].address = NULL;
         NE_Texture[slot].param = 0;
         NE_Texture[slot].palette = 0;
     }
@@ -328,7 +331,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     tex->texindex = NE_NO_TEXTURE;
     for (int i = 0; i < NE_MAX_TEXTURES; i++)
     {
-        if (NE_Texture[i].adress == NULL)
+        if (NE_Texture[i].address == NULL)
         {
             tex->texindex = i;
             break;
@@ -373,7 +376,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         int slot = tex->texindex;
         NE_Texture[slot].sizex = sizeX;
         NE_Texture[slot].sizey = sizeY;
-        NE_Texture[slot].adress = slot02;
+        NE_Texture[slot].address = slot02;
         NE_Texture[slot].uses = 1; // Initially only this material uses the texture
 
         // Unlock texture memory for writing
@@ -423,7 +426,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     int slot = tex->texindex;
     NE_Texture[slot].sizex = sizeX;
     NE_Texture[slot].sizey = sizeY;
-    NE_Texture[slot].adress = addr;
+    NE_Texture[slot].address = addr;
     NE_Texture[slot].uses = 1; // Initially only this material uses the texture
 
     // Unlock texture memory for writing
@@ -642,17 +645,17 @@ void NE_TextureDefragMem(void)
         int i;
         for (i = 0; i < NE_MAX_TEXTURES; i++)
         {
-            int size = NE_GetSize(NE_TexAllocList, (void*)NE_Texture[i].adress);
-            NE_Free(NE_TexAllocList,(void*)NE_Texture[i].adress);
+            int size = NE_GetSize(NE_TexAllocList, (void*)NE_Texture[i].address);
+            NE_Free(NE_TexAllocList,(void*)NE_Texture[i].address);
             void *pointer = NE_Alloc(NE_TexAllocList, size);
             // Aligned to 8 bytes
 
             NE_AssertPointer(pointer, "Couldn't reallocate texture");
 
-            if (pointer != NE_Texture[i].adress)
+            if (pointer != NE_Texture[i].address)
             {
-                dmaCopy((void*) NE_Texture[i].adress, pointer, size);
-                NE_Texture[i].adress = pointer;
+                dmaCopy((void*) NE_Texture[i].address, pointer, size);
+                NE_Texture[i].address = pointer;
                 NE_Texture[i].param &= 0xFFFF0000;
                 NE_Texture[i].param |= ((uint32)pointer >> 3) & 0xFFFF;
                 ok = false;
@@ -753,7 +756,7 @@ void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
     GFX_SPECULAR_EMISSION = ne_default_specular_emission;
 }
 
-static u16 *drawingtexture_adress = NULL;
+static u16 *drawingtexture_address = NULL;
 static int drawingtexture_x, drawingtexture_y;
 static int drawingtexture_type;
 static int drawingtexture_realx;
@@ -764,25 +767,25 @@ void *NE_TextureDrawingStart(const NE_Material *tex)
     NE_AssertPointer(tex, "NULL pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
 
-    NE_Assert(drawingtexture_adress == NULL,
+    NE_Assert(drawingtexture_address == NULL,
               "Another texture is already active");
 
     drawingtexture_x = NE_TextureGetSizeX(tex);
     drawingtexture_realx = NE_TextureGetRealSizeX(tex);
     drawingtexture_y = NE_TextureGetSizeY(tex);
-    drawingtexture_adress = (u16 *) ((uintptr_t)VRAM_A
+    drawingtexture_address = (u16 *) ((uintptr_t)VRAM_A
                           + ((NE_Texture[tex->texindex].param & 0xFFFF) << 3));
     drawingtexture_type = ((NE_Texture[tex->texindex].param >> 26) & 0x7);
 
     ne_vram_saved = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
                                         VRAM_D_LCD);
 
-    return drawingtexture_adress;
+    return drawingtexture_address;
 }
 
 void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
 {
-    NE_AssertPointer(drawingtexture_adress,
+    NE_AssertPointer(drawingtexture_address,
                      "No texture active for drawing");
     NE_Assert(drawingtexture_type == NE_A1RGB5,
               "Ative texture isn't NE_A1RGB5");
@@ -790,12 +793,12 @@ void NE_TexturePutPixelRGBA(u32 x, u32 y, u16 color)
     if (x >= drawingtexture_x || y >= drawingtexture_y)
         return;
 
-    drawingtexture_adress[x + (y * drawingtexture_realx)] = color;
+    drawingtexture_address[x + (y * drawingtexture_realx)] = color;
 }
 
 void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
 {
-    NE_AssertPointer(drawingtexture_adress,
+    NE_AssertPointer(drawingtexture_address,
                      "No texture active for drawing.");
     NE_Assert(drawingtexture_type == NE_PAL256,
               "Active texture isn't NE_PAL256");
@@ -806,15 +809,15 @@ void NE_TexturePutPixelRGB256(u32 x, u32 y, u8 palettecolor)
     int position = (x + (y * drawingtexture_realx)) >> 1;
     int desp = (x & 1) << 3;
 
-    drawingtexture_adress[position] &= 0xFF00 >> desp;
-    drawingtexture_adress[position] |= ((u16) palettecolor) << desp;
+    drawingtexture_address[position] &= 0xFF00 >> desp;
+    drawingtexture_address[position] |= ((u16) palettecolor) << desp;
 }
 
 void NE_TextureDrawingEnd(void)
 {
-    NE_Assert(drawingtexture_adress != NULL, "No active texture");
+    NE_Assert(drawingtexture_address != NULL, "No active texture");
 
     vramRestorePrimaryBanks(ne_vram_saved);
 
-    drawingtexture_adress = NULL;
+    drawingtexture_address = NULL;
 }
