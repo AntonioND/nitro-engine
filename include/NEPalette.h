@@ -9,6 +9,8 @@
 
 #include <nds.h>
 
+#include "NEPolygon.h"
+
 /// @file   NEPalette.h
 /// @brief  Functions for loading, using and deleting palettes.
 
@@ -36,16 +38,30 @@ NE_Palette *NE_PaletteCreate(void);
 /// @param path Path of the palette.
 /// @param format Format of the palette.
 /// @return It returns 1 on success, 0 on error.
-int NE_PaletteLoadFAT(NE_Palette *pal, char *path, int format);
+int NE_PaletteLoadFAT(NE_Palette *pal, char *path, NE_TextureFormat format);
 
-/// Assign a palette in RAM to a palette object.
+/// Assign a palette in RAM to a palette object, given its number of colors.
 ///
 /// @param pal Pointer to the palette object.
 /// @param pointer Pointer to the palette in RAM.
 /// @param numcolor Number of colors of the palette.
 /// @param format Format of the palette.
 /// @return It returns 1 on success, 0 on error.
-int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format);
+int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor,
+                   NE_TextureFormat format);
+
+/// Assign a palette in RAM to a palette object, given its size.
+///
+/// This function is like NE_PaletteLoad(), but it takes the size of the texture
+/// instead of the size.
+///
+/// @param pal Pointer to the palette object.
+/// @param pointer Pointer to the palette in RAM.
+/// @param size Size of the palette in bytes.
+/// @param format Format of the palette.
+/// @return It returns 1 on success, 0 on error.
+int NE_PaletteLoadSize(NE_Palette *pal, u16 *pointer, size_t size,
+                       NE_TextureFormat format);
 
 /// Deletes a palette object.
 ///

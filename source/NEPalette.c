@@ -45,7 +45,7 @@ NE_Palette *NE_PaletteCreate(void)
     return NULL;
 }
 
-int NE_PaletteLoadFAT(NE_Palette *pal, char *path, int format)
+int NE_PaletteLoadFAT(NE_Palette *pal, char *path, NE_TextureFormat format)
 {
     if (!ne_palette_system_inited)
         return 0;
@@ -62,13 +62,14 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, int format)
 
     char *ptr = NE_FATLoadData(path);
     NE_AssertPointer(ptr, "Couldn't load file from FAT");
-    int ret = NE_PaletteLoad(pal, (u16 *) ptr, size >> 1, format);
+    int ret = NE_PaletteLoadSize(pal, (u16 *)ptr, size, format);
     free(ptr);
 
     return ret;
 }
 
-int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
+int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor,
+                   NE_TextureFormat format)
 {
     if (!ne_palette_system_inited)
         return 0;
@@ -117,6 +118,12 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor, int format)
     vramSetBankE(VRAM_E_TEX_PALETTE);
 
     return 1;
+}
+
+int NE_PaletteLoadSize(NE_Palette *pal, u16 *pointer, size_t size,
+                       NE_TextureFormat format)
+{
+    return NE_PaletteLoad(pal, pointer, size >> 1, format);
 }
 
 void NE_PaletteDelete(NE_Palette *pal)

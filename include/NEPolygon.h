@@ -42,6 +42,18 @@ typedef enum {
     NE_Black     = RGB15(0, 0, 0)       ///<  Black
 } NE_ColorEnum;
 
+/// Supported texture formats
+typedef enum {
+    NE_A3PAL32    = 1, ///< 32 color palette, 3 bits of alpha
+    NE_PAL4       = 2, ///< 4 color palette
+    NE_PAL16      = 3, ///< 16 color palette
+    NE_PAL256     = 4, ///< 256 color palette
+    NE_COMPRESSED = 5, ///< 4x4 compressed format
+    NE_A5PAL8     = 6, ///< 8 color palette, 5 bits of alpha
+    NE_A1RGB5     = 7, ///< Direct color (5 bits per channel), 1 bit of alpha
+    NE_RGB5       = 8  ///< Don't use it. Like NE_A1RGB5, but sets alpha to 1 when loading
+} NE_TextureFormat;
+
 /// Switch off a light.
 ///
 /// @param index Index of the light to switch off (0 - 3).

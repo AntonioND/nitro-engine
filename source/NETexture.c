@@ -244,7 +244,6 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     }
     else
     {
-        // For everything else, we do a straight copy
         swiCopy((u32 *)texture, addr, (size >> 2) | COPY_MODE_WORD);
     }
 

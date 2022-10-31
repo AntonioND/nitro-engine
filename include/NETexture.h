@@ -8,7 +8,9 @@
 #define NE_TEXTURE_H__
 
 #include <nds.h>
+
 #include "NEPalette.h"
+#include "NEPolygon.h"
 
 /// @file   NETexture.h
 /// @brief  Texture and material functions.
@@ -32,18 +34,6 @@ typedef struct {
     u32 diffuse_ambient;    ///< Diffuse and ambient lighting material color
     u32 specular_emission;  ///< Specular and emission lighting material color
 } NE_Material;
-
-/// Supported texture formats
-typedef enum {
-    NE_A3PAL32    = 1, ///< 32 color palette, 3 bits of alpha
-    NE_PAL4       = 2, ///< 4 color palette
-    NE_PAL16      = 3, ///< 16 color palette
-    NE_PAL256     = 4, ///< 256 color palette
-    NE_COMPRESSED = 5, ///< Compressed (not supported yet)
-    NE_A5PAL8     = 6, ///< 8 color palette, 5 bits of alpha
-    NE_A1RGB5     = 7, ///< Direct color (5 bits per channel), 1 bit of alpha
-    NE_RGB5       = 8  ///< Direct color (5 bits per channel), alpha set to 1
-} NE_TextureFormat;
 
 /// Supported texture options
 typedef enum {
