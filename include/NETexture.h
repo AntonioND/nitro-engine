@@ -30,6 +30,7 @@
 /// Holds information of one material.
 typedef struct {
     int texindex;           ///< Index to internal texture object
+    NE_Palette *palette;    ///< Palette used by this material
     u32 color;              ///< Color of this material when lights aren't used
     u32 diffuse_ambient;    ///< Diffuse and ambient lighting material color
     u32 specular_emission;  ///< Specular and emission lighting material color

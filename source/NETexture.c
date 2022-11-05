@@ -15,8 +15,7 @@ typedef struct {
     // For compressed textures, this is the address in slot 0 or 2. The address
     // of the data in slot 1 can be calculated from it.
     char *address;
-    NE_Palette *palette;
-    int uses;
+    int uses; // Number of materials that use this texture
     int sizex, sizey;
 } ne_textureinfo_t;
 
@@ -124,7 +123,6 @@ static void ne_texture_delete(int texture_index)
 
         NE_Texture[slot].address = NULL;
         NE_Texture[slot].param = 0;
-        NE_Texture[slot].palette = 0;
     }
 }
 
@@ -144,6 +142,7 @@ NE_Material *NE_MaterialCreate(void)
         NE_AssertPointer(mat, "Not enough memory");
         NE_UserMaterials[i] = mat;
         mat->texindex = NE_NO_TEXTURE;
+        mat->palette = NULL;
         mat->color = NE_White;
         mat->diffuse_ambient = ne_default_diffuse_ambient;
         mat->specular_emission = ne_default_specular_emission;
@@ -475,7 +474,7 @@ void NE_MaterialSetPalette(NE_Material *tex, NE_Palette *pal)
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(pal, "NULL palette pointer");
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
-    NE_Texture[tex->texindex].palette = pal;
+    tex->palette = pal;
 }
 
 void NE_MaterialUse(const NE_Material *tex)
@@ -494,8 +493,8 @@ void NE_MaterialUse(const NE_Material *tex)
 
     NE_Assert(tex->texindex != NE_NO_TEXTURE, "No texture asigned to material");
 
-    if (NE_Texture[tex->texindex].palette)
-        NE_PaletteUse(NE_Texture[tex->texindex].palette);
+    if (tex->palette)
+        NE_PaletteUse(tex->palette);
 
     GFX_COLOR = tex->color;
     GFX_TEX_FORMAT = NE_Texture[tex->texindex].param;
