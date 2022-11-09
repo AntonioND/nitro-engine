@@ -444,7 +444,7 @@ int NE_ModelLoadDSMFAT(NE_Model *model, const char *path)
 
     void *pointer = NE_FATLoadData(path);
     if (pointer == NULL)
-        return 1;
+        return 0;
 
     if (model->free_mesh)
         free((void *)model->meshdata);
