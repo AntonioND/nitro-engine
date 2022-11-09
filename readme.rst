@@ -16,12 +16,19 @@ Features:
   <https://github.com/AntonioND/dsma-library>`_, which converts MD5 models (with
   skeletal animation) into a format that can be rendered with hardware
   acceleration. It can also blend two animations together (for transitions).
-- Support for all format of textures (except compressed textures).
+- Support for all format of textures (even compressed textures, but the
+  converter included in this repository doesn't support them yet).
 - Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
 - Functions to render 2D images accelerated by 3D hardware.
 - Basic text system.
 - Basic GUI elements like buttons and scrollbars.
 - Basic physic system: Axis-aligned bounding boxes (AABB) only.
+
+Nitro Engine doesn't support any of the 2D hardware of the DS. In order to use
+the 2D hardware you can use libnds directly, or you can use a library like
+`NFlib <https://github.com/knightfox75/nds_nflib>`_. There is an example of how
+to integrate Nitro Engine and NFlib in the same project `here
+<./examples/templates/using_nflib>`_.
 
 Setup
 -----
