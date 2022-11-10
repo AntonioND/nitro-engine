@@ -15,6 +15,8 @@
 //
 // - Remember to avoid using 3D features of NFlib.
 //
+// - Don't use the dual 3D mode in Nitro Engine.
+//
 // - You are free to use any features of NFlib in the secondary screen, but you
 //   need to assign VRAM C and D to NFlib to get space for sprites and
 //   backgrounds.
