@@ -1,4 +1,4 @@
-Nitro Engine v0.8.0
+Nitro Engine v0.8.1
 ===================
 
 Introduction
