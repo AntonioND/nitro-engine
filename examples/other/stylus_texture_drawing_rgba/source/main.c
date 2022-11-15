@@ -16,7 +16,7 @@ void Draw3DScene(void)
     NE_2DDrawTexturedQuad(0, 0, 256, 256, 0, Material);
 }
 
-int main()
+int main(void)
 {
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);

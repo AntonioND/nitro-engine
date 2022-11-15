@@ -39,7 +39,7 @@ void Draw3DScene(void)
            NE_GetPolygonCount(), NE_GetVertexCount());
 }
 
-int main()
+int main(void)
 {
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);

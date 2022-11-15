@@ -20,7 +20,7 @@ void Draw3DScene(void)
     NE_ModelDraw(Model);
 }
 
-int main()
+int main(void)
 {
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
