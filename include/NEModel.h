@@ -71,6 +71,27 @@ NE_Model *NE_ModelCreate(NE_ModelType type);
 /// @param model Pointer to the model.
 void NE_ModelDelete(NE_Model *model);
 
+/// Marks the mesh of a model to be freed when the model is deleted.
+///
+/// When a model is loaded with NE_ModelLoadStaticMeshFAT() or
+/// NE_ModelLoadDSMFAT(), the mesh is read from storage into RAM to a buffer
+/// allocated witn malloc(). This buffer is freed with free() when
+/// NE_ModelDelete() is called.
+///
+/// If the mesh is loaded using NE_ModelLoadStaticMesh() or NE_ModelLoadDSM(),
+/// Nitro Engine can't tell if the user has loaded it from storage, or if it has
+/// been included in the NDS file as data. If the user has loaded the mesh into
+/// a buffer allocated with malloc(), the user is responsible for calling free()
+/// after NE_ModelDelete().
+///
+/// NE_ModelFreeMeshWhenDeleted() gives you the option of skipping that last
+/// free(). After you call this function, NE_ModelDelete() will call free() for
+/// you automatically so that you don't have to keep track of the pointer in the
+/// logic of your program.
+///
+/// @param model Pointer to the model.
+void NE_ModelFreeMeshWhenDeleted(NE_Model *model);
+
 /// Assign a display list in RAM to a static model.
 ///
 /// @param model Pointer to the model.

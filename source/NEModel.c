@@ -137,6 +137,12 @@ int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer)
     return 1;
 }
 
+void NE_ModelFreeMeshWhenDeleted(NE_Model *model)
+{
+    NE_AssertPointer(model, "NULL model pointer");
+    model->free_mesh = true;
+}
+
 void NE_ModelSetMaterial(NE_Model *model, NE_Material *material)
 {
     NE_AssertPointer(model, "NULL model pointer");
