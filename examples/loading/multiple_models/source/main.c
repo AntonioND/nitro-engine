@@ -8,14 +8,16 @@
 
 #include "sphere_bin.h"
 
+#define NUM_MODELS 16
+
 NE_Camera *Camera;
-NE_Model *Model[16];
+NE_Model *Model[NUM_MODELS];
 
 void Draw3DScene(void)
 {
     NE_CameraUse(Camera);
 
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < NUM_MODELS; i++)
         NE_ModelDraw(Model[i]);
 
     // Get some information after drawing but before returning from the
@@ -37,7 +39,7 @@ int main(void)
     consoleDemoInit();
 
     // Allocate space for everything
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < NUM_MODELS; i++)
         Model[i] = NE_ModelCreate(NE_Static);
 
     Camera = NE_CameraCreate();
@@ -49,7 +51,7 @@ int main(void)
                     0, 1, 0);
 
     // Load model
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < NUM_MODELS; i++)
         NE_ModelLoadStaticMesh(Model[i], (u32 *)sphere_bin);
 
     // Setup light
@@ -58,8 +60,8 @@ int main(void)
     // Enable shading
     NE_ShadingEnable(true);
 
-    // Set start coordinates/rotation for models using random formules...
-    for (int i = 0; i < 16; i++)
+    // Set start coordinates/rotation of models
+    for (int i = 0; i < NUM_MODELS; i++)
     {
         NE_ModelSetRot(Model[i], i, i * 30, i * 20);
         NE_ModelSetCoord(Model[i], 0, i % 4, i / 4);
@@ -67,8 +69,8 @@ int main(void)
 
     while (1)
     {
-        // Rotate every model using random formules
-        for (int i = 0; i < 16; i++)
+        // Rotate every model
+        for (int i = 0; i < NUM_MODELS; i++)
             NE_ModelRotate(Model[i], -i, i % 5, 5 - i);
 
         // Draw scene

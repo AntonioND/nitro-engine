@@ -8,29 +8,32 @@
 
 #include "sphere_bin.h"
 
-// Pointers to objects...
-NE_Camera *Camera;
-NE_Model *Model[16];
+#define NUM_MODELS 16
 
-// Cloning models will avoid loading into memory the same data many times. This
-// is really useful when you want to draw lots of animated models, they will use
-// the memory of one!
+NE_Camera *Camera;
+NE_Model *Model[NUM_MODELS];
+
+// Cloning models will avoid loading into memory the same mesh many times. This
+// is really useful when you want to draw lots of the same model in different
+// locations, with different animations, etc. You won't need to store multiple
+// copies of the mesh in RAM.
 //
-// NOTE: Models use a few bytes for holding some information.
+// - The only safe way to use cloned models is to never delete the source model
+//   while you're using the cloned models.
 //
-// NOTE 2: Be careful when using NE_ModelClone(). If you delete source model and
-// try to draw a destination model game will eventually crash!
+// - Be careful when using NE_ModelDelete(). Only the initial model owns the
+//   mesh. If you load a mesh from storage, delete the source model, and try to
+//   draw the destination model, it will try to use a mesh that has been freed.
 //
-// NOTE 3: If you clone an animated model you will be able to set different
-// animation patterns for each model.
+// - If you clone an animated model you will be able to set different animations
+//   for each model.
 
 void Draw3DScene(void)
 {
     // Setup camera and draw all objects.
     NE_CameraUse(Camera);
 
-    int i;
-    for (i = 0; i < 16; i++)
+    for (int i = 0; i < NUM_MODELS; i++)
         NE_ModelDraw(Model[i]);
 
     // Get some information AFTER drawing but BEFORE returning from the
@@ -53,7 +56,7 @@ int main(void)
     consoleDemoInit();
 
     // Allocate space for everything.
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < NUM_MODELS; i++)
         Model[i] = NE_ModelCreate(NE_Static);
 
     Camera = NE_CameraCreate();
@@ -68,7 +71,7 @@ int main(void)
     NE_ModelLoadStaticMesh(Model[0], (u32 *)sphere_bin);
 
     // Clone model to the test of the objects
-    for (int i = 1; i < 16; i++)
+    for (int i = 1; i < NUM_MODELS; i++)
     {
         NE_ModelClone(Model[i],  // Destination
                       Model[0]); // Source model
@@ -80,8 +83,8 @@ int main(void)
     // Enable shading
     NE_ShadingEnable(true);
 
-    // Set start coordinates/rotation for models using random formules...
-    for (int i = 0; i < 16; i++)
+    // Set start coordinates/rotation of the models
+    for (int i = 0; i < NUM_MODELS; i++)
     {
         NE_ModelSetRot(Model[i], i, i * 30, i * 20);
         NE_ModelSetCoord(Model[i], 0, i % 4, i / 4);
@@ -89,8 +92,8 @@ int main(void)
 
     while (1)
     {
-        // Rotate every model using random formules :P
-        for (int i = 0; i < 16; i++)
+        // Rotate every model
+        for (int i = 0; i < NUM_MODELS; i++)
             NE_ModelRotate(Model[i], -i, i % 5, 5 - i);
 
         // Draw scene
