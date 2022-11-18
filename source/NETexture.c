@@ -322,7 +322,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         }
     }
 
-    // Check if texture exists
+    // Check if a texture exists
     if (tex->texindex != NE_NO_TEXTURE)
         ne_texture_delete(tex->texindex);
 

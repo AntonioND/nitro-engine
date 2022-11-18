@@ -18,15 +18,8 @@ NE_Model *Model[NUM_MODELS];
 // locations, with different animations, etc. You won't need to store multiple
 // copies of the mesh in RAM.
 //
-// - The only safe way to use cloned models is to never delete the source model
-//   while you're using the cloned models.
-//
-// - Be careful when using NE_ModelDelete(). Only the initial model owns the
-//   mesh. If you load a mesh from storage, delete the source model, and try to
-//   draw the destination model, it will try to use a mesh that has been freed.
-//
-// - If you clone an animated model you will be able to set different animations
-//   for each model.
+// If you clone an animated model you will be able to set different animations
+// for each model.
 
 void Draw3DScene(void)
 {

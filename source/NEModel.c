@@ -12,9 +12,100 @@
 
 /// @file NEModel.c
 
+typedef struct {
+    void *address;
+    int uses; // Number of models that use this mesh
+    bool has_to_free;
+} ne_mesh_info_t;
+
+static ne_mesh_info_t *NE_Mesh = NULL;
 static NE_Model **NE_ModelPointers;
 static int NE_MAX_MODELS;
 static bool ne_model_system_inited = false;
+
+static void ne_mesh_delete(int mesh_index)
+{
+    int slot = mesh_index;
+
+    // A mesh may be used by several models
+    NE_Mesh[slot].uses--;
+
+    // If the number of users is zero, delete it.
+    if (NE_Mesh[slot].uses == 0)
+    {
+        if (NE_Mesh[slot].has_to_free)
+            free(NE_Mesh[slot].address);
+
+        NE_Mesh[slot].address = NULL;
+    }
+}
+
+static int ne_model_get_free_mesh_slot(void)
+{
+    // Get free slot
+    for (int i = 0; i < NE_MAX_MODELS; i++)
+    {
+        if (NE_Mesh[i].address == NULL)
+            return i;
+    }
+
+    NE_DebugPrint("No free slots");
+    return NE_NO_MESH;
+}
+
+static int ne_model_load_ram_common(NE_Model *model, const void *pointer)
+{
+    NE_AssertPointer(model, "NULL model pointer");
+    NE_AssertPointer(pointer, "NULL data pointer");
+
+    // Check if a mesh exists
+    if (model->meshindex != NE_NO_MESH)
+        ne_mesh_delete(model->meshindex);
+
+    int slot = ne_model_get_free_mesh_slot();
+    if (slot == NE_NO_MESH)
+        return 0;
+
+    model->meshindex = slot;
+
+    ne_mesh_info_t *mesh = &NE_Mesh[slot];
+
+    mesh->address = (void *)pointer;
+    mesh->has_to_free = false;
+    mesh->uses = 1;
+
+    return 1;
+}
+
+static int ne_model_load_filesystem_common(NE_Model *model, const char *path)
+{
+    NE_AssertPointer(model, "NULL model pointer");
+    NE_AssertPointer(path, "NULL path pointer");
+
+    // Check if a mesh exists
+    if (model->meshindex != NE_NO_MESH)
+        ne_mesh_delete(model->meshindex);
+
+    int slot = ne_model_get_free_mesh_slot();
+    if (slot == NE_NO_MESH)
+        return 0;
+
+    void *pointer = NE_FATLoadData(path);
+    if (pointer == NULL)
+        return 0;
+
+    model->meshindex = slot;
+
+    ne_mesh_info_t *mesh = &NE_Mesh[slot];
+
+    mesh->address = pointer;
+    mesh->has_to_free = true;
+    mesh->uses = 1;
+
+    return 1;
+}
+
+//--------------------------------------------------------------------------
 
 NE_Model *NE_ModelCreate(NE_ModelType type)
 {
@@ -44,8 +135,7 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
     model->sx = model->sy = model->sz = inttof32(1);
 
     model->modeltype = type;
-    model->meshdata = NULL;
-    model->free_mesh = false;
+    model->meshindex = NE_NO_MESH;
 
     if (type == NE_Animated)
     {
@@ -83,14 +173,15 @@ void NE_ModelDelete(NE_Model *model)
         i++;
     }
 
-    if (model->free_mesh)
-        free((void *)model->meshdata);
-
     if (model->modeltype == NE_Animated)
     {
         for (int i = 0; i < 2; i++)
             free(model->animinfo[i]);
     }
+
+    // If there is an asigned mesh
+    if (model->meshindex != NE_NO_MESH)
+        ne_mesh_delete(model->meshindex);
 
     free(model);
 }
@@ -100,22 +191,9 @@ int NE_ModelLoadStaticMeshFAT(NE_Model *model, const char *path)
     if (!ne_model_system_inited)
         return 0;
 
-    NE_AssertPointer(model, "NULL model pointer");
-    NE_AssertPointer(path, "NULL path pointer");
     NE_Assert(model->modeltype == NE_Static, "Not a static model");
 
-    void *pointer = NE_FATLoadData(path);
-    if (pointer == NULL)
-        return 0;
-
-    // Free previous data...
-    if (model->free_mesh)
-        free((void *)model->meshdata);
-
-    model->meshdata = pointer;
-    model->free_mesh = true;
-
-    return 1;
+    return ne_model_load_filesystem_common(model, path);
 }
 
 int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer)
@@ -123,24 +201,19 @@ int NE_ModelLoadStaticMesh(NE_Model *model, const void *pointer)
     if (!ne_model_system_inited)
         return 0;
 
-    NE_AssertPointer(model, "NULL model pointer");
-    NE_AssertPointer(pointer, "NULL data pointer");
     NE_Assert(model->modeltype == NE_Static, "Not a static model");
 
-    // Free previous data...
-    if (model->free_mesh)
-        free((void *)model->meshdata);
-
-    model->meshdata = pointer;
-    model->free_mesh = false;
-
-    return 1;
+    return ne_model_load_ram_common(model, pointer);
 }
 
 void NE_ModelFreeMeshWhenDeleted(NE_Model *model)
 {
     NE_AssertPointer(model, "NULL model pointer");
-    model->free_mesh = true;
+    if (model->meshindex != NE_NO_MESH)
+    {
+        ne_mesh_info_t *mesh = &NE_Mesh[model->meshindex];
+        mesh->has_to_free = true;
+    }
 }
 
 void NE_ModelSetMaterial(NE_Model *model, NE_Material *material)
@@ -178,7 +251,7 @@ extern bool NE_TestTouch;
 void NE_ModelDraw(const NE_Model *model)
 {
     NE_AssertPointer(model, "NULL pointer");
-    if (model->meshdata == NULL)
+    if (model->meshindex == NE_NO_MESH)
         return;
 
     if (model->modeltype == NE_Animated)
@@ -217,15 +290,18 @@ void NE_ModelDraw(const NE_Model *model)
         NE_MaterialUse(model->texture);
     }
 
+    ne_mesh_info_t *mesh = &NE_Mesh[model->meshindex];
+    const void *meshdata = mesh->address;
+
     if (model->modeltype == NE_Static)
     {
-        glCallList(model->meshdata);
+        glCallList(meshdata);
     }
     else // if(model->modeltype == NE_Animated)
     {
         if (model->animinfo[0]->animation && model->animinfo[1]->animation)
         {
-            int ret = DSMA_DrawModelBlendAnimation(model->meshdata,
+            int ret = DSMA_DrawModelBlendAnimation(meshdata,
                     model->animinfo[0]->animation->data,
                     model->animinfo[0]->currframe,
                     model->animinfo[1]->animation->data,
@@ -235,7 +311,7 @@ void NE_ModelDraw(const NE_Model *model)
         }
         else // if (model->animinfo[0]->animation)
         {
-            int ret = DSMA_DrawModel(model->meshdata,
+            int ret = DSMA_DrawModel(meshdata,
                                      model->animinfo[0]->animation->data,
                                      model->animinfo[0]->currframe);
             NE_Assert(ret == DSMA_SUCCESS, "Failed to draw animated model");
@@ -256,12 +332,29 @@ void NE_ModelClone(NE_Model *dest, NE_Model *source)
     {
         memcpy(dest->animinfo[0], source->animinfo[0], sizeof(NE_AnimInfo));
         memcpy(dest->animinfo[1], source->animinfo[1], sizeof(NE_AnimInfo));
+        dest->anim_blend = source->anim_blend;
     }
 
-    dest->meshdata = source->meshdata;
-    dest->texture = source->texture;
+    dest->x = source->x;
+    dest->y = source->y;
+    dest->z = source->z;
+    dest->rx = source->rx;
+    dest->ry = source->ry;
+    dest->rz = source->rz;
+    dest->sx = source->sx;
+    dest->sy = source->sy;
+    dest->sz = source->sz;
 
-    dest->free_mesh = false;
+    dest->texture = source->texture;
+    dest->meshindex = source->meshindex;
+
+    // If the model has a mesh (which is the normal situation), increase the
+    // count of users of that mesh.
+    if (dest->meshindex != NE_NO_MESH)
+    {
+        ne_mesh_info_t *mesh = &NE_Mesh[dest->meshindex];
+        mesh->uses++;
+    }
 }
 
 void NE_ModelScaleI(NE_Model *model, int x, int y, int z)
@@ -444,21 +537,9 @@ int NE_ModelLoadDSMFAT(NE_Model *model, const char *path)
     if (!ne_model_system_inited)
         return 0;
 
-    NE_AssertPointer(model, "NULL model pointer");
-    NE_AssertPointer(path, "NULL path pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
-    void *pointer = NE_FATLoadData(path);
-    if (pointer == NULL)
-        return 0;
-
-    if (model->free_mesh)
-        free((void *)model->meshdata);
-
-    model->meshdata = (void *)pointer;
-    model->free_mesh = true;
-
-    return 1;
+    return ne_model_load_filesystem_common(model, path);
 }
 
 int NE_ModelLoadDSM(NE_Model *model, const void *pointer)
@@ -466,17 +547,9 @@ int NE_ModelLoadDSM(NE_Model *model, const void *pointer)
     if (!ne_model_system_inited)
         return 0;
 
-    NE_AssertPointer(model, "NULL model pointer");
-    NE_AssertPointer(pointer, "NULL data pointer");
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
 
-    if (model->free_mesh)
-        free((void *)model->meshdata);
-
-    model->free_mesh = false;
-    model->meshdata = pointer;
-
-    return 1;
+    return ne_model_load_ram_common(model, pointer);
 }
 
 void NE_ModelDeleteAll(void)
@@ -501,6 +574,8 @@ void NE_ModelSystemReset(int max_models)
     else
         NE_MAX_MODELS = max_models;
 
+    NE_Mesh = calloc(NE_MAX_MODELS, sizeof(ne_mesh_info_t));
+    NE_AssertPointer(NE_Mesh, "Not enough memory");
     NE_ModelPointers = malloc(NE_MAX_MODELS * sizeof(NE_ModelPointers));
     NE_AssertPointer(NE_ModelPointers, "Not enough memory");
 
@@ -517,6 +592,7 @@ void NE_ModelSystemEnd(void)
 
     NE_ModelDeleteAll();
 
+    free(NE_Mesh);
     free(NE_ModelPointers);
 
     ne_model_system_inited = false;

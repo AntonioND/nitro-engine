@@ -16,7 +16,8 @@
 ///
 /// @{
 
-#define NE_NO_TEXTURE       -1 ///< Value that represents a lack of textures
+#define NE_NO_TEXTURE       -1 ///< Value that represents not having a texture
+#define NE_NO_MESH          -1 ///< Value that represents not having a mesh
 
 #define NE_DEFAULT_MODELS   512 ///< Default max number of models
 
@@ -44,8 +45,7 @@ typedef enum {
 /// Holds information of a model.
 typedef struct {
     NE_ModelType modeltype;   ///< Model type (static or animated)
-    const u32 *meshdata;      ///< Display list / DSM file
-    bool free_mesh;           ///< True if the mesh has to be freed by NE
+    int meshindex;            ///< Index of mesh (static or DSM)
     NE_AnimInfo *animinfo[2]; ///< Animation information (two can be blended)
     int32_t anim_blend;       ///< Animation blend factor
     NE_Material *texture;     ///< Material used by this model
@@ -145,16 +145,10 @@ void NE_ModelDraw(const NE_Model *model);
 
 /// Clone model.
 ///
-/// Be careful with this, if you delete the source model and try to draw the
-/// destination model the game will eventually crash (because the source data is
-/// no longer owned by Nitro Engine).
-///
-/// You must delete the destination model if you delete the source model.
-///
-/// The two models have to be of the same type (animated or static).
-///
-/// You could use this if you make a tiled floor, for example, or if you have
-/// many enemies that look the same way.
+/// This clones the mesh, including the animation, the material it uses. It
+/// doesn't actually duplicate the memory used in RAM to store the mesh, and it
+/// keeps track of how many models use the same mesh. NE_ModelDelete() only
+/// frees the mesh when the user deletes the last model that uses it.
 ///
 /// @param dest Pointer to the destination model.
 /// @param source Pointer to the source model.

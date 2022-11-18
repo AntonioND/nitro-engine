@@ -25,7 +25,7 @@
 
 #define NE_DEFAULT_TEXTURES 128 ///< Default max number of materials
 
-#define NE_NO_PALETTE       -1 ///< Value that represents a lack of palettes
+#define NE_NO_PALETTE       -1 ///< Value that represents not having a palette
 
 /// Holds information of one material.
 typedef struct {
