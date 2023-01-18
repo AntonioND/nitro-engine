@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: MIT
 #
-# Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>
+# Copyright (c) 2022-2023 Antonio Niño Díaz <antonio_nd@outlook.com>
 
 from display_list import DisplayList
 
@@ -15,7 +15,7 @@ def is_valid_texture_size(size):
     return size in VALID_TEXTURE_SIZES
 
 def convert_obj(input_file, output_file, texture_size,
-                model_scale, model_translation):
+                model_scale, model_translation, use_vertex_color):
 
     vertices = []
     texcoords = []
@@ -38,7 +38,15 @@ def convert_obj(input_file, output_file, texture_size,
             tokens = tokens[1:]
 
             if cmd == 'v': # Vertex
-                v = (float(tokens[0]), float(tokens[1]), float(tokens[2]))
+                if len(tokens) == 3: # (x, y, z)
+                    if use_vertex_color:
+                        raise OBJFormatError(f"Found vertex with no color info: {tokens}")
+                    v = [float(tokens[i]) for i in range(3)]
+                elif len(tokens) == 6: # (x, y, z, r, g, b)
+                    v = [float(tokens[i]) for i in range(6)]
+                else:
+                    raise OBJFormatError(f"Unsupported vertex command: {tokens}")
+
                 vertices.append(v)
 
             elif cmd == 'vt': # Texture coordinate
@@ -95,7 +103,10 @@ def convert_obj(input_file, output_file, texture_size,
                 vertex_index = int(tokens[0])
                 if len(tokens[1]) > 0:
                     texcoord_index = int(tokens[1])
-                normal_index = int(tokens[2])
+                # Only generate normal commands if there is no vertex color, as
+                # it would overwrite it.
+                if not use_vertex_color:
+                    normal_index = int(tokens[2])
             else:
                 raise OBJFormatError(f"Invalid face {face}")
 
@@ -131,6 +142,10 @@ def convert_obj(input_file, output_file, texture_size,
                 v *= model_scale
                 vtx.append(v)
 
+            if use_vertex_color:
+                rgb = [vertices[vertex_index][i] for i in range(3, 6)]
+                dl.color(*rgb)
+
             # Let the DisplayList class pick the best vtx command
             dl.vtx(vtx[0], vtx[1], vtx[2])
 
@@ -144,8 +159,8 @@ if __name__ == "__main__":
     import sys
     import traceback
 
-    print("obj2dl v0.1.0")
-    print("Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>")
+    print("obj2dl v0.1.1")
+    print("Copyright (c) 2022-2023 Antonio Niño Díaz <antonio_nd@outlook.com>")
     print("All rights reserved")
     print("")
 
@@ -167,6 +182,9 @@ if __name__ == "__main__":
                         help="translate model by this value")
     parser.add_argument("--scale", default=1.0, type=float,
                         help="scale model by this value (after the translation)")
+    parser.add_argument("--use-vertex-color", required=False,
+                        action='store_true',
+                        help="use vertex colors instead of normals")
 
     args = parser.parse_args()
 
@@ -187,7 +205,7 @@ if __name__ == "__main__":
 
     try:
         convert_obj(args.input, args.output, args.texture,
-                    args.scale, args.translation)
+                    args.scale, args.translation, args.use_vertex_color)
     except BaseException as e:
         print("ERROR: " + str(e))
         traceback.print_exc()
