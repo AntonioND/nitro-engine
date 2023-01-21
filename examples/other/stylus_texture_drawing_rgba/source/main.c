@@ -23,7 +23,7 @@ int main(void)
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     NE_Init3D();
-    lcdMainOnBottom();
+    NE_MainScreenSetOnBottom();
 
     Material = NE_MaterialCreate();
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
