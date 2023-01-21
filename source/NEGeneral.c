@@ -336,8 +336,11 @@ void NE_Process(NE_Voidfunc drawscene)
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 }
 
-void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
+void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 {
+    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
+    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
+
     NE_UpdateInput();
 
     if (NE_Screen == ne_main_screen)
@@ -386,13 +389,10 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 
     MATRIX_IDENTITY = 0;
 
-    NE_AssertPointer(topscreen, "NULL function pointer (top screen)");
-    NE_AssertPointer(downscreen, "NULL function pointer (lower screen)");
-
     if (NE_Screen == 1)
-        topscreen();
+        mainscreen();
     else
-        downscreen();
+        subscreen();
 
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 

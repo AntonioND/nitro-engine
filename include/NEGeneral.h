@@ -63,9 +63,14 @@ void NE_InitDual3D(void);
 
 /// Draws a 3D scene in each screen.
 ///
-/// @param topscreen Function that draws the top screen.
-/// @param downscreen Function that draws the bottom screen.
-void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen);
+/// By default, the main screen is the top screen and the sub screen is the
+/// bottom screen. This can be changed with NE_MainScreenSetOnTop(),
+/// NE_MainScreenSetOnBottom() and NE_SwapScreens(). To check the current
+/// position of the main screen, use NE_MainScreenIsOnTop().
+///
+/// @param mainscreen Function that draws the main screen.
+/// @param subscreen Function that draws the sub screen.
+void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen);
 
 /// Inits the console of libnds in the main screen.
 ///
