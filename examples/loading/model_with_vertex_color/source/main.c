@@ -60,6 +60,9 @@ int main(void)
 
     while (1)
     {
+        // Wait for next frame
+        NE_WaitForVBL(0);
+
         // Get keys information
         scanKeys();
         uint32 keys = keysHeld();
@@ -78,8 +81,6 @@ int main(void)
 
         // Draw scene
         NE_Process(Draw3DScene);
-        // Wait for next frame
-        NE_WaitForVBL(0);
     }
 
     return 0;

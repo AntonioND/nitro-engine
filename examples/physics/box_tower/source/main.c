@@ -92,8 +92,9 @@ int main(void)
 
     while (1)
     {
-        NE_Process(Draw3DScene);
         NE_WaitForVBL(NE_UPDATE_PHYSICS);
+
+        NE_Process(Draw3DScene);
     }
 
     return 0;

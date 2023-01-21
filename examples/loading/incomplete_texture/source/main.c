@@ -74,9 +74,10 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         // Draw 3D scene
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

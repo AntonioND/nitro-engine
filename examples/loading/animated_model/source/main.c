@@ -58,6 +58,8 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
+
         scanKeys();
         uint32 keys = keysHeld();
 
@@ -75,7 +77,6 @@ int main(void)
                NE_GetCPUPercent(), f32tofloat(NE_ModelAnimGetFrame(Model)));
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
     }
 
     return 0;

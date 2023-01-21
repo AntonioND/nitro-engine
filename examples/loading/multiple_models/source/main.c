@@ -69,13 +69,14 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         // Rotate every model
         for (int i = 0; i < NUM_MODELS; i++)
             NE_ModelRotate(Model[i], -i, i % 5, 5 - i);
 
         // Draw scene
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

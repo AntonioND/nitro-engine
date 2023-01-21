@@ -70,6 +70,9 @@ int main(void)
 
     while (1)
     {
+        // Wait for next frame
+        NE_WaitForVBL(0);
+
         // Get time
         time_t unixTime = time(NULL);
         struct tm* timeStruct = gmtime((const time_t *)&unixTime);
@@ -101,8 +104,7 @@ int main(void)
             NE_ModelRotate(Model, 0, -2, 0);
 
         NE_Process(Draw3DScene);
-        // Wait for next frame
-        NE_WaitForVBL(0);
+
         // Increase frame count
         fpscount++;
     }

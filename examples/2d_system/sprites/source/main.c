@@ -65,6 +65,8 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         scanKeys();
         uint32 keys = keysHeld();
 
@@ -83,7 +85,6 @@ int main(void)
         NE_SpriteSetPos(Sprite[2], x, y);
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

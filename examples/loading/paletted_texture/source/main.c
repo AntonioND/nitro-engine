@@ -65,8 +65,9 @@ int main(void)
 
     while (1)
     {
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
         NE_WaitForVBL(0);
+
+        NE_ProcessDual(Draw3DScene, Draw3DScene2);
     }
 
     return 0;

@@ -97,9 +97,11 @@ int main(void)
 
     NE_ClearColorSet(NE_Black, 31, 63);
 
+    printf("\x1b[0;0HPad: Rotate\nSTART: Exit");
+
     while (1)
     {
-        printf("\x1b[0;0HPad: Rotate\nSTART: Exit");
+        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
 
         scanKeys();
         uint32 keys = keysHeld();
@@ -118,7 +120,6 @@ int main(void)
 
         // Draw scene...
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
     }
 
     return 0;

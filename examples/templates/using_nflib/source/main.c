@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
 // SPDX-FileContributor: NightFox, 2009-2011
 //
 // This file is part of Nitro Engine
@@ -200,6 +200,20 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
+
+        // At this point we are in the vertical blank period. This is where 2D
+        // elements have to be updated to avoid flickering.
+
+        // Update the scroll of the backgrounds
+        for (int n = 0; n < 3; n ++)
+                NF_ScrollBg(1, n + 1, bg_x[n], 0);
+
+        // Copy shadow OAM copy to the OAM of the 2D sub engine
+        oamUpdate(&oamSub);
+
+        // Start processing a new frame after the 2D elements have been updated.
+
         scanKeys();
         uint32 keys = keysHeld();
 
@@ -259,19 +273,8 @@ int main(void)
         // Refresh shadow OAM copy
         NF_SpriteOamSet(1);
 
-        // Draw scene...
+        // Draw 3D scene
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
-
-        // At this point we are in the vertical blank period. This is where 2D
-        // entities have to be updated to avoid flickering.
-
-        // Update the scroll of the backgrounds
-        for (int n = 0; n < 3; n ++)
-                NF_ScrollBg(1, n + 1, bg_x[n], 0);
-
-        // Copy shadow OAM copy to the OAM of the 2D sub engine
-        oamUpdate(&oamSub);
     }
 
     return 0;

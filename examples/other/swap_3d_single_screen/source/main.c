@@ -52,8 +52,9 @@ int main(void)
 
     while (1)
     {
-        scanKeys();
+        NE_WaitForVBL(0);
 
+        scanKeys();
         uint16_t keys = keysDown();
 
         if (keys & KEY_A)
@@ -64,7 +65,6 @@ int main(void)
             NE_MainScreenSetOnBottom();
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

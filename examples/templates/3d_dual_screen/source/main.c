@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
 //
 // This file is part of Nitro Engine
 
@@ -26,10 +26,13 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         scanKeys();
 
+        // Your code goes here
+
         NE_ProcessDual(Draw3DScene, Draw3DScene2);
-        NE_WaitForVBL(0);
     }
 
     return 0;

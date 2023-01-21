@@ -59,6 +59,8 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         // Get keys information
         scanKeys();
         uint32 keys = keysHeld();
@@ -87,7 +89,6 @@ int main(void)
             NE_CameraMoveFree(Camera, -0.05, 0, 0);
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

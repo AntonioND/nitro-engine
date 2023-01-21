@@ -150,6 +150,10 @@ int main(void)
 
     while (1)
     {
+        // Update GUI, input and wait for vertical blank. You have to
+        // call scanKeys() each frame for this to work.
+        NE_WaitForVBL(NE_UPDATE_GUI);
+
         scanKeys(); // This function is needed for the GUI
 
         printf("\x1b[0;0H");
@@ -166,10 +170,6 @@ int main(void)
 
         // Draw things...
         NE_Process(Draw3DScene);
-
-        // Update GUI, input and wait for vertical blank. You have to
-        // call scanKeys() each frame for this to work.
-        NE_WaitForVBL(NE_UPDATE_GUI);
     }
 
     return 0;

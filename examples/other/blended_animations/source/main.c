@@ -70,6 +70,8 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
+
         scanKeys();
         uint32 keys = keysHeld();
 
@@ -112,7 +114,6 @@ int main(void)
                f32tofloat(NE_ModelAnimSecondaryGetFrame(Model)));
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
     }
 
     return 0;

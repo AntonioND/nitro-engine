@@ -35,11 +35,10 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         scanKeys();
         touchPosition touch;
-
-        NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
 
         if (keysHeld() & KEY_TOUCH)
         {
@@ -58,6 +57,8 @@ int main(void)
 
             NE_TextureDrawingEnd();
         }
+
+        NE_Process(Draw3DScene);
     }
 
     return 0;

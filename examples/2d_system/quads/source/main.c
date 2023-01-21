@@ -78,14 +78,16 @@ int main(void)
 
     printf("A: Alpha");
 
-    while (1) {
+    while (1)
+    {
+        NE_WaitForVBL(0);
+
         scanKeys();
         kheld = keysHeld();
 
         UpdateQuads();
 
         NE_Process(Draw3DScene);
-        NE_WaitForVBL(0);
     }
 
     return 0;

@@ -102,6 +102,8 @@ int main(void)
 
     while (1)
     {
+        NE_WaitForVBL(0);
+
         // Get keys information
         scanKeys();
         uint32 keys = keysHeld();
@@ -165,7 +167,6 @@ int main(void)
         NE_ShininessTableGenerate(shininess);
 
         NE_ProcessDual(Draw3DScene1, Draw3DScene2);
-        NE_WaitForVBL(0);
     }
 
     return 0;
