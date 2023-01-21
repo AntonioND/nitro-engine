@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
 //
 // This file is part of Nitro Engine
 
@@ -72,7 +72,8 @@ int main(void)
     NE_ClearColorSet(0,       // Color not used when clear BMP
                      31, 63); // ID and alpha are used
 
-    u8 scrollx = 0, scrolly = 0;
+    int scrollx = 0, scrolly = 0;
+
     while (1)
     {
         scanKeys();
@@ -85,16 +86,16 @@ int main(void)
         if (keys & KEY_B)
             NE_ClearBMPEnable(false);
 
-        NE_ClearBMPScroll(scrollx,scrolly);
+        NE_ClearBMPScroll(scrollx, scrolly);
 
         if (keys & KEY_UP)
-            scrolly --;
+            scrolly--;
         if (keys & KEY_DOWN)
-            scrolly ++;
+            scrolly++;
         if (keys & KEY_RIGHT)
-            scrollx ++;
+            scrollx++;
         if (keys & KEY_LEFT)
-            scrollx --;
+            scrollx--;
 
         NE_Process(Draw3DScene);
         NE_WaitForVBL(0);

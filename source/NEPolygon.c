@@ -251,5 +251,5 @@ void NE_ClearBMPEnable(bool value)
 
 void NE_ClearBMPScroll(u32 x, u32 y)
 {
-    REG_CLRIMAGE_OFFSET = x | (y << 8);
+    REG_CLRIMAGE_OFFSET = (x & 0xFF) | ((y & 0xFF) << 8);
 }
