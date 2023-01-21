@@ -31,6 +31,8 @@ static SpriteEntry *NE_Sprites; // 2D sprites used for Dual 3D mode
 static int ne_znear, ne_zfar;
 static int fov;
 
+static int ne_main_screen = 1; // 1 = top, 0 = bottom
+
 void NE_End(void)
 {
     if (!ne_inited)
@@ -97,6 +99,26 @@ void NE_Viewport(int x1, int y1, int x2, int y2)
     MATRIX_CONTROL = GL_MODELVIEW;
 }
 
+void NE_MainScreenSetOnTop(void)
+{
+    ne_main_screen = 1;
+}
+
+void NE_MainScreenSetOnBottom(void)
+{
+    ne_main_screen = 0;
+}
+
+int NE_MainScreenIsOnTop(void)
+{
+    return ne_main_screen;
+}
+
+void NE_SwapScreens(void)
+{
+    ne_main_screen ^= 1;
+}
+
 void NE_SetFov(int fovValue)
 {
     fov = fovValue;
@@ -120,7 +142,8 @@ static void NE_Init__(void)
     GFX_FLUSH = 0;
     GFX_FLUSH = 0;
 
-    lcdMainOnTop();
+    NE_MainScreenSetOnTop();
+    REG_POWERCNT |= POWER_SWAP_LCDS;
 
     glResetMatrixStack();
 
@@ -133,7 +156,7 @@ static void NE_Init__(void)
 
     GFX_CLEAR_DEPTH = GL_MAX_DEPTH;
 
-    // Default number of objects for everyting - Textures are inited in
+    // Default number of objects for everyting. Textures are initialized in
     // NE_Init3D and NE_InitDual3D
     NE_CameraSystemReset(0);
     NE_PhysicsSystemReset(0);
@@ -178,11 +201,6 @@ static void NE_Init__(void)
     // Ready!!
 
     videoSetMode(MODE_0_3D);
-}
-
-void NE_SwapScreens(void)
-{
-    REG_POWERCNT ^= POWER_SWAP_LCDS;
 }
 
 void NE_UpdateInput(void)
@@ -295,6 +313,11 @@ void NE_Process(NE_Voidfunc drawscene)
 {
     NE_UpdateInput();
 
+    if (ne_main_screen == 1)
+        REG_POWERCNT |= POWER_SWAP_LCDS;
+    else
+        REG_POWERCNT &= ~POWER_SWAP_LCDS;
+
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
     GFX_VIEWPORT = NE_viewport;
@@ -317,8 +340,10 @@ void NE_ProcessDual(NE_Voidfunc topscreen, NE_Voidfunc downscreen)
 {
     NE_UpdateInput();
 
-    REG_POWERCNT ^= POWER_SWAP_LCDS;
-    NE_Screen ^= 1;
+    if (NE_Screen == ne_main_screen)
+        REG_POWERCNT |= POWER_SWAP_LCDS;
+    else
+        REG_POWERCNT &= ~POWER_SWAP_LCDS;
 
     if (NE_Screen == 1)
     {
@@ -423,6 +448,8 @@ void NE_VBLFunc(void)
         if (!NE_effectpause)
             NE_lastvbladd = (NE_lastvbladd + 1) & LUT_MASK;
     }
+
+    NE_Screen ^= 1;
 }
 
 void NE_SpecialEffectPause(bool pause)

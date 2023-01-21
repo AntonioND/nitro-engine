@@ -78,6 +78,17 @@ void NE_InitConsole(void);
 /// @param color New color.
 void NE_SetConsoleColor(u32 color);
 
+/// Set the top screen as main screen.
+void NE_MainScreenSetOnTop(void);
+
+/// Set the bottom screen as main screen.
+void NE_MainScreenSetOnBottom(void);
+
+/// Returns the current main screen.
+///
+/// @return Returns 1 if the top screen is the main screen, 0 otherwise.
+int NE_MainScreenIsOnTop(void);
+
 /// Swap top and bottom screen.
 void NE_SwapScreens(void);
 
