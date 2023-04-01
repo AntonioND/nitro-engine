@@ -591,7 +591,7 @@ def save_animation(frames, output_file, blender_fix):
             f.write(bytearray(b))
 
 def convert_md5mesh(model_file, name, output_folder, texture_size,
-                    draw_normal_polygons, suffix, blender_fix,
+                    draw_normal_polygons, extension, blender_fix,
                     export_base_pose):
 
     print(f"Converting model: {model_file}")
@@ -610,7 +610,7 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
         print("Converting base pose...")
 
         save_animation([joints],
-                       os.path.join(output_folder, f"{name}.dsa{suffix}"),
+                       os.path.join(output_folder, f"{name}{extension}"),
                        blender_fix)
 
     print("Converting meshes...")
@@ -750,10 +750,10 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
     dl.end_vtxs()
     dl.finalize()
 
-    dl.save_to_file(os.path.join(output_folder, f"{name}.dsm{suffix}"))
+    dl.save_to_file(os.path.join(output_folder, f"{name}{extension}"))
 
 
-def convert_md5anim(name, output_folder, anim_file, skip_frames, suffix,
+def convert_md5anim(name, output_folder, anim_file, skip_frames, extension,
                     blender_fix):
 
     print(f"Converting animation: {anim_file}")
@@ -766,7 +766,7 @@ def convert_md5anim(name, output_folder, anim_file, skip_frames, suffix,
 
     frames = frames[::skip_frames+1]
     save_animation(frames, os.path.join(output_folder,
-                   f"{name}_{anim_name}.dsa{suffix}"), blender_fix)
+                   f"{name}_{anim_name}{extension}"), blender_fix)
 
 
 if __name__ == "__main__":
@@ -833,17 +833,18 @@ if __name__ == "__main__":
     os.makedirs(args.output, exist_ok=True)
 
     # Add '.bin' to the name of the files if requested
-    suffix = ".bin" if args.bin else ""
+    extension_mesh = "_dsm.bin" if args.bin else ".dsm"
+    extension_anim = "_dsa.bin" if args.bin else ".dsa"
 
     try:
         if args.model is not None:
             convert_md5mesh(args.model, args.name, args.output, args.texture,
-                            args.draw_normal_polygons, suffix, args.blender_fix,
-                            args.export_base_pose)
+                            args.draw_normal_polygons, extension_mesh,
+                            args.blender_fix, args.export_base_pose)
 
         for anim_file in args.anims:
             convert_md5anim(args.name, args.output, anim_file, args.skip_frames,
-                            suffix, args.blender_fix)
+                            extension_anim, args.blender_fix)
 
     except BaseException as e:
         print("ERROR: " + str(e))
