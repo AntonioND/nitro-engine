@@ -33,7 +33,7 @@ to integrate Nitro Engine and NFlib in the same project `here
 Setup
 -----
 
-1. Clone this repository. Create a symbolic link) to it inside the devkitPro
+1. Clone this repository. Create a symbolic link to it inside the devkitPro
    folder in your system. For example, in Linux, create a symlink so that
    ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine:
 
