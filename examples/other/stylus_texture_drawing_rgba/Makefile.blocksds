@@ -1,0 +1,3 @@
+BINDIRS	:= data
+
+include ../../Makefile.example.blocksds

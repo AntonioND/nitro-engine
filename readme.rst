@@ -1,13 +1,15 @@
+###################
 Nitro Engine v0.8.1
-===================
+###################
 
 Introduction
-------------
+============
 
 This is a 3D game engine, a lot of functions designed to simplify the process of
-making a 3D game. It isn't standalone, it needs libnds to work. However, if you
-are developing for the NDS it is likely that you already have it installed. If
-not, you need to install devkitARM and libnds.
+making a 3D game. It isn't standalone, it needs libnds to work.
+
+You may use Nitro Engine with both devkitPro installations, and with `BlocksDS
+<https://github.com/blocksds/sdk>`_.
 
 Features:
 
@@ -31,7 +33,10 @@ to integrate Nitro Engine and NFlib in the same project `here
 <./examples/templates/using_nflib>`_.
 
 Setup
------
+=====
+
+devkitpro
+---------
 
 1. Clone this repository. Create a symbolic link to it inside the devkitPro
    folder in your system. For example, in Linux, create a symlink so that
@@ -52,21 +57,48 @@ Setup
 
 3. If you want to check that everything is working as expected, open one of the
    folders of the examples and type ``make``. That should build an ``.nds`` file
-   that you can run on an emulator or real hardware. Note that some features of
-   the 3D hardware aren't emulated by most emulators, so you may need to use an
-   actual NDS to test some things. **melonDS** seems to emulate all features
-   correctly. **DeSmuME** doesn't emulate the polygon/vertices count registers,
-   so the touch test feature of Nitro Engine doesn't work.
+   that you can run on an emulator or real hardware.
 
-4. Normally you should link your programs with ``-lNE``, which is the release
-   version of Nitro Engine. If you want to use the debug features of Nitro
-   Engine, you should link with ``-lNE_debug``, and add ``-DNE_DEBUG`` to the
-   ``CFLAGS`` and ``CPPFLAGS`` in your Makefile. Make sure to clean and rebuild
-   your project after doing the changes mentioned in this step. Check the
-   **error_handling** example to see how to use the debug mode of Nitro Engine.
+BlocksDS
+--------
+
+1. Clone this repository and run:
+
+   .. code:: bash
+
+       make -f Makefile.blocksds
+       make -f Makefile.blocksds NE_DEBUG=1
+       make -f Makefile.blocksds install
+
+   This should build the library in both debug and release modes and install it.
+
+2. If you want to check that everything is working as expected, open one of the
+   folders of the examples and run:
+
+   .. code:: bash
+
+       make -f Makefile.blocksds
+
+   That should build an ``.nds`` file that you can run on an emulator or real
+   hardware.
+
+Common
+------
+
+Note that some features of the 3D hardware aren't emulated by most emulators, so
+you may need to use an actual NDS to test some things. **melonDS** seems to
+emulate all features correctly. **DeSmuME** doesn't emulate the polygon/vertices
+count registers, so the touch test feature of Nitro Engine doesn't work.
+
+Normally you should link your programs with ``-lNE``, which is the release
+version of Nitro Engine. If you want to use the debug features of Nitro Engine,
+you should link with ``-lNE_debug``, and add ``-DNE_DEBUG`` to the ``CFLAGS``
+and ``CPPFLAGS`` in your Makefile. Make sure to clean and rebuild your project
+after doing the changes mentioned in this step. Check the **error_handling**
+example to see how to use the debug mode of Nitro Engine.
 
 Screenshots
------------
+===========
 
 Screenshots of some of the examples included with Nitro Engine:
 
@@ -96,7 +128,7 @@ Screenshots of some of the examples included with Nitro Engine:
 +------------------+-------------------+
 
 Contact
--------
+=======
 
 This project is currently hosted on GitHub at:
 
@@ -107,7 +139,7 @@ If you want to contact me (Antonio Niño Díaz) directly you can email me at:
    antonio underscore nd at outlook dot com
 
 License
--------
+=======
 
 The code of this repository is under the MIT license. The examples are under the
 CC0-1.0 license.
@@ -115,13 +147,13 @@ CC0-1.0 license.
 The full text of the licenses can be found under the ``licenses`` folder.
 
 Future work
------------
+===========
 
 - Asynchronous loading of assets.
 - Support for compressed textures.
 
 Thanks to
----------
+=========
 
 - **devkitPro**: https://devkitpro.org/
 - **libnds**: https://github.com/devkitPro/libnds
