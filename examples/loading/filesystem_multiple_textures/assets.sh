@@ -6,6 +6,8 @@ TOOLS=$NITRO_ENGINE/tools
 IMG2DS=$TOOLS/img2ds/img2ds.py
 OBJ2DL=$TOOLS/obj2dl/obj2dl.py
 
+mkdir -p nitrofiles
+
 python3 $OBJ2DL \
     --input $ASSETS/cube.obj \
     --output nitrofiles/cube.bin \

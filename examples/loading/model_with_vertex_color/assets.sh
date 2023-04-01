@@ -6,6 +6,8 @@ TOOLS=$NITRO_ENGINE/tools
 OBJ2DL=$TOOLS/obj2dl/obj2dl.py
 IMG2DS=$TOOLS/img2ds/img2ds.py
 
+mkdir -p data
+
 python3 $OBJ2DL \
     --input $ASSETS/sphere_vertex_colors.obj \
     --output data/sphere_vertex_colors.bin \

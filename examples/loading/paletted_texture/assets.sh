@@ -5,6 +5,8 @@ ASSETS=$NITRO_ENGINE/examples/assets
 TOOLS=$NITRO_ENGINE/tools
 IMG2DS=$TOOLS/img2ds/img2ds.py
 
+mkdir -p data
+
 python3 $IMG2DS \
     --input $ASSETS/a3pal32.png \
     --name a3pal32 \

@@ -33,9 +33,9 @@ ICON     :=
 NITRO    :=
 
 # These set the information text in the nds file
-GAME_TITLE     := Nitro Engine example
-GAME_SUBTITLE1 := built with devkitARM
-GAME_SUBTITLE2 := http://devitpro.org
+GAME_TITLE     := $(shell basename $(CURDIR))
+GAME_SUBTITLE1 := Nitro Engine example
+GAME_SUBTITLE2 := github.com/AntonioND/nitro-engine
 
 #---------------------------------------------------------------------------------
 # options for code generation
