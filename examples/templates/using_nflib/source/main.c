@@ -81,14 +81,14 @@ void LoadAndSetupGraphics3D(void)
     if (NE_ModelLoadDSMFAT(Model, "robot.dsm") == 0)
     {
         consoleDemoInit();
-        iprintf("Couldn't load model...");
+        printf("Couldn't load model...");
         WaitLoop();
     }
 
     if (NE_AnimationLoadFAT(Animation, "robot_wave.dsa") == 0)
     {
         consoleDemoInit();
-        iprintf("Couldn't load animation...");
+        printf("Couldn't load animation...");
         WaitLoop();
     }
 
@@ -96,7 +96,7 @@ void LoadAndSetupGraphics3D(void)
                               "texture_tex.bin") == 0)
     {
         consoleDemoInit();
-        iprintf("Couldn't load texture...");
+        printf("Couldn't load texture...");
         WaitLoop();
     }
 
@@ -167,7 +167,7 @@ int main(void)
     NF_Set2D(0, 0);
     NF_Set2D(1, 0);
     consoleDemoInit();
-    iprintf("Starting nitroFS...");
+    printf("Starting nitroFS...");
     swiWaitForVBlank();
 
     // Set the root folder to the nitroFS filesystem

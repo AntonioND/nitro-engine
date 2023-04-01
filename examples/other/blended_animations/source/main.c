@@ -63,10 +63,10 @@ int main(void)
 
     int32_t blend = floattof32(0.5);
 
-    iprintf("\x1b[0;0H"
-            "L/R: Remove one animation\n"
-            "A/B: Blend factor\n"
-            "Pad: Rotate\n");
+    printf("\x1b[0;0H"
+           "L/R: Remove one animation\n"
+           "A/B: Blend factor\n"
+           "Pad: Rotate\n");
 
     while (1)
     {

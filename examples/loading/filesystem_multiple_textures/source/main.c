@@ -37,7 +37,7 @@ int main(void)
 
     if (!nitroFSInit(NULL))
     {
-        iprintf("nitroFSInit failed.\nPress START to exit");
+        printf("nitroFSInit failed.\nPress START to exit");
         while (1)
         {
             swiWaitForVBlank();
