@@ -163,7 +163,7 @@ void NE_VBLFunc(void);
 /// @param pause true pauses the effect, false unpauses it.
 void NE_SpecialEffectPause(bool pause);
 
-/// Vertical blank interrupt handler.
+/// Horizontal blank interrupt handler.
 ///
 /// Internal use, must be called every horizontal blank. It's only needed to
 /// enable CPU usage measuring and things like special effects enabled by
