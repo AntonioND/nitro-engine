@@ -36,6 +36,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <filesystem.h>
 #include <nds.h>
 #include <NEMain.h>
 #include <nf_lib.h>
@@ -167,7 +169,21 @@ int main(void)
     NF_Set2D(0, 0);
     NF_Set2D(1, 0);
     consoleDemoInit();
-    printf("Starting nitroFS...");
+    printf("Starting nitroFS...\n");
+    if (!nitroFSInit(NULL))
+    {
+        printf("Failed to start nitroFS\n");
+        printf("Press START to exit\n");
+
+        while (1)
+        {
+            swiWaitForVBlank();
+            scanKeys();
+            if (keysHeld() & KEY_START)
+                return -1;
+        }
+    }
+
     swiWaitForVBlank();
 
     // Set the root folder to the nitroFS filesystem
