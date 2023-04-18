@@ -15,7 +15,7 @@ Install the dependencies with:
 Usage
 -----
 
-.. code:: python
+.. code:: bash
 
    python3 img2ds.py --input teapot.png --name texture --output data --format A1RGB5
 
