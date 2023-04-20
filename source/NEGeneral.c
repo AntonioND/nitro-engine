@@ -447,7 +447,7 @@ void NE_VBLFunc(void)
     if (NE_Effect == NE_NOISE || NE_Effect == NE_SINE)
     {
         if (!NE_effectpause)
-            NE_lastvbladd = (NE_lastvbladd + 1) & NE_NOISEPAUSE_SIZE;
+            NE_lastvbladd = (NE_lastvbladd + 1) & (NE_NOISEPAUSE_SIZE - 1);
     }
 
     NE_Screen ^= 1;
