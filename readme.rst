@@ -1,5 +1,5 @@
 ###################
-Nitro Engine v0.8.1
+Nitro Engine v0.8.2
 ###################
 
 Introduction

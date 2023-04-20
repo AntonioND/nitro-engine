@@ -1,6 +1,25 @@
 Changelog
 =========
 
+Version 0.8.2 (2023-04-20)
+--------------------------
+
+- Decouple mesh objects from model objects. This simplifies cloning models.
+  Previously it was needed to preserve the original object as long as you wanted
+  to use the clones. Now, it can be deleted and Nitro Engine won't free the mesh
+  until all clones have been deleted.
+
+- Support vertex color commands in ``obj2dl``. This can't be used at the same
+  time as normals.
+
+- Improve examples. A script has been added to convert all assets used by the
+  examples. Also, the NFlib example has been updated to work with upstream
+  NFlib.
+
+- Support BlocksDS.
+
+- A few minor fixes.
+
 Version 0.8.1 (2022-11-10)
 --------------------------
 
