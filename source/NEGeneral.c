@@ -433,6 +433,7 @@ int NE_GetVertexCount(void)
 static int NE_Effect = NE_NONE;
 static int NE_lastvbladd = 0;
 static bool NE_effectpause;
+#define NE_NOISEPAUSE_SIZE 512
 static int *ne_noisepause;
 static int ne_cpucount;
 static int ne_noise_value = 0xF;
@@ -446,7 +447,7 @@ void NE_VBLFunc(void)
     if (NE_Effect == NE_NOISE || NE_Effect == NE_SINE)
     {
         if (!NE_effectpause)
-            NE_lastvbladd = (NE_lastvbladd + 1) & LUT_MASK;
+            NE_lastvbladd = (NE_lastvbladd + 1) & NE_NOISEPAUSE_SIZE;
     }
 
     NE_Screen ^= 1;
@@ -460,9 +461,9 @@ void NE_SpecialEffectPause(bool pause)
     NE_effectpause = pause;
     if (pause)
     {
-        ne_noisepause = malloc(sizeof(int) * 512);
+        ne_noisepause = malloc(sizeof(int) * NE_NOISEPAUSE_SIZE);
 
-        for (int i = 0; i < 512; i++)
+        for (int i = 0; i < NE_NOISEPAUSE_SIZE; i++)
         {
             ne_noisepause[i] = (rand() & ne_noise_value)
                              - (ne_noise_value >> 1);
@@ -498,14 +499,14 @@ void NE_HBLFunc(void)
     {
         case NE_NOISE:
             if (NE_effectpause && ne_noisepause)
-                val = ne_noisepause[vcount & LUT_MASK];
+                val = ne_noisepause[vcount & (NE_NOISEPAUSE_SIZE - 1)];
             else
                 val = (rand() & ne_noise_value) - (ne_noise_value >> 1);
             REG_BG0HOFS = val;
             break;
 
         case NE_SINE:
-            angle = ((vcount + NE_lastvbladd) * ne_sine_mult) & LUT_MASK;
+            angle = (vcount + NE_lastvbladd) * ne_sine_mult;
             REG_BG0HOFS = sinLerp(angle << 6) >> ne_sine_shift;
             break;
 

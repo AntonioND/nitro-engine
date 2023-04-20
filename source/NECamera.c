@@ -197,8 +197,8 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
     {
         cam->matrix_is_updated = false;
 
-        sine = sinLerp((rx & LUT_MASK) << 6);
-        cosine = cosLerp((rx & LUT_MASK) << 6);
+        sine = sinLerp(rx << 6);
+        cosine = cosLerp(rx << 6);
 
         result_vector[1] = mulf32(cam_vector[1], cosine)
                          - mulf32(cam_vector[2], sine);
@@ -213,8 +213,8 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
     {
         cam->matrix_is_updated = false;
 
-        sine = sinLerp((ry & LUT_MASK) << 6);
-        cosine = cosLerp((ry & LUT_MASK) << 6);
+        sine = sinLerp(ry << 6);
+        cosine = cosLerp(ry << 6);
 
         result_vector[0] = mulf32(cam_vector[0], cosine)
                          - mulf32(cam_vector[2], sine);
@@ -229,8 +229,8 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
     {
         cam->matrix_is_updated = false;
 
-        sine = sinLerp((rz & LUT_MASK) << 6);
-        cosine = cosLerp((rz & LUT_MASK) << 6);
+        sine = sinLerp(rz << 6);
+        cosine = cosLerp(rz << 6);
 
         result_vector[0] = mulf32(cam_vector[0], cosine)
                          - mulf32(cam_vector[1], sine);
@@ -246,8 +246,8 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 static void __NE_RotateVectorAxis(int32 *vector, int angle, int x, int y, int z)
 {
     // Vector must be an array of 3 ints with your vector in f32 format!
-    int sin = sinLerp((angle & LUT_MASK) << 6);
-    int cos = cosLerp((angle & LUT_MASK) << 6);
+    int sin = sinLerp(angle << 6);
+    int cos = cosLerp(angle << 6);
 
     int one_minus_cos = inttof32(1) - cos;
 
