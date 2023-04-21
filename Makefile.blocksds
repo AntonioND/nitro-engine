@@ -16,7 +16,11 @@ BINDIRS		:=
 # Defines passed to all files
 # ---------------------------
 
+ifeq ($(NE_DEBUG),1)
+DEFINES		:= -DNE_DEBUG
+else
 DEFINES		:=
+endif
 
 # Libraries
 # ---------
