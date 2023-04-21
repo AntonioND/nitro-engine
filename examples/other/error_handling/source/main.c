@@ -19,7 +19,7 @@ void Draw3DScene(void)
     NE_PolyFormat(100, 120, 0, 0, 0);
 }
 
-void error_handler(const char * text)
+void error_handler(const char *text)
 {
     // Simple handler. You could write this to a file instead, for example.
     printf(text);

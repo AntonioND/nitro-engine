@@ -1,1 +1,4 @@
+DEFINES		:= -DNE_DEBUG
+LIBS		:= -lNE_debug -lnds9 -lc
+
 include ../../Makefile.example.blocksds

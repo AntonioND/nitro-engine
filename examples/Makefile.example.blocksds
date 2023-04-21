@@ -30,7 +30,7 @@ SDIMAGE		:= image.bin
 # Libraries
 # ---------
 
-LIBS		+= -lNE -lnds9 -lc
+LIBS		?= -lNE -lnds9 -lc
 LIBDIRS		+= $(BLOCKSDSEXT)/nitro-engine \
 		   $(BLOCKSDS)/libs/libnds
 
