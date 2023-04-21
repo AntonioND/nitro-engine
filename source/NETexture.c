@@ -131,7 +131,10 @@ static void ne_texture_delete(int texture_index)
 NE_Material *NE_MaterialCreate(void)
 {
     if (!ne_texture_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_MAX_TEXTURES; i++)
     {
@@ -139,7 +142,12 @@ NE_Material *NE_MaterialCreate(void)
             continue;
 
         NE_Material *mat = calloc(1, sizeof(NE_Material));
-        NE_AssertPointer(mat, "Not enough memory");
+        if (mat == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
+
         NE_UserMaterials[i] = mat;
         mat->texindex = NE_NO_TEXTURE;
         mat->palette = NULL;
@@ -502,20 +510,29 @@ void NE_MaterialUse(const NE_Material *tex)
 
 extern bool NE_Dual;
 
-void NE_TextureSystemReset(int max_textures, int max_palettes,
-                           NE_VRAMBankFlags bank_flags)
+int NE_TextureSystemReset(int max_textures, int max_palettes,
+                          NE_VRAMBankFlags bank_flags)
 {
     if (ne_texture_system_inited)
         NE_TextureSystemEnd();
+
+    NE_Assert((bank_flags & 0xF) != 0, "No VRAM banks selected");
 
     if (max_textures < 1)
         NE_MAX_TEXTURES = NE_DEFAULT_TEXTURES;
     else
         NE_MAX_TEXTURES = max_textures;
 
-    NE_AllocInit(&NE_TexAllocList, VRAM_A, VRAM_E);
+    if (NE_PaletteSystemReset(max_palettes) != 0)
+        return -1;
 
-    NE_Assert((bank_flags & 0xF) != 0, "No VRAM banks selected");
+    NE_Texture = calloc(NE_MAX_TEXTURES, sizeof(ne_textureinfo_t));
+    NE_UserMaterials = calloc(NE_MAX_TEXTURES, sizeof(NE_UserMaterials));
+    if ((NE_Texture == NULL) || (NE_UserMaterials == NULL))
+        goto cleanup;
+
+    if (NE_AllocInit(&NE_TexAllocList, VRAM_A, VRAM_E) != 0)
+        goto cleanup;
 
     // Prevent user from not selecting any bank
     if ((bank_flags & 0xF) == 0)
@@ -569,16 +586,17 @@ void NE_TextureSystemReset(int max_textures, int max_palettes,
         NE_Lock(NE_TexAllocList, VRAM_D);
     }
 
-    NE_Texture = calloc(NE_MAX_TEXTURES, sizeof(ne_textureinfo_t));
-    NE_AssertPointer(NE_Texture, "Not enough memory");
-    NE_UserMaterials = calloc(NE_MAX_TEXTURES, sizeof(NE_UserMaterials));
-    NE_AssertPointer(NE_UserMaterials, "Not enough memory");
-
-    NE_PaletteSystemReset(max_palettes);
-
     GFX_TEX_FORMAT = 0;
 
     ne_texture_system_inited = true;
+    return 0;
+
+cleanup:
+    NE_DebugPrint("Not enough memory");
+    NE_PaletteSystemEnd();
+    free(NE_Texture);
+    free(NE_UserMaterials);
+    return -1;
 }
 
 void NE_MaterialDelete(NE_Material *tex)

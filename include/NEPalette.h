@@ -77,7 +77,8 @@ void NE_PaletteUse(const NE_Palette *pal);
 ///
 /// @param max_palettes Max number of palettes. If lower than 1, it will
 ///                     create space for NE_DEFAULT_PALETTES.
-void NE_PaletteSystemReset(int max_palettes);
+/// @return Returns 0 on success.
+int NE_PaletteSystemReset(int max_palettes);
 
 /// Returns the available free memory for palettes.
 ///

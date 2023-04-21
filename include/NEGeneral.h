@@ -48,7 +48,9 @@ void NE_UpdateInput(void);
 void NE_End(void);
 
 /// Inits Nitro Engine and 3D mode in one screen.
-void NE_Init3D(void);
+///
+/// @return Returns 0 on success.
+int NE_Init3D(void);
 
 /// Draws a 3D scene.
 ///
@@ -59,7 +61,9 @@ void NE_Process(NE_Voidfunc drawscene);
 ///
 /// VRAM banks C and D are used as framebuffers, which means there is only 50%
 /// of the normally available VRAM for textures.
-void NE_InitDual3D(void);
+///
+/// @return Returns 0 on success.
+int NE_InitDual3D(void);
 
 /// Draws a 3D scene in each screen.
 ///

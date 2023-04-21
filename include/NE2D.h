@@ -129,7 +129,8 @@ void NE_SpriteDeleteAll(void);
 ///
 /// @param max_sprites Number of sprites. If it is lower than 1, it will create
 ///                    space for NE_DEFAULT_SPRITES.
-void NE_SpriteSystemReset(int max_sprites);
+/// @return Returns 0 on success.
+int NE_SpriteSystemReset(int max_sprites);
 
 /// Ends sprite system and all memory used by it.
 void NE_SpriteSystemEnd(void);

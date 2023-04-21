@@ -189,8 +189,9 @@ typedef enum {
 /// @param max_palettes Max number of palettes. If lower than 1, it will
 ///                     create space for NE_DEFAULT_PALETTES.
 /// @param bank_flags VRAM banks where Nitro Engine can allocate textures.
-void NE_TextureSystemReset(int max_textures, int max_palettes,
-                           NE_VRAMBankFlags bank_flags);
+/// @return Returns 0 on success.
+int NE_TextureSystemReset(int max_textures, int max_palettes,
+                          NE_VRAMBankFlags bank_flags);
 
 /// Deletes a material object.
 ///

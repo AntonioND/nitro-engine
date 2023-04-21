@@ -18,7 +18,7 @@ NE_Sprite *NE_SpriteCreate(void)
 {
     if (!ne_sprite_system_inited)
     {
-        NE_DebugPrint("System not inited");
+        NE_DebugPrint("System not initialized");
         return NULL;
     }
 
@@ -28,8 +28,11 @@ NE_Sprite *NE_SpriteCreate(void)
             continue;
 
         NE_Sprite *sprite = calloc(1, sizeof(NE_Sprite));
-
-        NE_AssertPointer(sprite, "Not enough memory");
+        if (sprite == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         sprite->visible = true;
         sprite->scale = inttof32(1);
@@ -133,7 +136,7 @@ void NE_SpriteDeleteAll(void)
         NE_SpriteDelete(NE_spritepointers[i]);
 }
 
-void NE_SpriteSystemReset(int max_sprites)
+int NE_SpriteSystemReset(int max_sprites)
 {
     if (ne_sprite_system_inited)
         NE_SpriteSystemEnd();
@@ -144,9 +147,14 @@ void NE_SpriteSystemReset(int max_sprites)
         NE_MAX_SPRITES = max_sprites;
 
     NE_spritepointers = calloc(NE_MAX_SPRITES, sizeof(NE_spritepointers));
-    NE_AssertPointer(NE_spritepointers, "Not enough memory");
+    if (NE_spritepointers == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_sprite_system_inited = true;
+    return 0;
 }
 
 void NE_SpriteSystemEnd(void)

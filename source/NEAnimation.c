@@ -17,10 +17,17 @@ static bool ne_animation_system_inited = false;
 NE_Animation *NE_AnimationCreate(void)
 {
     if (!ne_animation_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     NE_Animation *animation = calloc(1, sizeof(NE_Animation));
-    NE_AssertPointer(animation, "Not enough memory");
+    if (animation == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return NULL;
+    }
 
     int i = 0;
     while (1)
@@ -85,7 +92,11 @@ int NE_AnimationLoadFAT(NE_Animation *animation, const char *dsa_path)
     animation->loadedfromfat = true;
 
     uint32_t *pointer = (uint32_t *)NE_FATLoadData(dsa_path);
-    NE_AssertPointer(pointer, "Couldn't load file from FAT");
+    if (pointer == NULL)
+    {
+        NE_DebugPrint("Couldn't load file from FAT");
+        return 0;
+    }
 
     // Check version
     uint32_t version = pointer[0];
@@ -141,7 +152,7 @@ void NE_AnimationDeleteAll(void)
     }
 }
 
-void NE_AnimationSystemReset(int max_animations)
+int NE_AnimationSystemReset(int max_animations)
 {
     if (ne_animation_system_inited)
         NE_AnimationSystemEnd();
@@ -151,13 +162,15 @@ void NE_AnimationSystemReset(int max_animations)
     else
         NE_MAX_ANIMATIONS = max_animations;
 
-    NE_AnimationPointers = malloc(NE_MAX_ANIMATIONS * sizeof(NE_AnimationPointers));
-    NE_AssertPointer(NE_AnimationPointers, "Not enough memory");
-
-    for (int i = 0; i < NE_MAX_ANIMATIONS; i++)
-        NE_AnimationPointers[i] = NULL;
+    NE_AnimationPointers = calloc(NE_MAX_ANIMATIONS, sizeof(NE_AnimationPointers));
+    if (NE_AnimationPointers == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_animation_system_inited = true;
+    return 0;
 }
 
 void NE_AnimationSystemEnd(void)

@@ -218,7 +218,8 @@ void NE_GUIDeleteAll(void);
 ///
 /// @param max_objects Max number of objects. If it is lower than 1, the
 ///                    function will create space for NE_GUI_DEFAULT_OBJECTS.
-void NE_GUISystemReset(int max_objects);
+/// @return Returns 0 on success.
+int NE_GUISystemReset(int max_objects);
 
 /// Ends GUI system and all memory used by it.
 void NE_GUISystemEnd(void);

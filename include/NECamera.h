@@ -150,7 +150,8 @@ void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz);
 ///
 /// @param max_cameras Number of cameras. If it is less than 1, it will create
 ///                    space for NE_DEFAULT_CAMERAS.
-void NE_CameraSystemReset(int max_cameras);
+/// @return Returns 0 on success.
+int NE_CameraSystemReset(int max_cameras);
 
 /// Ends camera system and all memory used by it.
 void NE_CameraSystemEnd(void);

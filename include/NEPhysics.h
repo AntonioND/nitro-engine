@@ -88,7 +88,8 @@ void NE_PhysicsDeleteAll(void);
 ///
 /// @param max_objects Number of objects. If it is lower than 1, it will create
 ///                    space for NE_DEFAULT_PHYSICS.
-void NE_PhysicsSystemReset(int max_objects);
+/// @return Returns 0 on success.
+int NE_PhysicsSystemReset(int max_objects);
 
 /// Ends physics engine and frees all memory used by it.
 void NE_PhysicsSystemEnd(void);

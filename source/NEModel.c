@@ -110,10 +110,17 @@ static int ne_model_load_filesystem_common(NE_Model *model, const char *path)
 NE_Model *NE_ModelCreate(NE_ModelType type)
 {
     if (!ne_model_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     NE_Model *model = calloc(1, sizeof(NE_Model));
-    NE_AssertPointer(model, "Not enough memory");
+    if (model == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return NULL;
+    }
 
     int i = 0;
     while (1)
@@ -564,7 +571,7 @@ void NE_ModelDeleteAll(void)
     }
 }
 
-void NE_ModelSystemReset(int max_models)
+int NE_ModelSystemReset(int max_models)
 {
     if (ne_model_system_inited)
         NE_ModelSystemEnd();
@@ -575,14 +582,17 @@ void NE_ModelSystemReset(int max_models)
         NE_MAX_MODELS = max_models;
 
     NE_Mesh = calloc(NE_MAX_MODELS, sizeof(ne_mesh_info_t));
-    NE_AssertPointer(NE_Mesh, "Not enough memory");
-    NE_ModelPointers = malloc(NE_MAX_MODELS * sizeof(NE_ModelPointers));
-    NE_AssertPointer(NE_ModelPointers, "Not enough memory");
-
-    for (int i = 0; i < NE_MAX_MODELS; i++)
-        NE_ModelPointers[i] = NULL;
+    NE_ModelPointers = calloc(NE_MAX_MODELS, sizeof(NE_ModelPointers));
+    if ((NE_Mesh == NULL) || (NE_ModelPointers == NULL))
+    {
+        free(NE_Mesh);
+        free(NE_ModelPointers);
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_model_system_inited = true;
+    return 0;
 }
 
 void NE_ModelSystemEnd(void)

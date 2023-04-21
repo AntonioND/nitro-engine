@@ -26,7 +26,10 @@ static int NE_MAX_PALETTES;
 NE_Palette *NE_PaletteCreate(void)
 {
     if (!ne_palette_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_MAX_PALETTES; i++)
     {
@@ -34,7 +37,12 @@ NE_Palette *NE_PaletteCreate(void)
             continue;
 
         NE_Palette *ptr = malloc(sizeof(NE_Palette));
-        NE_AssertPointer(ptr, "Not enough memory");
+        if (ptr == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
+
         ptr->index = NE_NO_PALETTE;
         NE_UserPalette[i] = ptr;
         return ptr;
@@ -101,7 +109,6 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor,
 
     NE_PalInfo[slot].pointer = NE_Alloc(NE_PalAllocList, numcolor << 1);
     // Aligned to 16 bytes (except 8 bytes for NE_PAL4).
-
     if (NE_PalInfo[slot].pointer == NULL)
     {
         NE_DebugPrint("Not enough memory");
@@ -161,7 +168,7 @@ void NE_PaletteUse(const NE_Palette *pal)
     GFX_PAL_FORMAT = (uintptr_t)NE_PalInfo[pal->index].pointer >> shift;
 }
 
-void NE_PaletteSystemReset(int max_palettes)
+int NE_PaletteSystemReset(int max_palettes)
 {
     if (ne_palette_system_inited)
         NE_PaletteSystemEnd();
@@ -171,19 +178,24 @@ void NE_PaletteSystemReset(int max_palettes)
     else
         NE_MAX_PALETTES = max_palettes;
 
-    NE_PalInfo = malloc(NE_MAX_PALETTES * sizeof(ne_palinfo_t));
-    NE_AssertPointer(NE_PalInfo, "Not enough memory");
-    NE_UserPalette = malloc(NE_MAX_PALETTES * sizeof(NE_UserPalette));
-    NE_AssertPointer(NE_UserPalette, "Not enough memory");
+    NE_PalInfo = calloc(NE_MAX_PALETTES, sizeof(ne_palinfo_t));
+    NE_UserPalette = calloc(NE_MAX_PALETTES, sizeof(NE_UserPalette));
+    if ((NE_PalInfo == NULL) || (NE_UserPalette == NULL))
+        goto cleanup;
 
-    NE_AllocInit(&NE_PalAllocList, (void *)VRAM_E, (void *)VRAM_F);
-
-    memset(NE_PalInfo, 0, NE_MAX_PALETTES * sizeof(ne_palinfo_t));
-    memset(NE_UserPalette, 0, NE_MAX_PALETTES * sizeof(NE_UserPalette));
-
-    ne_palette_system_inited = true;
+    if (NE_AllocInit(&NE_PalAllocList, (void *)VRAM_E, (void *)VRAM_F) != 0)
+        goto cleanup;
 
     GFX_PAL_FORMAT = 0;
+
+    ne_palette_system_inited = true;
+    return 0;
+
+cleanup:
+    NE_DebugPrint("Not enough memory");
+    free(NE_PalInfo);
+    free(NE_UserPalette);
+    return -1;
 }
 
 int NE_PaletteFreeMem(void)

@@ -54,7 +54,10 @@ static void __NE_CameraUpdateMatrix(NE_Camera * cam)
 NE_Camera *NE_CameraCreate(void)
 {
     if (!ne_camera_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_MAX_CAMERAS; i++)
     {
@@ -62,7 +65,11 @@ NE_Camera *NE_CameraCreate(void)
             continue;
 
         NE_Camera *cam = calloc(1, sizeof(NE_Camera));
-        NE_AssertPointer(cam, "Not enough memory");
+        if (cam == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         cam->to[2] = inttof32(1);
         cam->up[1] = inttof32(1);
@@ -364,7 +371,7 @@ void NE_CameraDelete(NE_Camera *cam)
     NE_DebugPrint("Object not found");
 }
 
-void NE_CameraSystemReset(int max_cameras)
+int NE_CameraSystemReset(int max_cameras)
 {
     if (ne_camera_system_inited)
         NE_CameraSystemEnd();
@@ -375,9 +382,14 @@ void NE_CameraSystemReset(int max_cameras)
         NE_MAX_CAMERAS = max_cameras;
 
     NE_UserCamera = calloc(NE_MAX_CAMERAS, sizeof(NE_UserCamera));
-    NE_AssertPointer(NE_UserCamera, "Not enough memory");
+    if (NE_UserCamera == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_camera_system_inited = true;
+    return 0;
 }
 
 void NE_CameraSystemEnd(void)

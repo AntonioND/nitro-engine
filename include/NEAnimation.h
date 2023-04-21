@@ -55,7 +55,8 @@ void NE_AnimationDeleteAll(void);
 ///
 /// @param max_animations Number of animations. If it is lower than 1, it
 ///                       will create space for NE_DEFAULT_ANIMATIONS.
-void NE_AnimationSystemReset(int max_animations);
+/// @return Returns 0 on success.
+int NE_AnimationSystemReset(int max_animations);
 
 /// Ends animation system and all memory used by it.
 void NE_AnimationSystemEnd(void);

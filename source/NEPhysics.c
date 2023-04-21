@@ -16,7 +16,10 @@ static int NE_MAX_PHYSICS;
 NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
 {
     if (!ne_physics_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     // TODO
     if (type == NE_BoundingSphere)
@@ -31,7 +34,11 @@ NE_Physics *NE_PhysicsCreate(NE_PhysicsTypes type)
     }
 
     NE_Physics *temp = calloc(1, sizeof(NE_Physics));
-    NE_AssertPointer(temp, "Not enough memory");
+    if (temp == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return NULL;
+    }
 
     int i = 0;
     while (1)
@@ -94,7 +101,7 @@ void NE_PhysicsDeleteAll(void)
         NE_PhysicsDelete(NE_PhysicsPointers[i]);
 }
 
-void NE_PhysicsSystemReset(int max_objects)
+int NE_PhysicsSystemReset(int max_objects)
 {
     if (ne_physics_system_inited)
         NE_PhysicsSystemEnd();
@@ -105,9 +112,14 @@ void NE_PhysicsSystemReset(int max_objects)
         NE_MAX_PHYSICS = max_objects;
 
     NE_PhysicsPointers = calloc(NE_MAX_PHYSICS, sizeof(NE_PhysicsPointers));
-    NE_AssertPointer(NE_PhysicsPointers, "Not enough memory");
+    if (NE_PhysicsPointers == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_physics_system_inited = true;
+    return 0;
 }
 
 void NE_PhysicsSystemEnd(void)

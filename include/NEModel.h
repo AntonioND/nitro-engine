@@ -330,7 +330,8 @@ void NE_ModelDeleteAll(void);
 ///
 /// @param max_models Number of models. If it is lower than 1, it will create
 ///                   space for NE_DEFAULT_MODELS.
-void NE_ModelSystemReset(int max_models);
+/// @return Returns 0 on success.
+int NE_ModelSystemReset(int max_models);
 
 /// Ends model system and frees all memory used by it.
 void NE_ModelSystemEnd(void);

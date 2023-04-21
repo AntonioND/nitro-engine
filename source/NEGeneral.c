@@ -124,7 +124,47 @@ void NE_SetFov(int fovValue)
     fov = fovValue;
 }
 
-static void NE_Init__(void)
+static void ne_systems_end_all(void)
+{
+    NE_GUISystemEnd();
+    NE_SpriteSystemEnd();
+    NE_PhysicsSystemEnd();
+    NE_ModelSystemEnd();
+    NE_AnimationSystemEnd();
+    NE_TextResetSystem();
+    NE_TextureSystemEnd();
+    NE_CameraSystemEnd();
+    NE_SpecialEffectSet(0);
+}
+
+static int ne_systems_reset_all(NE_VRAMBankFlags vram_banks)
+{
+    // Default number of objects for everyting.
+    if (NE_CameraSystemReset(0) != 0)
+        goto cleanup;
+    if (NE_PhysicsSystemReset(0) != 0)
+        goto cleanup;
+    if (NE_SpriteSystemReset(0) != 0)
+        goto cleanup;
+    if (NE_GUISystemReset(0) != 0)
+        goto cleanup;
+    if (NE_ModelSystemReset(0) != 0)
+        goto cleanup;
+    if (NE_AnimationSystemReset(0) != 0)
+        goto cleanup;
+    if (NE_TextureSystemReset(0, 0, vram_banks) != 0)
+        goto cleanup;
+
+    NE_TextPriorityReset();
+
+    return 0;
+
+cleanup:
+    ne_systems_end_all();
+    return -1;
+}
+
+static void ne_init_registers(void)
 {
     // Power all 3D and 2D. Hide 3D screen during init
     powerOn(POWER_ALL);
@@ -155,16 +195,6 @@ static void NE_Init__(void)
     NE_FogEnableBackground(false);
 
     GFX_CLEAR_DEPTH = GL_MAX_DEPTH;
-
-    // Default number of objects for everyting. Textures are initialized in
-    // NE_Init3D and NE_InitDual3D
-    NE_CameraSystemReset(0);
-    NE_PhysicsSystemReset(0);
-    NE_SpriteSystemReset(0);
-    NE_GUISystemReset(0);
-    NE_ModelSystemReset(0);
-    NE_AnimationSystemReset(0);
-    NE_TextPriorityReset();
 
     MATRIX_CONTROL = GL_TEXTURE;
     MATRIX_IDENTITY = 0;
@@ -213,48 +243,43 @@ void NE_UpdateInput(void)
         touchRead(&ne_input.touch);
 }
 
-void NE_Init3D(void)
+int NE_Init3D(void)
 {
     if (ne_inited)
         NE_End();
 
-    NE_Init__();
-
-    NE_TextureSystemReset(0, 0, NE_VRAM_ABCD);
+    if (ne_systems_reset_all(NE_VRAM_ABCD) != 0)
+        return -1;
 
     NE_UpdateInput();
+
+    ne_init_registers();
 
     ne_inited = true;
     NE_Dual = false;
 
     NE_DebugPrint("Nitro Engine initialized in normal 3D mode");
+
+    return 0;
 }
 
-void NE_InitDual3D(void)
+int NE_InitDual3D(void)
 {
     if (ne_inited)
         NE_End();
 
-    NE_Init__();
-
-    NE_TextureSystemReset(0, 0, NE_VRAM_AB);
-
-    NE_UpdateInput();
-
-    videoSetModeSub(0);
-
-    REG_BG2CNT_SUB = BG_BMP16_256x256;
-    REG_BG2PA_SUB = 1 << 8;
-    REG_BG2PB_SUB = 0;
-    REG_BG2PC_SUB = 0;
-    REG_BG2PD_SUB = 1 << 8;
-    REG_BG2X_SUB = 0;
-    REG_BG2Y_SUB = 0;
-
-    vramSetBankC(VRAM_C_SUB_BG);
-    vramSetBankD(VRAM_D_SUB_SPRITE);
-
     NE_Sprites = calloc(128, sizeof(SpriteEntry));
+    if (NE_Sprites == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
+
+    if (ne_systems_reset_all(NE_VRAM_AB) != 0)
+    {
+        free(NE_Sprites);
+        return -2;
+    }
 
     // Reset sprites
     for (int i = 0; i < 128; i++)
@@ -273,6 +298,23 @@ void NE_InitDual3D(void)
         }
     }
 
+    NE_UpdateInput();
+
+    ne_init_registers();
+
+    videoSetModeSub(0);
+
+    REG_BG2CNT_SUB = BG_BMP16_256x256;
+    REG_BG2PA_SUB = 1 << 8;
+    REG_BG2PB_SUB = 0;
+    REG_BG2PC_SUB = 0;
+    REG_BG2PD_SUB = 1 << 8;
+    REG_BG2X_SUB = 0;
+    REG_BG2Y_SUB = 0;
+
+    vramSetBankC(VRAM_C_SUB_BG);
+    vramSetBankD(VRAM_D_SUB_SPRITE);
+
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE |
                     DISPLAY_SPR_2D_BMP_256);
 
@@ -280,6 +322,8 @@ void NE_InitDual3D(void)
     NE_Dual = true;
 
     NE_DebugPrint("Nitro Engine initialized in dual 3D mode");
+
+    return 0;
 }
 
 void NE_InitConsole(void)
@@ -458,10 +502,14 @@ void NE_SpecialEffectPause(bool pause)
     if (NE_Effect == 0)
         return;
 
-    NE_effectpause = pause;
     if (pause)
     {
         ne_noisepause = malloc(sizeof(int) * NE_NOISEPAUSE_SIZE);
+        if (ne_noisepause == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return;
+        }
 
         for (int i = 0; i < NE_NOISEPAUSE_SIZE; i++)
         {
@@ -477,6 +525,8 @@ void NE_SpecialEffectPause(bool pause)
             ne_noisepause = NULL;
         }
     }
+
+    NE_effectpause = pause;
 }
 
 void NE_HBLFunc(void)

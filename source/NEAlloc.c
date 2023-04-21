@@ -12,13 +12,23 @@
 int NE_AllocInit(NEChunk **first_chunk, void *start, void *end)
 {
     if (first_chunk == NULL)
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     if (end <= start)
+    {
+        NE_DebugPrint("Invalid range");
         return -2;
+    }
 
     *first_chunk = malloc(sizeof(NEChunk));
-    NE_AssertPointer(*first_chunk, "Couldn't allocate chunk");
+    if (*first_chunk == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -3;
+    }
 
     (*first_chunk)->previous = NULL;
     (*first_chunk)->state = NE_STATE_FREE;
@@ -32,7 +42,10 @@ int NE_AllocInit(NEChunk **first_chunk, void *start, void *end)
 int NE_AllocEnd(NEChunk **first_chunk)
 {
     if (first_chunk == NULL)
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     NEChunk *this = *first_chunk;
 
@@ -61,12 +74,18 @@ int NE_AllocEnd(NEChunk **first_chunk)
 // It returns a pointer to the new chunk.
 static NEChunk *ne_split_chunk(NEChunk *this, size_t this_size)
 {
+    NE_AssertPointer(this, "NULL pointer");
+
     // Get next chunk and create a new one.
 
     NEChunk *next = this->next;
 
     NEChunk *new = malloc(sizeof(NEChunk));
-    NE_AssertPointer(new, "Couldn't allocate chunk metadata.");
+    if (new == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return NULL;
+    }
 
     // Update pointers in the linked list
     // ----------------------------------
@@ -85,8 +104,7 @@ static NEChunk *ne_split_chunk(NEChunk *this, size_t this_size)
 
         // It shouldn't be free because deallocating a chunk should merge it
         // with any free chunk next to it.
-        NE_Assert(next->state != NE_STATE_FREE,
-                    "Possible list corruption");
+        NE_Assert(next->state != NE_STATE_FREE, "Possible list corruption");
     }
 
     // Update pointers to start and end of this chunk and the new chunk
@@ -104,6 +122,8 @@ static NEChunk *ne_split_chunk(NEChunk *this, size_t this_size)
 // the end address isn't considered part of that chunk.
 static NEChunk *ne_search_address(NEChunk *first_chunk, void *address)
 {
+    NE_AssertPointer(first_chunk, "NULL pointer");
+
     NEChunk *this = first_chunk;
 
     uintptr_t addr = (uintptr_t)address;
@@ -128,7 +148,10 @@ static NEChunk *ne_search_address(NEChunk *first_chunk, void *address)
 void *NE_AllocFindInRange(NEChunk *first_chunk, void *start, void *end, size_t size)
 {
     if ((first_chunk == NULL) || (start == NULL) || (end == NULL) || (size == 0))
+    {
+        NE_DebugPrint("Invalid arguments");
         return NULL;
+    }
 
     // Get the chunk that contains the first address. If the start address of
     // the first chunk is after the provided start, get the first chunk.
@@ -180,6 +203,8 @@ void *NE_AllocFindInRange(NEChunk *first_chunk, void *start, void *end, size_t s
 static NEChunk *ne_search_free_range_chunk(NEChunk *first_chunk,
                                            void *address, size_t size)
 {
+    NE_AssertPointer(first_chunk, "NULL pointer");
+
     // If that range of memory is free, it should be in one single chunk. Look
     // for the chunk that contains the base address, and check if the end
     // address is also part of that chunk.
@@ -203,7 +228,10 @@ static NEChunk *ne_search_free_range_chunk(NEChunk *first_chunk,
 int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
 {
     if ((first_chunk == NULL) || (address == NULL) || (size == 0))
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     // Force sizes multiple of NE_ALLOC_MIN_SIZE
     const size_t mask = NE_ALLOC_MIN_SIZE - 1;
@@ -233,11 +261,17 @@ int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
     //
     // Finally, return the chunk that stays in the middle.
 
+    bool this_is_modified = false;
+
     if (this_start < alloc_start)
     {
         // Split this chunk into two, ignore the first one and get the second
         // one (which contains the start address)
         this = ne_split_chunk(this, alloc_start - this_start);
+        if (this == NULL)
+            return -3;
+
+        this_is_modified = true;
 
         // Only the start has changed
         this_start = (uintptr_t)this->start;
@@ -245,11 +279,21 @@ int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
         NE_Assert(this_end == (uintptr_t)this->end, "Unexpected error");
     }
 
+    this->state = NE_STATE_USED;
+
     if (alloc_end < this_end)
     {
         // Split this chunk into two as well. The first one is the final desired
         // chunk, the second one is more free space.
         NEChunk *next = ne_split_chunk(this, size);
+        if (next == NULL)
+        {
+            if (this_is_modified)
+                NE_Free(first_chunk, this);
+
+            return -4;
+        }
+
         next->state = NE_STATE_FREE;
 
         // Only the end has changed
@@ -257,8 +301,6 @@ int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
 
         NE_Assert(this_start == (uintptr_t)this->start, "Unexpected error");
     }
-
-    this->state = NE_STATE_USED;
 
     NE_Assert(size == (this_end - this_start), "Unexpected error");
     NE_Assert(this->start == address, "Unexpected error");
@@ -269,7 +311,10 @@ int NE_AllocAddress(NEChunk *first_chunk, void *address, size_t size)
 void *NE_Alloc(NEChunk *first_chunk, size_t size)
 {
     if ((first_chunk == NULL) || (size == 0))
+    {
+        NE_DebugPrint("Invalid arguments");
         return NULL;
+    }
 
     // Force sizes multiple of NE_ALLOC_MIN_SIZE
     const size_t mask = NE_ALLOC_MIN_SIZE - 1;
@@ -308,6 +353,8 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size)
         // | USED | NOT USED | USED |
 
         NEChunk *new = ne_split_chunk(this, size);
+        if (new == NULL)
+            return NULL;
 
         // Flag this chunk as used and the new one as free
         this->state = NE_STATE_USED;
@@ -323,7 +370,10 @@ void *NE_Alloc(NEChunk *first_chunk, size_t size)
 void *NE_AllocFromEnd(NEChunk *first_chunk, size_t size)
 {
     if ((first_chunk == NULL) || (size == 0))
+    {
+        NE_DebugPrint("Invalid arguments");
         return NULL;
+    }
 
     // Force sizes multiple of NE_ALLOC_MIN_SIZE
     const size_t mask = NE_ALLOC_MIN_SIZE - 1;
@@ -368,6 +418,8 @@ void *NE_AllocFromEnd(NEChunk *first_chunk, size_t size)
         // The size of this chunk has to be the current one minus the requested
         // size for the new chunk.
         NEChunk *new = ne_split_chunk(this, this_size - size);
+        if (new == NULL)
+            return NULL;
 
         // Flag the new chunk as used
         new->state = NE_STATE_USED;
@@ -382,7 +434,10 @@ void *NE_AllocFromEnd(NEChunk *first_chunk, size_t size)
 int NE_Free(NEChunk *first_chunk, void *pointer)
 {
     if (first_chunk == NULL)
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     NEChunk *this = first_chunk;
 
@@ -490,7 +545,10 @@ int NE_Free(NEChunk *first_chunk, void *pointer)
 int NE_Lock(NEChunk *first_chunk, void *pointer)
 {
     if (first_chunk == NULL)
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     NEChunk *this = first_chunk;
 
@@ -517,7 +575,10 @@ int NE_Lock(NEChunk *first_chunk, void *pointer)
 int NE_Unlock(NEChunk *first_chunk, void *pointer)
 {
     if (first_chunk == NULL)
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     NEChunk *this = first_chunk;
 
@@ -544,7 +605,10 @@ int NE_Unlock(NEChunk *first_chunk, void *pointer)
 int NE_MemGetInformation(NEChunk *first_chunk, NEMemInfo *info)
 {
     if ((first_chunk == NULL) || (info == NULL))
+    {
+        NE_DebugPrint("Invalid arguments");
         return -1;
+    }
 
     info->free = 0;
     info->used = 0;

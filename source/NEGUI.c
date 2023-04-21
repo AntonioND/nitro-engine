@@ -644,7 +644,10 @@ void NE_GUIDraw(void)
 NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 {
     if (!ne_gui_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_GUI_OBJECTS; i++)
     {
@@ -652,10 +655,19 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
             continue;
 
         ne_button_t *ptr = malloc(sizeof(ne_button_t));
-        NE_AssertPointer(ptr, "Not enough memory");
+        if (ptr == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
-        NE_AssertPointer(NE_guipointers[i], "Not enough memory");
+        if (NE_guipointers[i] == NULL)
+        {
+            free(ptr);
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i]->pointer = (void *)ptr;
         NE_guipointers[i]->type = NE_Button;
@@ -680,7 +692,10 @@ NE_GUIObj *NE_GUIButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2)
 NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalue)
 {
     if (!ne_gui_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_GUI_OBJECTS; i++)
     {
@@ -688,10 +703,19 @@ NE_GUIObj *NE_GUICheckBoxCreate(s16 x1, s16 y1, s16 x2, s16 y2, bool initialvalu
             continue;
 
         ne_checkbox_t *ptr = malloc(sizeof(ne_checkbox_t));
-        NE_AssertPointer(ptr, "Not enough memory");
+        if (ptr == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
-        NE_AssertPointer(NE_guipointers[i], "Not enough memory");
+        if (NE_guipointers[i] == NULL)
+        {
+            free(ptr);
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i]->pointer = (void *)ptr;
         NE_guipointers[i]->type = NE_CheckBox;
@@ -718,7 +742,10 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
                                    bool initialvalue)
 {
     if (!ne_gui_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_GUI_OBJECTS; i++)
     {
@@ -726,10 +753,19 @@ NE_GUIObj *NE_GUIRadioButtonCreate(s16 x1, s16 y1, s16 x2, s16 y2, int group,
             continue;
 
         ne_radiobutton_t *ptr = malloc(sizeof(ne_radiobutton_t));
-        NE_AssertPointer(ptr, "Not enough memory");
+        if (ptr == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
-        NE_AssertPointer(NE_guipointers[i], "Not enough memory");
+        if (NE_guipointers[i] == NULL)
+        {
+            free(ptr);
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i]->pointer = (void *)ptr;
         NE_guipointers[i]->type = NE_RadioButton;
@@ -760,7 +796,10 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
                                 int max, int initialvalue)
 {
     if (!ne_gui_system_inited)
+    {
+        NE_DebugPrint("System not initialized");
         return NULL;
+    }
 
     for (int i = 0; i < NE_GUI_OBJECTS; i++)
     {
@@ -768,10 +807,19 @@ NE_GUIObj *NE_GUISlideBarCreate(s16 x1, s16 y1, s16 x2, s16 y2, int min,
             continue;
 
         ne_slidebar_t *ptr = malloc(sizeof(ne_slidebar_t));
-        NE_AssertPointer(ptr, "Not enough memory");
+        if (ptr == NULL)
+        {
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i] = malloc(sizeof(NE_GUIObj));
-        NE_AssertPointer(NE_guipointers[i], "Not enough memory");
+        if (NE_guipointers[i] == NULL)
+        {
+            free(ptr);
+            NE_DebugPrint("Not enough memory");
+            return NULL;
+        }
 
         NE_guipointers[i]->pointer = (void *)ptr;
         NE_guipointers[i]->type = NE_SlideBar;
@@ -991,7 +1039,7 @@ void NE_GUIDeleteAll(void)
     }
 }
 
-void NE_GUISystemReset(int max_objects)
+int NE_GUISystemReset(int max_objects)
 {
     if (ne_gui_system_inited)
         NE_GUISystemEnd();
@@ -1002,9 +1050,14 @@ void NE_GUISystemReset(int max_objects)
         NE_GUI_OBJECTS = max_objects;
 
     NE_guipointers = calloc(NE_GUI_OBJECTS, sizeof(NE_guipointers));
-    NE_AssertPointer(NE_guipointers, "Not enough memory");
+    if (NE_guipointers == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
 
     ne_gui_system_inited = true;
+    return 0;
 }
 
 void NE_GUISystemEnd(void)
