@@ -25,14 +25,6 @@
 //   rendering, but you will have to give up VRAM banks A and B. If you also use
 //   banks C and D for the secondary screen, it will leave you without any VRAM
 //   for textures.
-//
-// - Including the code of the library with your game (or the prebuilt .a file),
-//   like in this template, isn't good practice. This may change in the near
-//   future if I find a better way to integrate both libraries.
-//
-//   I have prebuilt NFlib in this example so that it's easier to use it, but
-//   this may cause future problems when there are updates in devkitARM. At
-//   that point, it will be needed to clean NFlib and rebuild it.
 
 #include <stdio.h>
 #include <stdlib.h>
