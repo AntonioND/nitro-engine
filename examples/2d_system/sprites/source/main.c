@@ -74,7 +74,7 @@ int main(void)
         NE_WaitForVBL(0);
 
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         rot = (rot + 2) & 511;
         NE_SpriteSetRot(Sprite[2], rot);
