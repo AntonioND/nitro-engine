@@ -11,7 +11,7 @@
 
 NE_Material *Material;
 NE_Palette *Palette;
-NE_Sprite *Sprite[3];
+NE_Sprite *Sprite[4];
 
 void Draw3DScene(void)
 {
@@ -42,6 +42,7 @@ int main(void)
     Sprite[0] = NE_SpriteCreate();
     Sprite[1] = NE_SpriteCreate();
     Sprite[2] = NE_SpriteCreate();
+    Sprite[3] = NE_SpriteCreate();
 
     NE_SpriteSetPos(Sprite[0], 0, 0);
     NE_SpriteSetSize(Sprite[0], 128, 128);
@@ -59,6 +60,11 @@ int main(void)
     NE_SpriteSetPriority(Sprite[2], 1);
     NE_SpriteSetMaterial(Sprite[2], Material);
     NE_SpriteSetParams(Sprite[2], 15, 2, NE_White);
+
+    NE_SpriteSetPos(Sprite[3], 256 - 64, 192 - 64);
+    NE_SpriteSetSize(Sprite[3], 64, 64);
+    NE_SpriteSetPriority(Sprite[3], 12);
+    NE_SpriteSetMaterial(Sprite[3], Material);
 
     int rot = 0;
     int x = 100, y = 50;
