@@ -269,22 +269,44 @@ void NE_2DViewInit(void)
     GFX_VIEWPORT = 0 | (0 << 8) | (255 << 16) | (191 << 24);
 
     // The projection matrix actually thinks that the size of the DS is
-    // (256 << 12) x (192 << 12). After this, we scale the MODELVIEW matrix to
-    // match this scale factor.
+    // (256 << factor) x (192 << factor). After this, we scale the MODELVIEW
+    // matrix to match this scale factor.
     //
     // This way, it is possible to draw on the screen by using numbers up to 256
     // x 192, but internally the DS has more digits when it does transformations
-    // like a rotation.
+    // like a rotation. Not having this factor results in noticeable flickering,
+    // specially in some emulators.
+    //
+    // Unfortunately, applying this factor reduces the accuracy of the Y
+    // coordinate a lot (nothing is noticeable in the X coordinate). Any factor
+    // over 4 starts showing a noticeable accuracy loss: some sprites start
+    // being slightly distorted, with missing some horizontal lines as the
+    // height is reduced. When the number is higher, like 12, the Y coordinate
+    // is significantly compressed. When the number is even higher, like 18, the
+    // polygons disappear because too much accuracy has been lost.
+    //
+    // The current solution is to compromise, and use a factor of 2, which
+    // doesn't cause any distortion, and solves most of the flickering. Ideally
+    // we would use 0 to simplify the calculations, but we want to reduce the
+    // flickering.
+    //
+    // On hardware, the difference in flickering between 0 and 2 isn't too
+    // noticeable, but it is noticeable. In DeSmuMe it is very noticeable.
+    // In my tests, Y axis distortion starts to happen with a factor of 4, so a
+    // factor of 2 should be safe and reduce enough flickering.
 
     MATRIX_CONTROL = GL_PROJECTION;
     MATRIX_IDENTITY = 0;
-    glOrthof32(0, 256 << 12, 192 << 12, 0, inttof32(1), inttof32(-1));
+
+    int factor = 2;
+
+    glOrthof32(0, 256 << factor, 192 << factor, 0, inttof32(1), inttof32(-1));
 
     MATRIX_CONTROL = GL_MODELVIEW;
     MATRIX_IDENTITY = 0;
 
-    MATRIX_SCALE = inttof32(1 << 12);
-    MATRIX_SCALE = inttof32(1 << 12);
+    MATRIX_SCALE = inttof32(1 << factor);
+    MATRIX_SCALE = inttof32(1 << factor);
     MATRIX_SCALE = inttof32(1);
 
     NE_PolyFormat(31, 0, 0, NE_CULL_NONE, 0);
