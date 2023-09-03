@@ -183,7 +183,7 @@ static void ne_init_registers(void)
     GFX_FLUSH = 0;
 
     NE_MainScreenSetOnTop();
-    REG_POWERCNT |= POWER_SWAP_LCDS;
+    lcdMainOnTop();
 
     glResetMatrixStack();
 
@@ -388,9 +388,9 @@ void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_UpdateInput();
 
     if (NE_Screen == ne_main_screen)
-        REG_POWERCNT |= POWER_SWAP_LCDS;
+        lcdMainOnTop();
     else
-        REG_POWERCNT &= ~POWER_SWAP_LCDS;
+        lcdMainOnBottom();
 
     if (NE_Screen == 1)
     {
