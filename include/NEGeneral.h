@@ -57,15 +57,56 @@ int NE_Init3D(void);
 /// @param drawscene Function that draws the screen.
 void NE_Process(NE_Voidfunc drawscene);
 
-/// Inits Nitro Engine and 3D mode both screens.
+/// Inits Nitro Engine to draw 3D to both screens.
 ///
 /// VRAM banks C and D are used as framebuffers, which means there is only 50%
 /// of the normally available VRAM for textures.
 ///
+/// This way to display 3D is unsafe. If the framerate of the game drops below
+/// 60 FPS the result will be having the same 3D output displayed on both
+/// screens during the frames when it doesn't have time to draw anything new.
+///
+/// However, this mode allows you to use DMA in GFX FIFO mode to draw models,
+/// which is more efficient.
+///
+/// In general, prefer NE_InitSafeDual3D() over NE_InitDual3D().
+///
 /// @return Returns 0 on success.
 int NE_InitDual3D(void);
 
-/// Draws a 3D scene in each screen.
+/// Inits Nitro Engine to draw 3D to both screens.
+///
+/// VRAM banks C and D are used as framebuffers, which means there is only 50%
+/// of the normally available VRAM for textures.
+///
+/// VRAM bank I is used as a pseudo-framebuffer, so that there are three
+/// framebuffers in total, which is required to make the output of both screens
+/// stable if framerate drops below 60 FPS.
+///
+/// DMA 2 is used in HBL trigger mode to transfer data from VRAM banks C and D
+/// to bank I. Because of this, it is unsafe to use the DMA In GFX FIFO mode to
+/// draw models, which has a small performance hit.
+///
+/// In general, prefer NE_InitSafeDual3D() over NE_InitDual3D().
+///
+/// @return Returns 0 on success.
+int NE_InitSafeDual3D(void);
+
+/// Draws 3D scenes in both screens.
+///
+/// By default, the main screen is the top screen and the sub screen is the
+/// bottom screen. This can be changed with NE_MainScreenSetOnTop(),
+/// NE_MainScreenSetOnBottom() and NE_SwapScreens(). To check the current
+/// position of the main screen, use NE_MainScreenIsOnTop().
+///
+/// Important note: When using safe dual 3D mode, use NE_ProcessSafeDual3D()
+/// instead.
+///
+/// @param mainscreen Function that draws the main screen.
+/// @param subscreen Function that draws the sub screen.
+void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen);
+
+/// Draws 3D scenes in both screens in safe dual 3D mode.
 ///
 /// By default, the main screen is the top screen and the sub screen is the
 /// bottom screen. This can be changed with NE_MainScreenSetOnTop(),
@@ -74,13 +115,24 @@ int NE_InitDual3D(void);
 ///
 /// @param mainscreen Function that draws the main screen.
 /// @param subscreen Function that draws the sub screen.
-void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen);
+void NE_ProcessSafeDual3D(NE_Voidfunc mainscreen, NE_Voidfunc subscreen);
 
 /// Inits the console of libnds in the main screen.
 ///
 /// It works in dual 3D mode as well, and it uses VRAM_F for the background
 /// layer that contains the text.
+///
+/// Important note: When using safe dual 3D mode, use NE_InitConsoleSafeDual3D()
+/// instead.
 void NE_InitConsole(void);
+
+/// Inits the console of libnds in the main screen in safe dual 3D mode.
+///
+/// This function sets up the console so that the graphics are stored in parts
+/// of VRAM banks C and I that aren't used by Nitro Engine. Since you're most
+/// likely not using them for anything, this is more memory-efficient than
+/// NE_InitConsole().
+void NE_InitConsoleSafeDual3D(void);
 
 /// Changes the color of the text of the console.
 ///
@@ -175,6 +227,10 @@ void NE_SpecialEffectPause(bool pause);
 void NE_HBLFunc(void);
 
 /// Specify which special effect to display in the 3D screens.
+///
+/// Note: In safe dual 3D mode, DesMuME doesn't emulate the effects correctly.
+/// It doesn't seem to emulate capturing the 3D output scrolled by a horizontal
+/// offset.
 ///
 /// @param effect One effect out of NE_NOISE, NE_SINE or NE_NONE.
 void NE_SpecialEffectSet(NE_SpecialEffects effect);

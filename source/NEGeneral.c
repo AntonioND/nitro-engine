@@ -4,6 +4,7 @@
 //
 // This file is part of Nitro Engine
 
+#include <nds/arm9/background.h>
 #include <nds/arm9/postest.h>
 
 #include "NEMain.h"
@@ -19,7 +20,7 @@ static bool NE_UsingConsole;
 bool NE_TestTouch;
 static int NE_screenratio;
 static uint32_t NE_viewport;
-static u8 NE_Screen;
+static u8 NE_Screen; // 1 = main screen, 0 = sub screen
 bool NE_Dual;
 
 NE_Input ne_input;
@@ -332,6 +333,33 @@ int NE_InitDual3D(void)
     return 0;
 }
 
+int NE_InitSafeDual3D(void)
+{
+    if (ne_inited)
+        NE_End();
+
+    if (ne_systems_reset_all(NE_VRAM_AB) != 0)
+        return -1;
+
+    NE_DisplayListSetDefaultFunction(NE_DL_CPU);
+
+    NE_UpdateInput();
+
+    ne_init_registers();
+
+    videoSetMode(0);
+    videoSetModeSub(0);
+
+    ne_inited = true;
+    NE_Dual = true;
+
+    NE_Screen = 0;
+
+    NE_DebugPrint("Nitro Engine initialized in safe dual 3D mode");
+
+    return 0;
+}
+
 void NE_InitConsole(void)
 {
     if (!ne_inited)
@@ -339,7 +367,7 @@ void NE_InitConsole(void)
 
     NE_UsingConsole = true;
 
-    videoSetMode(MODE_0_3D | DISPLAY_BG1_ACTIVE);
+    videoBgEnable(1);
 
     vramSetBankF(VRAM_F_MAIN_BG);
 
@@ -354,6 +382,35 @@ void NE_InitConsole(void)
     consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
 }
 
+void NE_InitConsoleSafeDual3D(void)
+{
+    if (!ne_inited)
+        return;
+
+    NE_UsingConsole = true;
+
+    BG_PALETTE[255] = 0xFFFF;
+
+    vramSetBankF(VRAM_F_LCD);
+    vramSetBankG(VRAM_G_LCD);
+    vramSetBankH(VRAM_H_LCD);
+
+    // Main engine - VRAM_C:
+    //     BMP base 0 (256x192): 0x06008000 - 0x06020000 (96KB)
+    //     Tile base 0: 0x06000000 - 0x06001000 (4KB)
+    //     Map base 8: 0x06004000 - 0x06004800 (2KB)
+    vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
+    consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
+
+    // Sub engine - VRAM_I:
+    //     Available memory: 0x06208000 - 0x0620C000 (16KB)
+    //     Framebuffer (one line): 0x06208000 - 0x06208200 (512B)
+    //     Tile base 2: 0x06208000 - 0x06209000 (4KB)
+    //     Map base 23: 0x0620B800 - 0x0620C000 (2KB)
+    vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+    consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
+}
+
 void NE_SetConsoleColor(u32 color)
 {
     BG_PALETTE[255] = color;
@@ -364,9 +421,9 @@ void NE_Process(NE_Voidfunc drawscene)
     NE_UpdateInput();
 
     if (ne_main_screen == 1)
-        REG_POWERCNT |= POWER_SWAP_LCDS;
+        lcdMainOnTop();
     else
-        REG_POWERCNT &= ~POWER_SWAP_LCDS;
+        lcdMainOnBottom();
 
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
 
@@ -451,6 +508,149 @@ void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Screen ^= 1;
 }
 
+static uint32_t ne_dma_enabled = 0;
+static uint32_t ne_dma_src = 0;
+static uint32_t ne_dma_dst = 0;
+static uint32_t ne_dma_cr = 0;
+
+static void ne_do_dma(void)
+{
+    DMA_CR(2) = 0;
+
+    DMA_SRC(2) = ne_dma_src;
+    DMA_DEST(2) = ne_dma_dst;
+    DMA_CR(2) = ne_dma_cr;
+}
+
+void NE_ProcessSafeDual3D(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
+    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
+
+    if (NE_Screen == ne_main_screen)
+        lcdMainOnBottom();
+    else
+        lcdMainOnTop();
+
+    NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    NE_Viewport(0, 0, 255, 191);
+
+    MATRIX_IDENTITY = 0;
+
+    if (NE_Screen == 1)
+    {
+        // DMA copies from VRAM C to VRAM I
+
+        // Main engine: displays VRAM D as 16-bit BG
+        // Sub engine: displays VRAM I as 16-bit BG
+
+        videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+        if (NE_UsingConsole)
+            videoSetModeSub(MODE_5_2D | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE);
+        else
+            videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+
+        vramSetBankC(VRAM_C_LCD);
+        vramSetBankD(VRAM_D_MAIN_BG_0x06000000);
+        vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+
+        REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+                       | DCAP_BANK(DCAP_BANK_VRAM_C)
+                       | DCAP_OFFSET(1) // Write with an offset of 0x8000
+                       | DCAP_MODE(DCAP_MODE_A)
+                       | DCAP_SRC_A(DCAP_SRC_A_3DONLY)
+                       | DCAP_ENABLE;
+
+        REG_BG2CNT = BG_BMP16_256x256 | BG_BMP_BASE(2) | BG_PRIORITY(2);
+        REG_BG2PA = 1 << 8;
+        REG_BG2PB = 0;
+        REG_BG2PC = 0;
+        REG_BG2PD = 1 << 8;
+        REG_BG2X = 0;
+        REG_BG2Y = -1 << 8;
+
+        REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(2) | BG_PRIORITY(2);
+        REG_BG2PA_SUB = 1 << 8;
+        REG_BG2PB_SUB = 0;
+        REG_BG2PC_SUB = 0;
+        REG_BG2PD_SUB = 0; // Scale first row to expand to the full screen
+        REG_BG2X_SUB = 0;
+        REG_BG2Y_SUB = 0;
+
+        ne_dma_enabled = 1;
+        ne_dma_src = (uint32)VRAM_C + 0x8000;
+        ne_dma_dst = (uint32)BG_BMP_RAM_SUB(2),
+        ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
+                    DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
+
+        ne_do_dma();
+
+        mainscreen();
+    }
+    else
+    {
+        // DMA copies from VRAM D to VRAM I
+
+        // Main engine: displays VRAM C as 16-bit sprites
+        // Sub engine: displays VRAM I as 16-bit BG
+
+        if (NE_UsingConsole)
+            videoSetMode(MODE_5_2D | DISPLAY_BG1_ACTIVE | DISPLAY_BG2_ACTIVE);
+        else
+            videoSetMode(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+        videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+
+        vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
+        vramSetBankD(VRAM_D_LCD);
+        vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+
+        REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+                       | DCAP_BANK(DCAP_BANK_VRAM_D)
+                       | DCAP_OFFSET(1) // Write with an offset of 0x8000
+                       | DCAP_MODE(DCAP_MODE_A)
+                       | DCAP_SRC_A(DCAP_SRC_A_3DONLY)
+                       | DCAP_ENABLE;
+
+        REG_BG2CNT = BG_BMP16_256x256 | BG_BMP_BASE(2) | BG_PRIORITY(2);
+        REG_BG2PA = 1 << 8;
+        REG_BG2PB = 0;
+        REG_BG2PC = 0;
+        REG_BG2PD = 1 << 8;
+        REG_BG2X = 0;
+        REG_BG2Y = -1 << 8;
+
+        REG_BG2CNT_SUB = BG_BMP16_256x256 | BG_BMP_BASE(2) | BG_PRIORITY(2);
+        REG_BG2PA_SUB = 1 << 8;
+        REG_BG2PB_SUB = 0;
+        REG_BG2PC_SUB = 0;
+        REG_BG2PD_SUB = 0; // Scale first row to expand to the full screen
+        REG_BG2X_SUB = 0;
+        REG_BG2Y_SUB = 0;
+
+        ne_dma_enabled = 1;
+        ne_dma_src = (uint32)VRAM_D + 0x8000;
+        ne_dma_dst = (uint32)BG_BMP_RAM_SUB(2),
+        ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
+                    DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
+
+        // Synchronize console of the main engine from the sub engine. Use a
+        // channel other than 2, that one is used for HBL copies.
+        if (NE_UsingConsole)
+            dmaCopyWords(3, BG_MAP_RAM_SUB(23), BG_MAP_RAM(8), 32 * 32 * 2);
+
+        ne_do_dma();
+
+        subscreen();
+    }
+
+    GFX_FLUSH = GL_TRANS_MANUALSORT;
+
+    NE_Screen ^= 1;
+
+    NE_UpdateInput();
+}
+
 void NE_ClippingPlanesSetI(int znear, int zfar)
 {
     NE_Assert(znear < zfar, "znear must be smaller than zfar");
@@ -495,6 +695,18 @@ void NE_VBLFunc(void)
 {
     if (!ne_inited)
         return;
+
+    if (ne_dma_enabled)
+    {
+        // The first line of the sub screen must be set to black during VBL
+        // because the DMA transfer won't start until the first HBL, which
+        // happens after the first line has been drawn.
+        //
+        // For consistency, in the main screen this is achieved by simply
+        // scrolling the bitmap background by one pixel.
+        dmaFillWords(0, BG_BMP_RAM_SUB(2), 256 * 2);
+        ne_do_dma();
+    }
 
     if (NE_Effect == NE_NOISE || NE_Effect == NE_SINE)
     {
