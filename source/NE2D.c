@@ -390,7 +390,6 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
-    int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
     int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);
 
     NE_MaterialUse(mat);
@@ -401,13 +400,13 @@ void NE_2DDrawTexturedQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF); // Up-left
     GFX_VERTEX16 = z;
 
-    GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF); // Down-left
 
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF); // Down-right
 
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), 0);
     GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF); // Up-right
 }
 
@@ -417,7 +416,6 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
-    int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
     int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);
 
     NE_MaterialUse(mat);
@@ -430,13 +428,13 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF); // Up-left
     GFX_VERTEX16 = z;
 
-    GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF); // Down-left
 
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF); // Down-right
 
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), 0);
     GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF); // Up-right
 }
 
@@ -447,7 +445,6 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     NE_AssertPointer(mat, "NULL pointer");
     NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
 
-    int rx = __NE_TextureGetRawX(mat), ry = __NE_TextureGetRawY(mat);
     int x = NE_TextureGetSizeX(mat), y = NE_TextureGetSizeY(mat);
 
     NE_MaterialUse(mat);
@@ -460,14 +457,14 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
     GFX_VERTEX16 = z;
 
     GFX_COLOR = color4;
-    GFX_TEX_COORD = TEXTURE_PACK(0, (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(0, inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF); // Down-left
 
     GFX_COLOR = color3;
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), (inttot16(y) + ry));
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), inttot16(y));
     GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF); // Down-right
 
     GFX_COLOR = color2;
-    GFX_TEX_COORD = TEXTURE_PACK((inttot16(x) + rx), 0);
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), 0);
     GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF); // Up-right
 }
