@@ -321,6 +321,8 @@ int NE_InitDual3D(void)
     ne_inited = true;
     NE_Dual = true;
 
+    NE_Screen = 0;
+
     NE_DebugPrint("Nitro Engine initialized in dual 3D mode");
 
     return 0;
@@ -441,6 +443,8 @@ void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 
     dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
+
+    NE_Screen ^= 1;
 }
 
 void NE_ClippingPlanesSetI(int znear, int zfar)
@@ -493,8 +497,6 @@ void NE_VBLFunc(void)
         if (!NE_effectpause)
             NE_lastvbladd = (NE_lastvbladd + 1) & (NE_NOISEPAUSE_SIZE - 1);
     }
-
-    NE_Screen ^= 1;
 }
 
 void NE_SpecialEffectPause(bool pause)
