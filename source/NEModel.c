@@ -302,7 +302,7 @@ void NE_ModelDraw(const NE_Model *model)
 
     if (model->modeltype == NE_Static)
     {
-        glCallList(meshdata);
+        NE_DisplayListDrawDefault(meshdata);
     }
     else // if(model->modeltype == NE_Animated)
     {

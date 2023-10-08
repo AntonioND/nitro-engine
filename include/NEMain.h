@@ -28,6 +28,7 @@ extern "C" {
 #include "NE2D.h"
 #include "NEAnimation.h"
 #include "NECamera.h"
+#include "NEDisplayList.h"
 #include "NEFAT.h"
 #include "NEFormats.h"
 #include "NEGeneral.h"

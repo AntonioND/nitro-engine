@@ -251,6 +251,8 @@ int NE_Init3D(void)
     if (ne_systems_reset_all(NE_VRAM_ABCD) != 0)
         return -1;
 
+    NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
+
     NE_UpdateInput();
 
     ne_init_registers();
@@ -297,6 +299,8 @@ int NE_InitDual3D(void)
             i++;
         }
     }
+
+    NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
 
     NE_UpdateInput();
 
