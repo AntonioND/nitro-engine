@@ -21,11 +21,10 @@ bool NE_TestTouch;
 static int NE_screenratio;
 static uint32_t NE_viewport;
 static u8 NE_Screen; // 1 = main screen, 0 = sub screen
-bool NE_Dual;
+
+static NE_ExecutionModes ne_execution_mode = NE_ModeUninitialized;
 
 NE_Input ne_input;
-
-static bool ne_inited = false;
 
 static SpriteEntry *NE_Sprites; // 2D sprites used for Dual 3D mode
 
@@ -34,9 +33,14 @@ static int fov;
 
 static int ne_main_screen = 1; // 1 = top, 0 = bottom
 
+NE_ExecutionModes NE_CurrentExecutionMode(void)
+{
+    return ne_execution_mode;
+}
+
 void NE_End(void)
 {
-    if (!ne_inited)
+    if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
     // Hide BG0
@@ -44,24 +48,49 @@ void NE_End(void)
 
     vramSetBankA(VRAM_A_LCD);
     vramSetBankB(VRAM_B_LCD);
-    if (NE_Dual)
-    {
-        vramSetBankC(VRAM_C_LCD);
-        vramSetBankD(VRAM_D_LCD);
 
-        free(NE_Sprites);
-    }
-    else if (GFX_CONTROL & GL_CLEAR_BMP)
+    switch (ne_execution_mode)
     {
-        NE_ClearBMPEnable(false);
+        case NE_ModeSingle3D:
+        {
+            if (GFX_CONTROL & GL_CLEAR_BMP)
+                NE_ClearBMPEnable(false);
+
+            if (NE_UsingConsole)
+                vramSetBankF(VRAM_F_LCD);
+
+            break;
+        }
+
+        case NE_ModeDual3D:
+        {
+            vramSetBankC(VRAM_C_LCD);
+            vramSetBankD(VRAM_D_LCD);
+
+            free(NE_Sprites);
+
+            if (NE_UsingConsole)
+                vramSetBankF(VRAM_F_LCD);
+
+            break;
+        }
+
+        case NE_ModeSafeDual3D:
+        {
+            vramSetBankC(VRAM_C_LCD);
+            vramSetBankD(VRAM_D_LCD);
+
+            vramSetBankI(VRAM_I_LCD); // The console goes here
+            break;
+        }
+
+        default:
+            break;
     }
 
-    vramSetBankE(VRAM_E_LCD);
-    if (NE_UsingConsole)
-    {
-        vramSetBankF(VRAM_F_LCD);
-        NE_UsingConsole = false;
-    }
+    NE_UsingConsole = false;
+
+    vramSetBankE(VRAM_E_LCD); // Palettes
 
     NE_GUISystemEnd();
     NE_SpriteSystemEnd();
@@ -78,7 +107,7 @@ void NE_End(void)
 
     NE_DebugPrint("Nitro Engine disabled");
 
-    ne_inited = false;
+    ne_execution_mode = NE_ModeUninitialized;
 }
 
 void NE_Viewport(int x1, int y1, int x2, int y2)
@@ -246,8 +275,7 @@ void NE_UpdateInput(void)
 
 int NE_Init3D(void)
 {
-    if (ne_inited)
-        NE_End();
+    NE_End();
 
     if (ne_systems_reset_all(NE_VRAM_ABCD) != 0)
         return -1;
@@ -258,8 +286,7 @@ int NE_Init3D(void)
 
     ne_init_registers();
 
-    ne_inited = true;
-    NE_Dual = false;
+    ne_execution_mode = NE_ModeSingle3D;
 
     NE_DebugPrint("Nitro Engine initialized in normal 3D mode");
 
@@ -268,8 +295,7 @@ int NE_Init3D(void)
 
 int NE_InitDual3D(void)
 {
-    if (ne_inited)
-        NE_End();
+    NE_End();
 
     NE_Sprites = calloc(128, sizeof(SpriteEntry));
     if (NE_Sprites == NULL)
@@ -323,8 +349,7 @@ int NE_InitDual3D(void)
     videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE | DISPLAY_SPR_ACTIVE |
                     DISPLAY_SPR_2D_BMP_256);
 
-    ne_inited = true;
-    NE_Dual = true;
+    ne_execution_mode = NE_ModeDual3D;
 
     NE_Screen = 0;
 
@@ -335,8 +360,7 @@ int NE_InitDual3D(void)
 
 int NE_InitSafeDual3D(void)
 {
-    if (ne_inited)
-        NE_End();
+    NE_End();
 
     if (ne_systems_reset_all(NE_VRAM_AB) != 0)
         return -1;
@@ -350,8 +374,7 @@ int NE_InitSafeDual3D(void)
     videoSetMode(0);
     videoSetModeSub(0);
 
-    ne_inited = true;
-    NE_Dual = true;
+    ne_execution_mode = NE_ModeSafeDual3D;
 
     NE_Screen = 0;
 
@@ -362,7 +385,7 @@ int NE_InitSafeDual3D(void)
 
 void NE_InitConsole(void)
 {
-    if (!ne_inited)
+    if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
     NE_UsingConsole = true;
@@ -384,7 +407,7 @@ void NE_InitConsole(void)
 
 void NE_InitConsoleSafeDual3D(void)
 {
-    if (!ne_inited)
+    if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
     NE_UsingConsole = true;
@@ -693,7 +716,7 @@ static int ne_sine_mult = 10, ne_sine_shift = 9;
 
 void NE_VBLFunc(void)
 {
-    if (!ne_inited)
+    if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
     if (ne_dma_enabled)
@@ -749,11 +772,11 @@ void NE_SpecialEffectPause(bool pause)
 
 void NE_HBLFunc(void)
 {
+    if (ne_execution_mode == NE_ModeUninitialized)
+        return;
+
     s16 angle;
     int val;
-
-    if (!ne_inited)
-        return;
 
     // This counter is used to estimate CPU usage
     ne_cpucount++;
@@ -852,8 +875,9 @@ void __ne_debugoutputtoconsole(const char *text)
 
 void __NE_debugprint(const char *text)
 {
-    if (!ne_inited)
+    if (ne_execution_mode == NE_ModeUninitialized)
         return;
+
     if (ne_userdebugfn)
         ne_userdebugfn(text);
 }

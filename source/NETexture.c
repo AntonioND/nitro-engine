@@ -508,8 +508,6 @@ void NE_MaterialUse(const NE_Material *tex)
     GFX_TEX_FORMAT = NE_Texture[tex->texindex].param;
 }
 
-extern bool NE_Dual;
-
 int NE_TextureSystemReset(int max_textures, int max_palettes,
                           NE_VRAMBankFlags bank_flags)
 {
@@ -539,7 +537,7 @@ int NE_TextureSystemReset(int max_textures, int max_palettes,
         bank_flags = NE_VRAM_ABCD;
 
     // VRAM_C and VRAM_D can't be used in dual 3D mode
-    if (NE_Dual)
+    if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
         bank_flags &= ~NE_VRAM_CD;
 
     // Now, configure allocation system. The buffer size always sees the

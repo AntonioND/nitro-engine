@@ -70,8 +70,6 @@ static void NE_write32(u32 *address, u32 value)
     *fourth = (value >> 24) & 0xff;
 }
 
-extern bool NE_Dual;
-
 int NE_ScreenshotBMP(const char *filename)
 {
     FILE *f = fopen(filename, "wb");
@@ -86,8 +84,10 @@ int NE_ScreenshotBMP(const char *filename)
 
     // In normal 3D mode we need to capture the composited (3D+2D output)
     // and save it to VRAM. In dual 3D mode it already is in VRAM.
-    if (!NE_Dual)
+    if (NE_CurrentExecutionMode() == NE_ModeSingle3D)
     {
+        // TODO: VRAM_D needs to be saved somewhere and then restored!
+
         vramSetBankD(VRAM_D_LCD);
 
         REG_DISPCAPCNT = DCAP_BANK(DCAP_BANK_VRAM_D)
@@ -96,19 +96,19 @@ int NE_ScreenshotBMP(const char *filename)
                        | DCAP_SRC_A(DCAP_SRC_A_COMPOSITED)
                        | DCAP_ENABLE;
 
-        while (REG_DISPCAPCNT & DCAP_ENABLE) ;
+        while (REG_DISPCAPCNT & DCAP_ENABLE);
     }
 
     int ysize = 0;
 
-    if (NE_Dual)
-        ysize = 384;
-    else
+    if (NE_CurrentExecutionMode() == NE_ModeSingle3D)
         ysize = 192;
+    else
+        ysize = 384;
 
-    u8 *temp = (u8 *)malloc(256 * ysize * 3
-                            + sizeof(NE_BMPInfoHeader)
-                            + sizeof(NE_BMPHeader));
+    u8 *temp = malloc(256 * ysize * 3
+                      + sizeof(NE_BMPInfoHeader)
+                      + sizeof(NE_BMPHeader));
 
     NE_BMPHeader *header = (NE_BMPHeader *) temp;
     NE_BMPInfoHeader *infoheader =
@@ -136,7 +136,7 @@ int NE_ScreenshotBMP(const char *filename)
 
     // Allow CPU to access VRAM
     uint32 vramTemp = 0;
-    if (NE_Dual)
+    if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
     {
         vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD,
                                        VRAM_C_LCD, VRAM_D_LCD);
@@ -148,16 +148,16 @@ int NE_ScreenshotBMP(const char *filename)
         {
             u16 color = 0;
 
-            if (NE_Dual)
+            if (NE_CurrentExecutionMode() == NE_ModeSingle3D)
+            {
+                color = VRAM_D[256 * 192 - (y + 1) * 256 + x];
+            }
+            else
             {
                 if (y > 191)
                     color = VRAM_C[256 * 192 - (y - 192 + 1) * 256 + x];
                 else
                     color = VRAM_D[256 * 192 - (y + 1) * 256 + x];
-            }
-            else
-            {
-                color = VRAM_D[256 * 192 - (y + 1) * 256 + x];
             }
 
             u8 b = (color & 31) << 3;
@@ -174,7 +174,7 @@ int NE_ScreenshotBMP(const char *filename)
         }
     }
 
-    if (NE_Dual)
+    if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
         vramRestorePrimaryBanks(vramTemp);
 
     DC_FlushAll();

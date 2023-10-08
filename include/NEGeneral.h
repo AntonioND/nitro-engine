@@ -44,6 +44,19 @@ typedef struct {
 /// scanKeys() each frame for this to work.
 void NE_UpdateInput(void);
 
+///< List of all the possible initialization states of Nitro Engine.
+typedef enum {
+    NE_ModeUninitialized    = 0, ///< Nitro Engine hasn't been initialized.
+    NE_ModeSingle3D         = 1, ///< Nitro Engine initialized in single 3D mode.
+    NE_ModeDual3D           = 2, ///< Nitro Engine initialized in regular dual 3D mode.
+    NE_ModeSafeDual3D       = 3 ///< Nitro Engine initialized in safe dual 3D mode.
+} NE_ExecutionModes;
+
+/// Returns the current execution mode.
+///
+/// @return Returns the execution mode.
+NE_ExecutionModes NE_CurrentExecutionMode(void);
+
 /// Ends Nitro Engine and frees all memory used by it.
 void NE_End(void);
 

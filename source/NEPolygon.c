@@ -220,12 +220,9 @@ void NE_ClearColorSet(u32 color, u32 alpha, u32 id)
     GFX_CLEAR_COLOR = ne_clearcolor;
 }
 
-// From NE_General.c
-extern bool NE_Dual;
-
 void NE_ClearBMPEnable(bool value)
 {
-    if (NE_Dual)
+    if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
     {
         // It needs two banks that are used for the display capture
         NE_DebugPrint("Not available in dual 3D mode");
