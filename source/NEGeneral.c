@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022-2023 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -11,9 +11,9 @@
 
 /// @file NEGeneral.c
 
-const char NE_VersioString[] =
+const char NE_VersionString[] =
     "Nitro Engine - Version " NITRO_ENGINE_VERSION_STRING " - "
-    "(C) 2008-2011, 2019, 2022 Antonio Nino Diaz";
+    "(C) 2008-2011, 2019, 2022-2023 Antonio Nino Diaz";
 
 static bool NE_UsingConsole;
 bool NE_TestTouch;
