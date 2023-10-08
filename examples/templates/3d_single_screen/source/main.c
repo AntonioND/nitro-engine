@@ -18,6 +18,7 @@ int main(void)
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     NE_Init3D();
+    NE_InitConsole();
 
     while (1)
     {

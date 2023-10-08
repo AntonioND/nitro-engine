@@ -28,6 +28,7 @@ int main(void)
     irqSet(IRQ_VBLANK, NE_HBLFunc);
 
     NE_InitSafeDual3D();
+    NE_InitConsoleSafeDual3D();
 
     while (1)
     {
