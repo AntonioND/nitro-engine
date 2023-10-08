@@ -26,6 +26,7 @@
 //   banks C and D for the secondary screen, it will leave you without any VRAM
 //   for textures.
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
