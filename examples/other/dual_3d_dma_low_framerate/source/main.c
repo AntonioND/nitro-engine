@@ -4,7 +4,10 @@
 //
 // This file is part of Nitro Engine
 
-// This demo doesn't work on DesMuME. It works on melonDS and hardware.
+// This demo shows how to use dual 3D DMA mode, and how a drop in framerate
+// doesn't affect the video output. It remains stable even after droping several
+// frames. This doesn't happen in regular dual 3D mode, where the same image
+// would be shown on both screens.
 
 #include <NEMain.h>
 
@@ -38,8 +41,8 @@ int main(void)
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     // Init dual 3D mode and console
-    NE_InitSafeDual3D();
-    NE_InitConsoleSafeDual3D();
+    NE_InitDual3D_DMA();
+    NE_InitConsole();
 
     // Allocate objects...
     Teapot = NE_ModelCreate(NE_Static);
@@ -62,32 +65,26 @@ int main(void)
     // Enable shading
     NE_ShadingEnable(true);
 
-    // Other test configurations
-    //NE_SpecialEffectNoiseConfig(31);
-    //NE_SpecialEffectSineConfig(3, 8);
-
     while (1)
     {
         NE_WaitForVBL(0);
 
         // Draw 3D scenes
-        NE_ProcessSafeDual3D(Draw3DScene, Draw3DScene2);
+        NE_ProcessDual(Draw3DScene, Draw3DScene2);
 
         // Refresh keys
         scanKeys();
         uint32 keys = keysHeld();
-        uint32 kdown = keysDown();
 
         printf("\x1b[0;0H"
-               "START: Lock CPU until released\n"
-               "Pad: Rotate.\nA: Sine effect.\nB: Noise effect.\n"
-               "X: Deactivate effects.\nL/R: Pause/Unpause.");
+               "START: Lock CPU for 20 frames\n"
+               "Pad: Rotate.\n");
 
         // Lock CPU in an infinite loop to simulate a drop in framerate
-        while (keys & KEY_START)
+        if (keys & KEY_START)
         {
-            scanKeys();
-            keys = keysHeld();
+            for (int i = 0; i < 20; i++)
+                swiWaitForVBlank();
         }
 
         // Rotate model
@@ -111,21 +108,6 @@ int main(void)
             NE_ModelRotate(Sphere, 0, -2, 0);
             NE_ModelRotate(Teapot, 0, -2, 0);
         }
-
-        // Activate effects
-        if (kdown & KEY_B)
-            NE_SpecialEffectSet(NE_NOISE);
-        if (kdown & KEY_A)
-            NE_SpecialEffectSet(NE_SINE);
-        // Deactivate effects
-        if (kdown & KEY_X)
-            NE_SpecialEffectSet(0);
-
-        // Pause effects
-        if (kdown & KEY_L)
-            NE_SpecialEffectPause(true);
-        if (kdown & KEY_R)
-            NE_SpecialEffectPause(false);
     }
 
     return 0;

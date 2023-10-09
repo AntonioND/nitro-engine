@@ -75,7 +75,13 @@ void NE_End(void)
             break;
         }
 
-        case NE_ModeSafeDual3D:
+        case NE_ModeDual3D_FB:
+        {
+            // TODO
+            break;
+        }
+
+        case NE_ModeDual3D_DMA:
         {
             vramSetBankC(VRAM_C_LCD);
             vramSetBankD(VRAM_D_LCD);
@@ -358,7 +364,14 @@ int NE_InitDual3D(void)
     return 0;
 }
 
-int NE_InitSafeDual3D(void)
+int NE_InitDual3D_FB(void)
+{
+    // TODO
+
+    return -1;
+}
+
+int NE_InitDual3D_DMA(void)
 {
     NE_End();
 
@@ -374,11 +387,11 @@ int NE_InitSafeDual3D(void)
     videoSetMode(0);
     videoSetModeSub(0);
 
-    ne_execution_mode = NE_ModeSafeDual3D;
+    ne_execution_mode = NE_ModeDual3D_DMA;
 
     NE_Screen = 0;
 
-    NE_DebugPrint("Nitro Engine initialized in safe dual 3D mode");
+    NE_DebugPrint("Nitro Engine initialized in dual 3D DMA mode");
 
     return 0;
 }
@@ -388,50 +401,69 @@ void NE_InitConsole(void)
     if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
+    switch (ne_execution_mode)
+    {
+        case NE_ModeSingle3D:
+        case NE_ModeDual3D:
+        {
+            videoBgEnable(1);
+
+            vramSetBankF(VRAM_F_MAIN_BG);
+
+            BG_PALETTE[255] = 0xFFFF;
+
+            // Use BG 1 for text, set to highest priority
+            REG_BG1CNT = BG_MAP_BASE(4) | BG_PRIORITY(0);
+
+            // Set BG 0 (3D background) to be a lower priority than BG 1
+            REG_BG0CNT = BG_PRIORITY(1);
+
+            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
+
+            break;
+        }
+
+        case NE_ModeDual3D_FB:
+        {
+            // TODO
+            break;
+        }
+
+        case NE_ModeDual3D_DMA:
+        {
+            NE_UsingConsole = true;
+
+            BG_PALETTE[255] = 0xFFFF;
+
+            vramSetBankF(VRAM_F_LCD);
+            vramSetBankG(VRAM_G_LCD);
+            vramSetBankH(VRAM_H_LCD);
+
+            // Main engine - VRAM_C:
+            //     BMP base 0 (256x192): 0x06008000 - 0x06020000 (96 KB)
+            //     Tile base 0: 0x06000000 - 0x06001000 (4 KB)
+            //     Map base 8: 0x06004000 - 0x06004800 (2 KB)
+            vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
+            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
+
+            // Sub engine - VRAM_I:
+            //     Available memory: 0x06208000 - 0x0620C000 (16 KB)
+            //     Framebuffer (one line): 0x06208000 - 0x06208200 (512 B)
+            //     Tile base 2: 0x06208000 - 0x06209000 (4 KB)
+            //     Map base 23: 0x0620B800 - 0x0620C000 (2 KB)
+            vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
+
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+
     NE_UsingConsole = true;
-
-    videoBgEnable(1);
-
-    vramSetBankF(VRAM_F_MAIN_BG);
-
-    BG_PALETTE[255] = 0xFFFF;
-
-    // Use BG 1 for text, set to highest priority
-    REG_BG1CNT = BG_MAP_BASE(4) | BG_PRIORITY(0);
-
-    // Set BG 0 (3D background) to be a lower priority than BG 1
-    REG_BG0CNT = BG_PRIORITY(1);
-
-    consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
-}
-
-void NE_InitConsoleSafeDual3D(void)
-{
-    if (ne_execution_mode == NE_ModeUninitialized)
-        return;
-
-    NE_UsingConsole = true;
-
-    BG_PALETTE[255] = 0xFFFF;
-
-    vramSetBankF(VRAM_F_LCD);
-    vramSetBankG(VRAM_G_LCD);
-    vramSetBankH(VRAM_H_LCD);
-
-    // Main engine - VRAM_C:
-    //     BMP base 0 (256x192): 0x06008000 - 0x06020000 (96KB)
-    //     Tile base 0: 0x06000000 - 0x06001000 (4KB)
-    //     Map base 8: 0x06004000 - 0x06004800 (2KB)
-    vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
-    consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
-
-    // Sub engine - VRAM_I:
-    //     Available memory: 0x06208000 - 0x0620C000 (16KB)
-    //     Framebuffer (one line): 0x06208000 - 0x06208200 (512B)
-    //     Tile base 2: 0x06208000 - 0x06209000 (4KB)
-    //     Map base 23: 0x0620B800 - 0x0620C000 (2KB)
-    vramSetBankI(VRAM_I_SUB_BG_0x06208000);
-    consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
 }
 
 void NE_SetConsoleColor(u32 color)
@@ -466,11 +498,8 @@ void NE_Process(NE_Voidfunc drawscene)
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 }
 
-void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 {
-    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
-    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
-
     NE_UpdateInput();
 
     if (NE_Screen == ne_main_screen)
@@ -545,7 +574,7 @@ static void ne_do_dma(void)
     DMA_CR(2) = ne_dma_cr;
 }
 
-void NE_ProcessSafeDual3D(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 {
     NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
     NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
@@ -672,6 +701,37 @@ void NE_ProcessSafeDual3D(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Screen ^= 1;
 
     NE_UpdateInput();
+}
+
+void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
+    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
+
+    switch (ne_execution_mode)
+    {
+        case NE_ModeDual3D:
+        {
+            ne_process_dual_3d(mainscreen, subscreen);
+            return;
+        }
+
+        case NE_ModeDual3D_FB:
+        {
+            // TODO
+            break;
+        }
+
+        case NE_ModeDual3D_DMA:
+        {
+            ne_process_dual_3d_dma(mainscreen, subscreen);
+            return;
+        }
+        default:
+        {
+            return;
+        }
+    }
 }
 
 void NE_ClippingPlanesSetI(int znear, int zfar)

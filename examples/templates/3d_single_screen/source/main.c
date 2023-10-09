@@ -23,12 +23,11 @@ int main(void)
     while (1)
     {
         NE_WaitForVBL(0);
+        NE_Process(Draw3DScene);
 
         scanKeys();
 
         // Your code goes here
-
-        NE_Process(Draw3DScene);
     }
 
     return 0;
