@@ -631,8 +631,8 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
         REG_BG2Y_SUB = 0;
 
         ne_dma_enabled = 1;
-        ne_dma_src = (uint32)VRAM_C + 0x8000;
-        ne_dma_dst = (uint32)BG_BMP_RAM_SUB(2),
+        ne_dma_src = (uint32_t)VRAM_C + 0x8000;
+        ne_dma_dst = (uint32_t)BG_BMP_RAM_SUB(2),
         ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
                     DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
 
@@ -681,8 +681,8 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
         REG_BG2Y_SUB = 0;
 
         ne_dma_enabled = 1;
-        ne_dma_src = (uint32)VRAM_D + 0x8000;
-        ne_dma_dst = (uint32)BG_BMP_RAM_SUB(2),
+        ne_dma_src = (uint32_t)VRAM_D + 0x8000;
+        ne_dma_dst = (uint32_t)BG_BMP_RAM_SUB(2),
         ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
                     DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
 
