@@ -84,7 +84,11 @@ void NE_End(void)
 
         case NE_ModeDual3D_FB:
         {
-            // TODO
+            videoSetMode(0);
+            videoSetModeSub(0);
+
+            vramSetBankC(VRAM_C_LCD);
+            vramSetBankD(VRAM_D_LCD);
             break;
         }
 
@@ -313,6 +317,26 @@ int NE_Init3D(void)
     return 0;
 }
 
+static void ne_setup_sprites(void)
+{
+    // Reset sprites
+    for (int i = 0; i < 128; i++)
+        NE_Sprites[i].attribute[0] = ATTR0_DISABLED;
+
+    int i = 0;
+    for (int y = 0; y < 3; y++)
+    {
+        for (int x = 0; x < 4; x++)
+        {
+            NE_Sprites[i].attribute[0] = ATTR0_BMP | ATTR0_SQUARE | (64 * y);
+            NE_Sprites[i].attribute[1] = ATTR1_SIZE_64 | (64 * x);
+            NE_Sprites[i].attribute[2] = ATTR2_ALPHA(1) | (8 * 32 * y)
+                                       | (8 * x);
+            i++;
+        }
+    }
+}
+
 int NE_InitDual3D(void)
 {
     NE_End();
@@ -330,22 +354,7 @@ int NE_InitDual3D(void)
         return -2;
     }
 
-    // Reset sprites
-    for (int i = 0; i < 128; i++)
-        NE_Sprites[i].attribute[0] = ATTR0_DISABLED;
-
-    int i = 0;
-    for (int y = 0; y < 3; y++)
-    {
-        for (int x = 0; x < 4; x++)
-        {
-            NE_Sprites[i].attribute[0] = ATTR0_BMP | ATTR0_SQUARE | (64 * y);
-            NE_Sprites[i].attribute[1] = ATTR1_SIZE_64 | (64 * x);
-            NE_Sprites[i].attribute[2] = ATTR2_ALPHA(1) | (8 * 32 * y)
-                                       | (8 * x);
-            i++;
-        }
-    }
+    ne_setup_sprites();
 
     NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
 
@@ -380,9 +389,57 @@ int NE_InitDual3D(void)
 
 int NE_InitDual3D_FB(void)
 {
-    // TODO
+    NE_End();
 
-    return -1;
+    NE_Sprites = calloc(128, sizeof(SpriteEntry));
+    if (NE_Sprites == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
+
+    if (ne_systems_reset_all(NE_VRAM_AB) != 0)
+        return -2;
+
+    ne_setup_sprites();
+
+    NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
+
+    NE_UpdateInput();
+
+    ne_init_registers();
+
+    videoSetModeSub(0);
+
+    REG_BG2CNT = BG_BMP16_256x256;
+    REG_BG2PA = 1 << 8;
+    REG_BG2PB = 0;
+    REG_BG2PC = 0;
+    REG_BG2PD = 1 << 8;
+    REG_BG2X = 0;
+    REG_BG2Y = 0;
+
+    REG_BG2CNT_SUB = BG_BMP16_256x256;
+    REG_BG2PA_SUB = 1 << 8;
+    REG_BG2PB_SUB = 0;
+    REG_BG2PC_SUB = 0;
+    REG_BG2PD_SUB = 1 << 8;
+    REG_BG2X_SUB = 0;
+    REG_BG2Y_SUB = 0;
+
+    vramSetBankC(VRAM_C_LCD);
+    vramSetBankD(VRAM_D_LCD);
+
+    videoSetMode(0);
+    videoSetModeSub(0);
+
+    ne_execution_mode = NE_ModeDual3D_FB;
+
+    NE_Screen = 0;
+
+    NE_DebugPrint("Nitro Engine initialized in dual 3D FB mode");
+
+    return 0;
 }
 
 int NE_InitDual3D_DMA(void)
@@ -439,7 +496,7 @@ void NE_InitConsole(void)
 
         case NE_ModeDual3D_FB:
         {
-            // TODO
+            NE_Assert(false, "Debug console not supported in ModeDual3D_FB");
             break;
         }
 
@@ -572,6 +629,61 @@ static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Screen ^= 1;
 }
 
+static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    NE_UpdateInput();
+
+    if (NE_Screen == ne_main_screen)
+        lcdMainOnTop();
+    else
+        lcdMainOnBottom();
+
+    if (NE_Screen == 1)
+    {
+        videoSetMode(MODE_FB3);
+        videoSetModeSub(MODE_5_2D | DISPLAY_BG2_ACTIVE);
+
+        vramSetBankC(VRAM_C_SUB_BG);
+        vramSetBankD(VRAM_D_LCD);
+
+        REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+                       | DCAP_BANK(DCAP_BANK_VRAM_D)
+                       | DCAP_MODE(DCAP_MODE_A)
+                       | DCAP_SRC_A(DCAP_SRC_A_3DONLY)
+                       | DCAP_ENABLE;
+    }
+    else
+    {
+        videoSetMode(MODE_FB2);
+        videoSetModeSub(MODE_5_2D | DISPLAY_SPR_ACTIVE | DISPLAY_SPR_2D_BMP_256);
+
+        vramSetBankC(VRAM_C_LCD);
+        vramSetBankD(VRAM_D_SUB_SPRITE);
+
+        REG_DISPCAPCNT = DCAP_SIZE(DCAP_SIZE_256x192)
+                       | DCAP_BANK(DCAP_BANK_VRAM_C)
+                       | DCAP_MODE(DCAP_MODE_A)
+                       | DCAP_SRC_A(DCAP_SRC_A_3DONLY)
+                       | DCAP_ENABLE;
+    }
+
+    NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    NE_Viewport(0, 0, 255, 191);
+
+    MATRIX_IDENTITY = 0;
+
+    if (NE_Screen == 1)
+        mainscreen();
+    else
+        subscreen();
+
+    GFX_FLUSH = GL_TRANS_MANUALSORT;
+
+    dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
+
+    NE_Screen ^= 1;
+}
 
 static void ne_do_dma(void)
 {
@@ -726,8 +838,8 @@ void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 
         case NE_ModeDual3D_FB:
         {
-            // TODO
-            break;
+            ne_process_dual_3d_fb(mainscreen, subscreen);
+            return;
         }
 
         case NE_ModeDual3D_DMA:

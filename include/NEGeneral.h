@@ -88,7 +88,19 @@ void NE_Process(NE_Voidfunc drawscene);
 /// @return Returns 0 on success.
 int NE_InitDual3D(void);
 
-// TODO
+/// Inits Nitro Engine to draw 3D to both screens.
+///
+/// VRAM banks C and D are used as framebuffers, which means there is only 50%
+/// of the normally available VRAM for textures.
+///
+/// Direct VRAM display mode is used for the main engine, which means there is
+/// no way to display the debug console on either screen in a stable way, so the
+/// debug console is not supported in this mode.
+///
+/// This mode is stable. If the framerate drops below 60 FPS the screens will
+/// remain stable.
+///
+/// @return Returns 0 on success.
 int NE_InitDual3D_FB(void);
 
 /// Inits Nitro Engine to draw 3D to both screens.
@@ -104,6 +116,9 @@ int NE_InitDual3D_FB(void);
 /// to bank I. Because of this, it is unsafe to use the DMA In GFX FIFO mode to
 /// draw models, which has a small performance hit.
 ///
+/// This mode is stable. If the framerate drops below 60 FPS the screens will
+/// remain stable.
+///
 /// In general, prefer NE_InitDual3D_DMA() over NE_InitDual3D().
 ///
 /// @return Returns 0 on success.
@@ -115,9 +130,6 @@ int NE_InitDual3D_DMA(void);
 /// bottom screen. This can be changed with NE_MainScreenSetOnTop(),
 /// NE_MainScreenSetOnBottom() and NE_SwapScreens(). To check the current
 /// position of the main screen, use NE_MainScreenIsOnTop().
-///
-/// Important note: When using safe dual 3D mode, use NE_ProcessSafeDual3D()
-/// instead.
 ///
 /// @param mainscreen Function that draws the main screen.
 /// @param subscreen Function that draws the sub screen.
