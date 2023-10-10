@@ -33,6 +33,11 @@ static int fov;
 
 static int ne_main_screen = 1; // 1 = top, 0 = bottom
 
+static uint32_t ne_dma_enabled = 0;
+static uint32_t ne_dma_src = 0;
+static uint32_t ne_dma_dst = 0;
+static uint32_t ne_dma_cr = 0;
+
 NE_ExecutionModes NE_CurrentExecutionMode(void)
 {
     return ne_execution_mode;
@@ -43,9 +48,6 @@ void NE_End(void)
     if (ne_execution_mode == NE_ModeUninitialized)
         return;
 
-    // Hide BG0
-    REG_DISPCNT &= ~(DISPLAY_BG0_ACTIVE | ENABLE_3D);
-
     vramSetBankA(VRAM_A_LCD);
     vramSetBankB(VRAM_B_LCD);
 
@@ -53,6 +55,8 @@ void NE_End(void)
     {
         case NE_ModeSingle3D:
         {
+            videoSetMode(0);
+
             if (GFX_CONTROL & GL_CLEAR_BMP)
                 NE_ClearBMPEnable(false);
 
@@ -64,6 +68,9 @@ void NE_End(void)
 
         case NE_ModeDual3D:
         {
+            videoSetMode(0);
+            videoSetModeSub(0);
+
             vramSetBankC(VRAM_C_LCD);
             vramSetBankD(VRAM_D_LCD);
 
@@ -83,10 +90,17 @@ void NE_End(void)
 
         case NE_ModeDual3D_DMA:
         {
+            ne_dma_enabled = 0;
+            DMA_CR(2) = 0;
+
+            videoSetMode(0);
+            videoSetModeSub(0);
+
             vramSetBankC(VRAM_C_LCD);
             vramSetBankD(VRAM_D_LCD);
 
-            vramSetBankI(VRAM_I_LCD); // The console goes here
+            // A pseudo framebuffer and the debug console go here
+            vramSetBankI(VRAM_I_LCD);
             break;
         }
 
@@ -431,8 +445,6 @@ void NE_InitConsole(void)
 
         case NE_ModeDual3D_DMA:
         {
-            NE_UsingConsole = true;
-
             BG_PALETTE[255] = 0xFFFF;
 
             vramSetBankF(VRAM_F_LCD);
@@ -560,10 +572,6 @@ static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Screen ^= 1;
 }
 
-static uint32_t ne_dma_enabled = 0;
-static uint32_t ne_dma_src = 0;
-static uint32_t ne_dma_dst = 0;
-static uint32_t ne_dma_cr = 0;
 
 static void ne_do_dma(void)
 {
