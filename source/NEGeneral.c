@@ -220,6 +220,13 @@ cleanup:
 
 static void ne_init_registers(void)
 {
+    // This function is usually called when the program boots. We don't know
+    // which time in the frame exactly. In order to make the behaviour
+    // consistent across emulators and hardware, it is required to synchronize
+    // to the LCD refresh here.
+
+    swiWaitForVBlank();
+
     // Power all 3D and 2D. Hide 3D screen during init
     powerOn(POWER_ALL);
 
@@ -281,6 +288,14 @@ static void ne_init_registers(void)
 
     MATRIX_CONTROL = GL_MODELVIEW;
     MATRIX_IDENTITY = 0;
+
+    // Make sure that this function is left always at the same time regardless
+    // of whether it runs on hardware or emulators (which can be more or less
+    // accurate). If not, the output of the screens in dual 3D mode may be
+    // switched initially (and change once there is a framerate drop when
+    // loading assets, for example).
+
+    swiWaitForVBlank();
 
     // Ready!!
 
