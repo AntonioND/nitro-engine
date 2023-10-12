@@ -546,6 +546,18 @@ void NE_InitConsole(void)
             //     Framebuffer (one line): 0x06208000 - 0x06208200 (512 B)
             //     Tile base 2: 0x06208000 - 0x06209000 (4 KB)
             //     Map base 23: 0x0620B800 - 0x0620C000 (2 KB)
+            //
+            // There is an overlap between the framebuffer and the tileset.
+            // Tileset slots are 16 KB in size, so there is only one tileset
+            // available in VRAM I. However, bitmap slots are also 16 KB in
+            // size, so both the bitmap and tileset need to share the same
+            // space.
+            //
+            // Luckily, 256 bytes for a 4 bpp tileset uses the same amount of
+            // memory as 256 / (8 * 8 * 4 / 8) = 8 tiles. The first characters
+            // of the console correspond to non-printable ASCII characters, so
+            // this overlap isn't a real issue as the first 8 characters won't
+            // ever be shown anyway.
             vramSetBankI(VRAM_I_SUB_BG_0x06208000);
             consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
 
