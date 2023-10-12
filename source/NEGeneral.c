@@ -530,6 +530,17 @@ void NE_InitConsole(void)
             vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
             consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
 
+            // We have just called consoleInit() to initialize the background
+            // and to load the graphics. The next call to consoleInit() will
+            // deinitialize the console from VRAM C, but it will leave the
+            // graphics that have been loaded, which is what we wanted.
+            //
+            // VRAM I is always setup as sub background RAM, so we can rely on
+            // the console always being mapped at the same address, while VRAM C
+            // will alternate between LCD and main BG. We use libnds to write to
+            // VRAM I, and copy the map to VRAM C whenever VRAM C is set as main
+            // BG RAM.
+
             // Sub engine - VRAM_I:
             //     Available memory: 0x06208000 - 0x0620C000 (16 KB)
             //     Framebuffer (one line): 0x06208000 - 0x06208200 (512 B)
