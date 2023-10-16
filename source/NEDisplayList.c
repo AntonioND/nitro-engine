@@ -25,9 +25,13 @@ void NE_DisplayListDrawDMA_GFX_FIFO(const void *list)
     // conditions, simply ensure that there are no DMA channels active.
     while (dmaBusy(0) || dmaBusy(1) || dmaBusy(2) || dmaBusy(3));
 
+#ifdef NE_BLOCKSDS
+    dmaSetParams(0, p, (void *)&GFX_FIFO, DMA_FIFO | words);
+#else
     DMA_SRC(0) = (uint32_t)p;
     DMA_DEST(0) = (uint32_t)&GFX_FIFO;
     DMA_CR(0) = DMA_FIFO | words;
+#endif
 
     while (dmaBusy(0));
 }

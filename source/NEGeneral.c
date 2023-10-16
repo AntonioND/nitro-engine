@@ -6,6 +6,7 @@
 
 #include <nds/arm9/background.h>
 #include <nds/arm9/postest.h>
+#include <nds/dma.h>
 
 #include "NEMain.h"
 #include "NEMath.h"
@@ -95,7 +96,12 @@ void NE_End(void)
         case NE_ModeDual3D_DMA:
         {
             ne_dma_enabled = 0;
+
+#ifdef NE_BLOCKSDS
+            dmaStopSafe(2);
+#else
             DMA_CR(2) = 0;
+#endif
 
             videoSetMode(0);
             videoSetModeSub(0);
@@ -740,11 +746,20 @@ static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 
 static void ne_do_dma(void)
 {
+    // BlocksDS has a safe way to start DMA copies that doesn't involve writing
+    // to registers directly. It's safer to call the functions directly. The
+    // libnds of devkitPro doesn't have this functionality.
+#ifdef NE_BLOCKSDS
+    dmaStopSafe(2);
+
+    dmaSetParams(2, (const void *)ne_dma_src, (void *)ne_dma_dst, ne_dma_cr);
+#else
     DMA_CR(2) = 0;
 
     DMA_SRC(2) = ne_dma_src;
     DMA_DEST(2) = ne_dma_dst;
     DMA_CR(2) = ne_dma_cr;
+#endif
 }
 
 static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)

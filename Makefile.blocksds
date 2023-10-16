@@ -17,9 +17,9 @@ BINDIRS		:=
 # ---------------------------
 
 ifeq ($(NE_DEBUG),1)
-DEFINES		:= -DNE_DEBUG
+DEFINES		:= -DNE_DEBUG -DNE_BLOCKSDS
 else
-DEFINES		:=
+DEFINES		:= -DNE_BLOCKSDS
 endif
 
 # Libraries
