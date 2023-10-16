@@ -543,8 +543,8 @@ void NE_InitConsole(void)
 
             // Sub engine - VRAM_I:
             //     Available memory: 0x06208000 - 0x0620C000 (16 KB)
-            //     Framebuffer (one line): 0x06208000 - 0x06208200 (512 B)
             //     Tile base 2: 0x06208000 - 0x06209000 (4 KB)
+            //     Framebuffer (one line): 0x0620B000 - 0x0620B200 (512 B)
             //     Map base 23: 0x0620B800 - 0x0620C000 (2 KB)
             //
             // There is an overlap between the framebuffer and the tileset.
@@ -553,11 +553,24 @@ void NE_InitConsole(void)
             // size, so both the bitmap and tileset need to share the same
             // space.
             //
-            // Luckily, 256 bytes for a 4 bpp tileset uses the same amount of
-            // memory as 256 / (8 * 8 * 4 / 8) = 8 tiles. The first characters
-            // of the console correspond to non-printable ASCII characters, so
-            // this overlap isn't a real issue as the first 8 characters won't
-            // ever be shown anyway.
+            // Luckily, the tileset of the console doesn't use the whole 16 KB.
+            // The current console of libnds uses up to 128 characters. The
+            // absolute maximum would be 256 characters, which requires (for a 4
+            // bpp tileset) 8 KB of VRAM. This means that anything in the second
+            // half of the bank (VRAM I is 16 KB in size) can be used for maps
+            // or to store the pseudo framebuffer line.
+            //
+            // 8 KB is the same size as 16 lines in a 16-bit background. We can
+            // setup our 16-bit bitmap as if it started at the same base as the
+            // tileset, and we can store our line bitmap at some point between
+            // 16 and 32 lines.
+            //
+            // Now, remember that the map uses the last 2 KB of the VRAM bank,
+            // and that uses as much memory as 8 lines of a 16-bit bitmap. The
+            // free lines of the bitmap are actually 16 to 24.
+            //
+            // Nitro Engine uses line 20, located at offset 0x3000 from the
+            // start of the bank.
             vramSetBankI(VRAM_I_SUB_BG_0x06208000);
             consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
 
@@ -666,6 +679,8 @@ static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 
     NE_Screen ^= 1;
 }
+
+#define NE_DUAL_DMA_3D_LINES_OFFSET 20
 
 static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
 {
@@ -786,11 +801,12 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
         REG_BG2PC_SUB = 0;
         REG_BG2PD_SUB = 0; // Scale first row to expand to the full screen
         REG_BG2X_SUB = 0;
-        REG_BG2Y_SUB = 0;
+        REG_BG2Y_SUB = NE_DUAL_DMA_3D_LINES_OFFSET << 8;
 
         ne_dma_enabled = 1;
         ne_dma_src = (uint32_t)VRAM_C + 0x8000;
-        ne_dma_dst = (uint32_t)BG_BMP_RAM_SUB(2),
+        ne_dma_dst = ((uint32_t)BG_BMP_RAM_SUB(2))
+                   + 256 * NE_DUAL_DMA_3D_LINES_OFFSET * 2;
         ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
                     DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
 
@@ -836,11 +852,12 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
         REG_BG2PC_SUB = 0;
         REG_BG2PD_SUB = 0; // Scale first row to expand to the full screen
         REG_BG2X_SUB = 0;
-        REG_BG2Y_SUB = 0;
+        REG_BG2Y_SUB = NE_DUAL_DMA_3D_LINES_OFFSET << 8;
 
         ne_dma_enabled = 1;
         ne_dma_src = (uint32_t)VRAM_D + 0x8000;
-        ne_dma_dst = (uint32_t)BG_BMP_RAM_SUB(2),
+        ne_dma_dst = ((uint32_t)BG_BMP_RAM_SUB(2))
+                   + 256 * NE_DUAL_DMA_3D_LINES_OFFSET * 2;
         ne_dma_cr = DMA_COPY_WORDS | (256 * 2 / 4) |
                     DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
 
@@ -945,7 +962,9 @@ void NE_VBLFunc(void)
         //
         // For consistency, in the main screen this is achieved by simply
         // scrolling the bitmap background by one pixel.
-        dmaFillWords(0, BG_BMP_RAM_SUB(2), 256 * 2);
+        dmaFillWords(0, BG_BMP_RAM_SUB(2) + 256 * NE_DUAL_DMA_3D_LINES_OFFSET,
+                     256 * 2);
+
         ne_do_dma();
     }
 
