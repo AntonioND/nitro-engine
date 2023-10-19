@@ -1,6 +1,43 @@
 Changelog
 =========
 
+Version 0.9.0 (2023-10-19)
+--------------------------
+
+- Introduce two new dual 3D modes. They are resilient and they will always show
+  the same output on both screens even if the framerate drops. This isn't the
+  case with the previous dual 3D mode.
+
+- Fix 2D projection used to display 3D sprites. The Y coordinate didn't work
+  correctly for numbers close to 192. This means that an ugly hack to apply an
+  offset to the texture coordinates of 2D polygons is no longer needed.
+
+- Fix initialization of the library. Sometimes, depending on the loader, the
+  game would start in a different time in the screen rendering cycle. This would
+  swap the images of the screens until the framerate dropped when loading
+  assets, for example.
+
+- The code that switches between screens in dual 3D mode has been more reliable.
+  Nitro Engine now swaps screens after they are actually drawn, not in the
+  vertical blanking interrupt handler, when it switched every frame even if no
+  new frame had been drawn by the game.
+
+- Switch a lot of assert() in the library into permanent runtime checks. Several
+  functions now return error codes instead of not returning any value.
+
+- Use safe DMA copy functions if the libnds of the toolchain provides them (they
+  are only available in BlocksDS at the moment).
+
+- The library now supports sending display lists to the GPU in different ways to
+  work around a hardware bug in the ARM9 DMA when it is set to GFX FIFO mode.
+
+- Fix debug build of the library.
+
+- Fix build of the NFlib template with devkitPro libraries.
+
+- Update examples and add some more, particularly about comparisons between dual
+  3D modes.
+
 Version 0.8.2 (2023-04-20)
 --------------------------
 
