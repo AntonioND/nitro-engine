@@ -44,7 +44,7 @@ typedef struct {
 /// scanKeys() each frame for this to work.
 void NE_UpdateInput(void);
 
-///< List of all the possible initialization states of Nitro Engine.
+/// List of all the possible initialization states of Nitro Engine.
 typedef enum {
     NE_ModeUninitialized    = 0, ///< Nitro Engine hasn't been initialized.
     NE_ModeSingle3D         = 1, ///< Initialized in single 3D mode.
