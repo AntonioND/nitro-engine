@@ -10,7 +10,7 @@
 
 char *NE_FATLoadData(const char *filename)
 {
-    FILE *f = fopen(filename, "rb+");
+    FILE *f = fopen(filename, "rb");
     if (f == NULL)
     {
         NE_DebugPrint("%s could't be opened", filename);
@@ -28,7 +28,12 @@ char *NE_FATLoadData(const char *filename)
         return NULL;
     }
 
-    fread(buffer, 1, size, f);
+    if (fread(buffer, 1, size, f) != size)
+    {
+        NE_DebugPrint("Failed to read data of %s", filename);
+        return NULL;
+    }
+
     fclose(f);
     return buffer;
 }
