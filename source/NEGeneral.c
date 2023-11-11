@@ -597,7 +597,7 @@ void NE_SetConsoleColor(u32 color)
     BG_PALETTE[255] = color;
 }
 
-void NE_Process(NE_Voidfunc drawscene)
+static void ne_process_common(void)
 {
     NE_UpdateInput();
 
@@ -617,6 +617,11 @@ void NE_Process(NE_Voidfunc drawscene)
 
     MATRIX_CONTROL = GL_MODELVIEW;
     MATRIX_IDENTITY = 0;
+}
+
+void NE_Process(NE_Voidfunc drawscene)
+{
+    ne_process_common();
 
     NE_AssertPointer(drawscene, "NULL function pointer");
     drawscene();
@@ -624,7 +629,17 @@ void NE_Process(NE_Voidfunc drawscene)
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 }
 
-static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+void NE_ProcessArg(NE_VoidArgfunc drawscene, void *arg)
+{
+    ne_process_common();
+
+    NE_AssertPointer(drawscene, "NULL function pointer");
+    drawscene(arg);
+
+    GFX_FLUSH = GL_TRANS_MANUALSORT;
+}
+
+static void ne_process_dual_3d_common_start(void)
 {
     NE_UpdateInput();
 
@@ -673,12 +688,10 @@ static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Viewport(0, 0, 255, 191);
 
     MATRIX_IDENTITY = 0;
+}
 
-    if (NE_Screen == 1)
-        mainscreen();
-    else
-        subscreen();
-
+static void ne_process_dual_3d_common_end(void)
+{
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 
     dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
@@ -686,9 +699,35 @@ static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Screen ^= 1;
 }
 
+static void ne_process_dual_3d(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    ne_process_dual_3d_common_start();
+
+    if (NE_Screen == 1)
+        mainscreen();
+    else
+        subscreen();
+
+    ne_process_dual_3d_common_end();
+}
+
+static void ne_process_dual_3d_arg(NE_VoidArgfunc mainscreen,
+                                   NE_VoidArgfunc subscreen,
+                                   void *argmain, void *argsub)
+{
+    ne_process_dual_3d_common_start();
+
+    if (NE_Screen == 1)
+        mainscreen(argmain);
+    else
+        subscreen(argsub);
+
+    ne_process_dual_3d_common_end();
+}
+
 #define NE_DUAL_DMA_3D_LINES_OFFSET 20
 
-static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+static void ne_process_dual_3d_fb_common_start(void)
 {
     NE_UpdateInput();
 
@@ -731,17 +770,41 @@ static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
     NE_Viewport(0, 0, 255, 191);
 
     MATRIX_IDENTITY = 0;
+}
+
+static void ne_process_dual_3d_fb_common_end(void)
+{
+    GFX_FLUSH = GL_TRANS_MANUALSORT;
+
+    dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
+
+    NE_Screen ^= 1;
+}
+
+static void ne_process_dual_3d_fb(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    ne_process_dual_3d_fb_common_start();
 
     if (NE_Screen == 1)
         mainscreen();
     else
         subscreen();
 
-    GFX_FLUSH = GL_TRANS_MANUALSORT;
+    ne_process_dual_3d_fb_common_end();
+}
 
-    dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
+static void ne_process_dual_3d_fb_arg(NE_VoidArgfunc mainscreen,
+                                      NE_VoidArgfunc subscreen,
+                                      void *argmain, void *argsub)
+{
+    ne_process_dual_3d_fb_common_start();
 
-    NE_Screen ^= 1;
+    if (NE_Screen == 1)
+        mainscreen(argmain);
+    else
+        subscreen(argsub);
+
+    ne_process_dual_3d_fb_common_end();
 }
 
 static void ne_do_dma(void)
@@ -762,11 +825,8 @@ static void ne_do_dma(void)
 #endif
 }
 
-static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+static void ne_process_dual_3d_dma_common_start(void)
 {
-    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
-    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
-
     if (NE_Screen == ne_main_screen)
         lcdMainOnBottom();
     else
@@ -826,8 +886,6 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
                     DMA_START_HBL | DMA_REPEAT | DMA_SRC_INC | DMA_DST_RESET;
 
         ne_do_dma();
-
-        mainscreen();
     }
     else
     {
@@ -882,15 +940,42 @@ static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen
             dmaCopyWords(3, BG_MAP_RAM_SUB(23), BG_MAP_RAM(8), 32 * 32 * 2);
 
         ne_do_dma();
-
-        subscreen();
     }
+}
 
+static void ne_process_dual_3d_dma_common_end(void)
+{
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 
     NE_Screen ^= 1;
 
     NE_UpdateInput();
+}
+
+static void ne_process_dual_3d_dma(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
+{
+    ne_process_dual_3d_dma_common_start();
+
+    if (NE_Screen == 1)
+        mainscreen();
+    else
+        subscreen();
+
+    ne_process_dual_3d_dma_common_end();
+}
+
+static void ne_process_dual_3d_dma_arg(NE_VoidArgfunc mainscreen,
+                                       NE_VoidArgfunc subscreen,
+                                       void *argmain, void *argsub)
+{
+    ne_process_dual_3d_dma_common_start();
+
+    if (NE_Screen == 1)
+        mainscreen(argmain);
+    else
+        subscreen(argsub);
+
+    ne_process_dual_3d_dma_common_end();
 }
 
 void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
@@ -915,6 +1000,38 @@ void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen)
         case NE_ModeDual3D_DMA:
         {
             ne_process_dual_3d_dma(mainscreen, subscreen);
+            return;
+        }
+        default:
+        {
+            return;
+        }
+    }
+}
+
+void NE_ProcessDualArg(NE_VoidArgfunc mainscreen, NE_VoidArgfunc subscreen,
+                       void *argmain, void *argsub)
+{
+    NE_AssertPointer(mainscreen, "NULL function pointer (main screen)");
+    NE_AssertPointer(subscreen, "NULL function pointer (sub screen)");
+
+    switch (ne_execution_mode)
+    {
+        case NE_ModeDual3D:
+        {
+            ne_process_dual_3d_arg(mainscreen, subscreen, argmain, argsub);
+            return;
+        }
+
+        case NE_ModeDual3D_FB:
+        {
+            ne_process_dual_3d_fb_arg(mainscreen, subscreen, argmain, argsub);
+            return;
+        }
+
+        case NE_ModeDual3D_DMA:
+        {
+            ne_process_dual_3d_dma_arg(mainscreen, subscreen, argmain, argsub);
             return;
         }
         default:

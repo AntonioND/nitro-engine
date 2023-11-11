@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2011, 2019, 2022 Antonio Niño Díaz
+// Copyright (c) 2008-2011, 2019, 2022-2023 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -29,6 +29,11 @@
 
 /// Void function pointer used in NE_Process and NE_ProcessDual.
 typedef void (*NE_Voidfunc)(void);
+
+/// Void function pointer that takes a void pointer as argument.
+///
+/// Used in NE_ProcessArg and NE_ProcessDualArg.
+typedef void (*NE_VoidArgfunc)(void *);
 
 /// Holds information of keys and stylus input for internal use.
 typedef struct {
@@ -70,6 +75,12 @@ int NE_Init3D(void);
 ///
 /// @param drawscene Function that draws the screen.
 void NE_Process(NE_Voidfunc drawscene);
+
+/// Draws a 3D scene passing an argument to the draw function.
+///
+/// @param drawscene Function that draws the screen.
+/// @param arg Argument to pass to the drawscene function.
+void NE_ProcessArg(NE_VoidArgfunc drawscene, void *arg);
 
 /// Inits Nitro Engine to draw 3D to both screens.
 ///
@@ -134,6 +145,20 @@ int NE_InitDual3D_DMA(void);
 /// @param mainscreen Function that draws the main screen.
 /// @param subscreen Function that draws the sub screen.
 void NE_ProcessDual(NE_Voidfunc mainscreen, NE_Voidfunc subscreen);
+
+/// Draws 3D scenes in both screens and passes arguments to the draw functions.
+///
+/// By default, the main screen is the top screen and the sub screen is the
+/// bottom screen. This can be changed with NE_MainScreenSetOnTop(),
+/// NE_MainScreenSetOnBottom() and NE_SwapScreens(). To check the current
+/// position of the main screen, use NE_MainScreenIsOnTop().
+///
+/// @param mainscreen Function that draws the main screen.
+/// @param subscreen Function that draws the sub screen.
+/// @param argmain Argument to pass to the mainscreen function.
+/// @param argsub Argument to pass to the subscreen function.
+void NE_ProcessDualArg(NE_VoidArgfunc mainscreen, NE_VoidArgfunc subscreen,
+                       void *argmain, void *argsub);
 
 /// Inits the console of libnds in the main screen.
 ///
