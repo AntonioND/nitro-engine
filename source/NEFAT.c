@@ -40,7 +40,7 @@ char *NE_FATLoadData(const char *filename)
 
 size_t NE_FATFileSize(const char *filename)
 {
-    FILE *f = fopen(filename, "rb+");
+    FILE *f = fopen(filename, "rb");
     if (f == NULL)
     {
         NE_DebugPrint("%s could't be opened", filename);
