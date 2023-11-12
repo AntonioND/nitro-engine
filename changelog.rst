@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version 0.9.1 (2023-11-12)
+--------------------------
+
+- Update Makefiles to build on BlocksDS.
+
+- Fix functions used to load assets from FAT.
+
 Version 0.9.0 (2023-10-19)
 --------------------------
 
