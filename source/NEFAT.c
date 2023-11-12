@@ -17,7 +17,13 @@ char *NE_FATLoadData(const char *filename)
         return NULL;
     }
 
-    fseek(f, 0, SEEK_END);
+    if (fseek(f, 0, SEEK_END) != 0)
+    {
+        NE_DebugPrint("Failed to fseek: %s", filename);
+        fclose(f);
+        return NULL;
+    }
+
     size_t size = ftell(f);
     rewind(f);
 
@@ -25,12 +31,14 @@ char *NE_FATLoadData(const char *filename)
     if (buffer == NULL)
     {
         NE_DebugPrint("Not enought memory to load %s", filename);
+        fclose(f);
         return NULL;
     }
 
     if (fread(buffer, 1, size, f) != size)
     {
         NE_DebugPrint("Failed to read data of %s", filename);
+        fclose(f);
         return NULL;
     }
 
@@ -47,7 +55,13 @@ size_t NE_FATFileSize(const char *filename)
         return -1;
     }
 
-    fseek(f, 0, SEEK_END);
+    if (fseek(f, 0, SEEK_END) != 0)
+    {
+        NE_DebugPrint("Failed to fseek: %s", filename);
+        fclose(f);
+        return -1;
+    }
+
     size_t size = ftell(f);
     fclose(f);
     return size;
