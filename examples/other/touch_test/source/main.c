@@ -17,7 +17,7 @@ int object_touched;
 
 int rotz, roty;
 
-uint32 keys;
+uint32_t keys;
 
 void Draw3DScene(void)
 {

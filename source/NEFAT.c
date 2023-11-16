@@ -154,7 +154,7 @@ int NE_ScreenshotBMP(const char *filename)
     NE_write32(&infoheader->ncolors, 0);
 
     // Allow CPU to access VRAM
-    uint32 vramTemp = 0;
+    uint32_t vramTemp = 0;
     if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
     {
         vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD,

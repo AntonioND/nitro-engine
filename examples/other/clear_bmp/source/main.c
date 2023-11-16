@@ -79,7 +79,7 @@ int main(void)
         NE_WaitForVBL(0);
 
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         NE_ModelRotate(Model, 0, 2, 1);
 

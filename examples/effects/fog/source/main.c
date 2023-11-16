@@ -89,7 +89,7 @@ int main(void)
 
         // Refresh keys
         scanKeys();
-        uint32 keys = keysDown();
+        uint32_t keys = keysDown();
 
         // Modify parameters
         if (keys & KEY_UP)

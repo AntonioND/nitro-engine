@@ -105,7 +105,7 @@ void NE_PolyNormalI(int x, int y, int z)
 void NE_PolyVertexI(int x, int y, int z)
 {
     GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
-    GFX_VERTEX16 = (uint32) (uint16) (z);
+    GFX_VERTEX16 = (uint32_t)(uint16_t)z;
 }
 
 void NE_PolyTexCoord(int u, int v)

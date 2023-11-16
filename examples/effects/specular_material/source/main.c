@@ -106,8 +106,8 @@ int main(void)
 
         // Get keys information
         scanKeys();
-        uint32 keys = keysHeld();
-        uint32 keys_down = keysDown();
+        uint32_t keys = keysHeld();
+        uint32_t keys_down = keysDown();
 
         printf("\x1b[0;0H"
                "PAD: Rotate\n"

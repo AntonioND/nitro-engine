@@ -224,7 +224,7 @@ int main(void)
         // Start processing a new frame after the 2D elements have been updated.
 
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         if (keys & KEY_START)
             break;

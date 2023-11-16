@@ -37,9 +37,9 @@ typedef void (*NE_VoidArgfunc)(void *);
 
 /// Holds information of keys and stylus input for internal use.
 typedef struct {
-    uint32 kdown;           ///< Keys that have just been pressed this frame.
-    uint32 kheld;           ///< Keys that are pressed.
-    uint32 kup;             ///< Keys that have just been released this frame.
+    uint32_t kdown;         ///< Keys that have just been pressed this frame.
+    uint32_t kheld;         ///< Keys that are pressed.
+    uint32_t kup;           ///< Keys that have just been released this frame.
     touchPosition touch;    ///< Touch screen state
 } NE_Input;
 

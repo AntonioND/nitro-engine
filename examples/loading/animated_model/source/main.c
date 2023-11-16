@@ -61,7 +61,7 @@ int main(void)
         NE_WaitForVBL(NE_UPDATE_ANIMATIONS);
 
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         if (keys & KEY_RIGHT)
             NE_ModelRotate(Model,0,2,0);

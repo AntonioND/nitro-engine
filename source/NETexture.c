@@ -82,7 +82,7 @@ static inline void *slot1_to_slot2(void *ptr)
 }
 
 static inline void ne_set_material_tex_param(NE_Material *tex,
-                            int sizeX, int sizeY, uint32 *addr,
+                            int sizeX, int sizeY, uint32_t *addr,
                             GL_TEXTURE_TYPE_ENUM mode, u32 param)
 {
     NE_AssertPointer(tex, "NULL pointer");
@@ -90,7 +90,7 @@ static inline void ne_set_material_tex_param(NE_Material *tex,
     NE_Texture[tex->texindex].param =
             (ne_tex_raw_size(sizeX) << 20) |
             (ne_tex_raw_size(sizeY) << 23) |
-            (((uint32)addr >> 3) & 0xFFFF) |
+            (((uint32_t)addr >> 3) & 0xFFFF) |
             (mode << 26) | param;
 }
 
@@ -650,7 +650,7 @@ void NE_TextureDefragMem(void)
     if (!ne_texture_system_inited)
         return;
 
-    uint32 vramTemp = vramSetMainBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
+    uint32_t vramTemp = vramSetMainBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
                                        VRAM_D_LCD);
 
     bool ok = false;
@@ -672,7 +672,7 @@ void NE_TextureDefragMem(void)
                 dmaCopy((void*) NE_Texture[i].address, pointer, size);
                 NE_Texture[i].address = pointer;
                 NE_Texture[i].param &= 0xFFFF0000;
-                NE_Texture[i].param |= ((uint32)pointer >> 3) & 0xFFFF;
+                NE_Texture[i].param |= ((uint32_t)pointer >> 3) & 0xFFFF;
                 ok = false;
             }
         }

@@ -74,7 +74,7 @@ int main(void)
 
         // Refresh keys
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         printf("\x1b[0;0H"
                "START: Lock CPU for 20 frames\n"

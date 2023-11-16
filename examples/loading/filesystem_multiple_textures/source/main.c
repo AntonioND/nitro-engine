@@ -89,7 +89,7 @@ int main(void)
         NE_WaitForVBL(0);
 
         scanKeys(); //Get keys information...
-        uint32 keys = keysDown();
+        uint32_t keys = keysDown();
 
         if (keys & KEY_START)
             return 0;

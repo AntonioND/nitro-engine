@@ -89,7 +89,7 @@ int main(void)
 
         // Get keys information
         scanKeys();
-        uint32 keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         printf("\x1b[0;0HPad: Rotate.");
 

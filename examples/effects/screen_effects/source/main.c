@@ -69,8 +69,8 @@ int main(void)
 
         // Refresh keys
         scanKeys();
-        uint32 keys = keysHeld();
-        uint32 kdown = keysDown();
+        uint32_t keys = keysHeld();
+        uint32_t kdown = keysDown();
 
         printf("\x1b[0;0H"
                "Pad: Rotate.\nA: Sine effect.\nB: Noise effect.\n"
