@@ -8,11 +8,6 @@
 
 /// @file NEPolygon.c
 
-void NE_PolyColor(u32 color)
-{
-    GFX_COLOR = color;
-}
-
 void NE_LightOff(int index)
 {
     NE_AssertMinMax(0, index, 3, "Invalid light index %d", index);
@@ -87,32 +82,6 @@ void NE_ShininessTableGenerate(NE_ShininessFunction function)
         GFX_SHININESS = table[i];
 }
 
-void NE_PolyBegin(int mode)
-{
-    GFX_BEGIN = mode;
-}
-
-void NE_PolyEnd(void)
-{
-    GFX_END = 0;
-}
-
-void NE_PolyNormalI(int x, int y, int z)
-{
-    GFX_NORMAL = NORMAL_PACK(x, y, z);
-}
-
-void NE_PolyVertexI(int x, int y, int z)
-{
-    GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
-    GFX_VERTEX16 = (uint32_t)(uint16_t)z;
-}
-
-void NE_PolyTexCoord(int u, int v)
-{
-    GFX_TEX_COORD = TEXTURE_PACK(inttot16(u), inttot16(v));
-}
-
 void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
                    NE_CullingEnum culling, NE_OtherFormatEnum other)
 {
@@ -121,14 +90,6 @@ void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
 
     GFX_POLY_FORMAT = POLY_ALPHA(alpha) | POLY_ID(id)
                     | lights | culling | other;
-}
-
-void NE_OutliningEnable(bool value)
-{
-    if (value)
-        GFX_CONTROL |= GL_OUTLINE;
-    else
-        GFX_CONTROL &= ~GL_OUTLINE;
 }
 
 void NE_OutliningSetColor(u32 index, u32 color)
@@ -152,14 +113,6 @@ void NE_ShadingEnable(bool value)
         for (int i = 0; i < 32; i++)
             GFX_TOON_TABLE[i] = 0;
     }
-}
-
-void NE_ToonHighlightEnable(bool value)
-{
-    if (value)
-        GFX_CONTROL |= GL_TOON_HIGHLIGHT;
-    else
-        GFX_CONTROL &= ~GL_TOON_HIGHLIGHT;
 }
 
 void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass, int depth)
@@ -201,11 +154,6 @@ void NE_FogEnableBackground(bool value)
     GFX_CLEAR_COLOR = ne_clearcolor;
 }
 
-void NE_FogDisable(void)
-{
-    GFX_CONTROL &= ~(GL_FOG | (15 << 8));
-}
-
 void NE_ClearColorSet(u32 color, u32 alpha, u32 id)
 {
     NE_AssertMinMax(0, alpha, 31, "Invalid alpha value %lu", alpha);
@@ -244,9 +192,4 @@ void NE_ClearBMPEnable(bool value)
         //vramSetBankC(VRAM_C_LCD);
         //vramSetBankD(VRAM_D_LCD);
     }
-}
-
-void NE_ClearBMPScroll(u32 x, u32 y)
-{
-    REG_CLRIMAGE_OFFSET = (x & 0xFF) | ((y & 0xFF) << 8);
 }

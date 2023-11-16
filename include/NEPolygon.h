@@ -101,24 +101,34 @@ void NE_ShininessTableGenerate(NE_ShininessFunction function);
 /// Begins a polygon.
 ///
 /// @param mode Type of polygon to draw (GL_TRIANGLE, GL_QUAD...).
-void NE_PolyBegin(int mode);
+static inline void NE_PolyBegin(int mode)
+{
+    GFX_BEGIN = mode;
+}
 
 /// Stops drawing polygons.
-///
-/// This function seems to not be needed for anything.
-void NE_PolyEnd(void);
+static inline void NE_PolyEnd(void)
+{
+    GFX_END = 0;
+}
 
 /// Sets the color for the following vertices.
 ///
 /// @param color Color.
-void NE_PolyColor(u32 color);
+static inline void NE_PolyColor(u32 color)
+{
+    GFX_COLOR = color;
+}
 
 /// Set the normal vector for next group of vertices.
 ///
 /// @param x (x, y, z) Unit vector (v10).
 /// @param y (x, y, z) Unit vector (v10).
 /// @param z (x, y, z) Unit vector (v10).
-void NE_PolyNormalI(int x, int y, int z);
+static inline void NE_PolyNormalI(int x, int y, int z)
+{
+    GFX_NORMAL = NORMAL_PACK(x, y, z);
+}
 
 /// Set the normal vector for next group of vertices.
 ///
@@ -133,7 +143,11 @@ void NE_PolyNormalI(int x, int y, int z);
 /// @param x (x, y, z) Vertex coordinates (v16).
 /// @param y (x, y, z) Vertex coordinates (v16).
 /// @param z (x, y, z) Vertex coordinates (v16).
-void NE_PolyVertexI(int x, int y, int z);
+static inline void NE_PolyVertexI(int x, int y, int z)
+{
+    GFX_VERTEX16 = (y << 16) | (x & 0xFFFF);
+    GFX_VERTEX16 = (uint32_t)(uint16_t)z;
+}
 
 /// Send vertex to the GPU.
 ///
@@ -152,7 +166,10 @@ void NE_PolyVertexI(int x, int y, int z);
 ///
 /// @param u (u, v) Texture coordinates (0 - texturesize).
 /// @param v (u, v) Texture coordinates (0 - texturesize).
-void NE_PolyTexCoord(int u, int v);
+static inline void NE_PolyTexCoord(int u, int v)
+{
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(u), inttot16(v));
+}
 
 /// Flags for NE_PolyFormat() to enable lights.
 typedef enum {
@@ -231,7 +248,13 @@ void NE_PolyFormat(u32 alpha, u32 id, NE_LightEnum lights,
 /// It only works with opaque or wireframe polygons.
 ///
 /// @param value True enables it, false disables it.
-void NE_OutliningEnable(bool value);
+static inline void NE_OutliningEnable(bool value)
+{
+    if (value)
+        GFX_CONTROL |= GL_OUTLINE;
+    else
+        GFX_CONTROL &= ~GL_OUTLINE;
+}
 
 /// Set outlining color for the specified index.
 ///
@@ -257,7 +280,13 @@ void NE_ShadingEnable(bool value);
 /// By default, toon shading is selected.
 ///
 /// @param value True enables highlight shading, false enables toon shading.
-void NE_ToonHighlightEnable(bool value);
+static inline void NE_ToonHighlightEnable(bool value)
+{
+    if (value)
+        GFX_CONTROL |= GL_TOON_HIGHLIGHT;
+    else
+        GFX_CONTROL &= ~GL_TOON_HIGHLIGHT;
+}
 
 /// Set color and related values of the rear plane.
 ///
@@ -296,7 +325,10 @@ void NE_ClearBMPEnable(bool value);
 ///
 /// @param x Scroll on the X axis (0 - 255).
 /// @param y Scroll on the Y axis (0 - 255).
-void NE_ClearBMPScroll(u32 x, u32 y);
+static inline void NE_ClearBMPScroll(u32 x, u32 y)
+{
+    REG_CLRIMAGE_OFFSET = (x & 0xFF) | ((y & 0xFF) << 8);
+}
 
 /// Enables fog and sets its parameters.
 ///
@@ -320,7 +352,10 @@ void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass, int depth);
 void NE_FogEnableBackground(bool value);
 
 /// Disable fog.
-void NE_FogDisable(void);
+static inline void NE_FogDisable(void)
+{
+    GFX_CONTROL &= ~(GL_FOG | (15 << 8));
+}
 
 /// TODO: Function to set value of DISP_1DOT_DEPTH
 
