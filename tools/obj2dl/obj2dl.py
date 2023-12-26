@@ -84,7 +84,10 @@ def convert_obj(input_file, output_file, texture_size,
         elif faces_number == 4:
             dl.switch_vtxs("quads")
         else:
-            raise OBJFormatError(f"Unsupported polygons with {faces_number} faces")
+            raise OBJFormatError(
+                f"Unsupported polygons with {faces_number} faces. "
+                "Please, split the polygons in your model to triangles."
+            )
 
         # Read vertices
         for vertex in face:
