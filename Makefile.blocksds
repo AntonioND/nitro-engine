@@ -139,8 +139,14 @@ $(ARCHIVE): $(OBJS)
 install: all
 	@echo "  INSTALL $(BLOCKSDSEXT)/$(INSTALLNAME)/"
 	$(V)$(RM) $(BLOCKSDSEXT)/$(INSTALLNAME)/
-	$(V)$(INSTALL) -d $(BLOCKSDSEXT)/$(INSTALLNAME)/
+	$(V)$(INSTALL) -d $(BLOCKSDSEXT)/$(INSTALLNAME)/ \
+	                  $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/img2ds \
+	                  $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/md5_to_dsma \
+	                  $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/obj2dl
 	$(V)$(CP) -r include lib $(BLOCKSDSEXT)/$(INSTALLNAME)/
+	$(V)$(CP) -r tools/img2ds/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/img2ds
+	$(V)$(CP) -r tools/md5_to_dsma/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/md5_to_dsma
+	$(V)$(CP) -r tools/obj2dl/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/obj2dl
 
 clean:
 	@echo "  CLEAN"
