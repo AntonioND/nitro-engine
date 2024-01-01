@@ -666,7 +666,8 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
                 # -------
 
                 st = vert.st
-
+                # In the MD5 format (0, 0) is the top-left corner, same as what
+                # the GPU of the DS expects.
                 u = st[0] * texture_size[0]
                 v = st[1] * texture_size[1]
                 dl.texcoord(u, v)

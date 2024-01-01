@@ -130,8 +130,8 @@ def convert_obj(input_file, output_file, texture_size,
 
             if texcoord_index is not None:
                 u, v = texcoords[texcoord_index]
-                # On OBJ, (0, 0) is the bottom-left corner. On the DS, (0, 0) is
-                # the top left corner. This flips the top and the bottom.
+                # In the OBJ format (0, 0) is the bottom-left corner. In the DS,
+                # (0, 0) is the top left corner. We need tp flip top and bottom.
                 v = 1.0 - v
                 u *= texture_size[0]
                 v *= texture_size[1]
