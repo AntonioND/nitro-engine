@@ -2,7 +2,7 @@
 
 # SPDX-License-Identifier: MIT
 #
-# Copyright (c) 2022-2023 Antonio Niño Díaz <antonio_nd@outlook.com>
+# Copyright (c) 2022-2024 Antonio Niño Díaz <antonio_nd@outlook.com>
 
 from display_list import DisplayList
 
@@ -130,6 +130,9 @@ def convert_obj(input_file, output_file, texture_size,
 
             if texcoord_index is not None:
                 u, v = texcoords[texcoord_index]
+                # On OBJ, (0, 0) is the bottom-left corner. On the DS, (0, 0) is
+                # the top left corner. This flips the top and the bottom.
+                v = 1.0 - v
                 u *= texture_size[0]
                 v *= texture_size[1]
                 dl.texcoord(u, v)
@@ -162,8 +165,8 @@ if __name__ == "__main__":
     import sys
     import traceback
 
-    print("obj2dl v0.1.1")
-    print("Copyright (c) 2022-2023 Antonio Niño Díaz <antonio_nd@outlook.com>")
+    print("obj2dl v0.1.2")
+    print("Copyright (c) 2022-2024 Antonio Niño Díaz <antonio_nd@outlook.com>")
     print("All rights reserved")
     print("")
 
