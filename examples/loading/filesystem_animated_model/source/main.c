@@ -5,6 +5,7 @@
 // This file is part of Nitro Engine
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include <filesystem.h>
 
