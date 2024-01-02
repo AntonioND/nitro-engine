@@ -510,7 +510,7 @@ void NE_InitConsole(void)
             // Set BG 0 (3D background) to be a lower priority than BG 1
             REG_BG0CNT = BG_PRIORITY(1);
 
-            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
+            consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 4, 0, true, true);
 
             break;
         }
@@ -534,7 +534,7 @@ void NE_InitConsole(void)
             //     Tile base 0: 0x06000000 - 0x06001000 (4 KB)
             //     Map base 8: 0x06004000 - 0x06004800 (2 KB)
             vramSetBankC(VRAM_C_MAIN_BG_0x06000000);
-            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
+            consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 8, 0, true, true);
 
             // We have just called consoleInit() to initialize the background
             // and to load the graphics. The next call to consoleInit() will
@@ -578,7 +578,7 @@ void NE_InitConsole(void)
             // Nitro Engine uses line 20, located at offset 0x3000 from the
             // start of the bank.
             vramSetBankI(VRAM_I_SUB_BG_0x06208000);
-            consoleInit(0, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
+            consoleInit(NULL, 1, BgType_Text4bpp, BgSize_T_256x256, 23, 2, false, true);
 
             break;
         }
