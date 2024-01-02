@@ -36,6 +36,8 @@ size_t NE_FATFileSize(const char *filename);
 /// It takes a screenshot of the 3D screen (or both screens if in dual 3D mode)
 /// and saves it as a BMP file.
 ///
+/// Warning: This function hasn't been tested with all dual 3D modes.
+///
 /// @param filename File to save the screenshot.
 /// @return Returns 1 on success, 0 on error.
 int NE_ScreenshotBMP(const char *filename);
