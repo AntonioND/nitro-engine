@@ -1,0 +1,4 @@
+BINDIRS	:= data
+NITROFSDIR	:= nitrofiles
+
+include ../../Makefile.example.blocksds
