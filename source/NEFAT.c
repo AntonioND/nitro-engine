@@ -196,7 +196,6 @@ int NE_ScreenshotBMP(const char *filename)
     if (NE_CurrentExecutionMode() != NE_ModeSingle3D)
         vramRestorePrimaryBanks(vramTemp);
 
-    DC_FlushAll();
     fwrite(temp, 1, 256 * ysize * 3 + sizeof(NE_BMPInfoHeader)
                     + sizeof(NE_BMPHeader), f);
     fclose(f);
