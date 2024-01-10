@@ -39,7 +39,6 @@ void Draw3DScene(void)
         NE_PolyTexCoord(64, 0);
         NE_PolyVertex(1, 1, 0);
 
-    // Apparently this command is ignored by the GPU
     NE_PolyEnd();
 }
 

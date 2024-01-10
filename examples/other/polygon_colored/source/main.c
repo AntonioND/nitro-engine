@@ -28,7 +28,6 @@ void Draw3DScene(void)
         NE_PolyColor(NE_Blue);
         NE_PolyVertex(1, 1, 0);
 
-    // This seems to not be needed
     NE_PolyEnd();
 }
 
