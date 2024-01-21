@@ -48,7 +48,8 @@ typedef enum {
     NE_PAL4       = 2, ///< 4 color palette
     NE_PAL16      = 3, ///< 16 color palette
     NE_PAL256     = 4, ///< 256 color palette
-    NE_COMPRESSED = 5, ///< 4x4 compressed format
+    NE_COMPRESSED = 5, ///< @deprecated 4x4 compressed format (compatibilty name)
+    NE_TEX4X4     = 5, ///< 4x4 compressed format
     NE_A5PAL8     = 6, ///< 8 color palette, 5 bits of alpha
     NE_A1RGB5     = 7, ///< Direct color (5 bits per channel), 1 bit of alpha
     NE_RGB5       = 8  ///< Don't use it. Like NE_A1RGB5, but sets alpha to 1 when loading

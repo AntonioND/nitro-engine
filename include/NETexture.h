@@ -83,6 +83,11 @@ void NE_MaterialColorDelete(NE_Material *tex);
 /// bigger, but then you ignore the additional space, as it will be used by
 /// other textures).
 ///
+/// Textures with the 4x4 Texel format (NE_TEX4X4) are normally split into two
+/// parts: one that goes into texture slots 0 or 2 and another one that goes
+/// into texture slot 1. This function expects the two parts to be concatenated
+/// (with the slot 1 part after the other part).
+///
 /// @param tex Material.
 /// @param fmt Texture format.
 /// @param sizeX (sizeX, sizeY) Texture size.
@@ -93,6 +98,21 @@ void NE_MaterialColorDelete(NE_Material *tex);
 int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
                           int sizeX, int sizeY, NE_TextureFlags flags,
                           char *path);
+
+/// Loads a texture in Texel 4x4 format from the filesystem and assigns it to a
+/// material object.
+///
+/// Width and height need to be powers of two.
+///
+/// @param tex Material.
+/// @param sizeX (sizeX, sizeY) Texture size.
+/// @param sizeY (sizeX, sizeY) Texture size.
+/// @param flags Parameters of the texture.
+/// @param path02 Path of the texture file (part that goes in slot 0/2).
+/// @param path1 Path of the texture file (part that goes in slot 1).
+/// @return It returns 1 on success, 0 on error.
+int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
+                             NE_TextureFlags flags, char *path02, char *path1);
 
 /// Loads a texture from RAM and assigns it to a material object.
 ///
@@ -106,6 +126,11 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
 /// bigger, but then you ignore the additional space, as it will be used by
 /// other textures).
 ///
+/// Textures with the 4x4 Texel format (NE_TEX4X4) are normally split into two
+/// parts: one that goes into texture slots 0 or 2 and another one that goes
+/// into texture slot 1. This function expects the two parts to be concatenated
+/// (with the slot 1 part after the other part).
+///
 /// @param tex Material.
 /// @param fmt Texture format.
 /// @param sizeX (sizeX, sizeY) Texture size.
@@ -116,6 +141,20 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
 int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
                        int sizeX, int sizeY, NE_TextureFlags flags,
                        void *texture);
+
+/// Loads a texture from RAM and assigns it to a material object.
+///
+/// Width and height need to be powers of two.
+///
+/// @param tex Material.
+/// @param sizeX (sizeX, sizeY) Texture size.
+/// @param sizeY (sizeX, sizeY) Texture size.
+/// @param flags Parameters of the texture.
+/// @param texture02 Pointer to the texture data (part that goes in slot 0/2).
+/// @param texture1 Pointer to the texture data (part that goes in slot 1).
+/// @return It returns 1 on success, 0 on error.
+int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
+                          NE_TextureFlags flags, void *texture02, void *texture1);
 
 /// Copies the texture of a material into another material.
 ///

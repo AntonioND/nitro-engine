@@ -106,7 +106,7 @@ static void ne_texture_delete(int texture_index)
     {
         uint32_t fmt = (NE_Texture[slot].param >> 26) & 7;
 
-        if (fmt == NE_COMPRESSED)
+        if (fmt == NE_TEX4X4)
         {
             // Check if the texture is allocated in VRAM_A or VRAM_C, and
             // calculate the corresponding address in VRAM_B.
@@ -183,15 +183,47 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
     NE_AssertPointer(path, "NULL path pointer");
     NE_Assert(sizeX > 0 && sizeY > 0, "Size must be positive");
 
-    char *ptr = NE_FATLoadData(path);
+    void *ptr = NE_FATLoadData(path);
     if (ptr == NULL)
     {
         NE_DebugPrint("Couldn't load file from FAT");
         return 0;
     }
 
-    int ret = NE_MaterialTexLoad(tex, fmt, sizeX, sizeY, flags, (u8 *)ptr);
+    int ret = NE_MaterialTexLoad(tex, fmt, sizeX, sizeY, flags, ptr);
     free(ptr);
+
+    return ret;
+}
+
+int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
+                             NE_TextureFlags flags, char *path02, char *path1)
+{
+    NE_AssertPointer(tex, "NULL material pointer");
+    NE_AssertPointer(path02, "NULL path02 pointer");
+    NE_AssertPointer(path1, "NULL path1 pointer");
+    NE_Assert(sizeX > 0 && sizeY > 0, "Size must be positive");
+
+    void *texture02 = NE_FATLoadData(path02);
+    if (texture02 == NULL)
+    {
+        NE_DebugPrint("Couldn't load file from FAT");
+        return 0;
+    }
+
+    void *texture1 = NE_FATLoadData(path1);
+    if (texture1 == NULL)
+    {
+        NE_DebugPrint("Couldn't load file from FAT");
+        free(texture02);
+        return 0;
+    }
+
+    int ret = NE_MaterialTex4x4Load(tex, sizeX, sizeY, flags, texture02,
+                                    texture1);
+
+    free(texture02);
+    free(texture1);
 
     return ret;
 }
@@ -304,30 +336,17 @@ static int ne_alloc_compressed_tex(size_t size, void **slot02, void **slot1)
     return -1;
 }
 
-int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
-                       int sizeX, int sizeY, NE_TextureFlags flags,
-                       void *texture)
+int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
+                          NE_TextureFlags flags, void *texture02, void *texture1)
 {
     NE_AssertPointer(tex, "NULL material pointer");
-    NE_Assert(fmt != 0, "No texture format provided");
 
-    // The width of a texture must be a power of 2. The height doesn't need to
-    // be a power of 2, but we will have to cheat later and make the DS believe
-    // it is a power of 2.
-    if (ne_is_valid_tex_size(sizeX) != sizeX)
+    // For tex4x4 textures, both width and height must be valid
+    if ((ne_is_valid_tex_size(sizeX) != sizeX)
+        || (ne_is_valid_tex_size(sizeY) != sizeY))
     {
-        NE_DebugPrint("Width of textures must be powers of 2");
+        NE_DebugPrint("Width and height of tex4x4 textures must be a power of 2");
         return 0;
-    }
-
-    // Compressed textures are organized in 4x4 chunks.
-    if (fmt == NE_COMPRESSED)
-    {
-        if ((sizeY & 3) != 0)
-        {
-            NE_DebugPrint("Compressed textures need a height multiple of 4");
-            return 0;
-        }
     }
 
     // Check if a texture exists
@@ -351,57 +370,104 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         return 0;
     }
 
-    if (fmt == NE_COMPRESSED)
+    size_t size02 = (sizeX * sizeY) >> 2;
+    size_t size1 = size02 >> 1;
+
+    void *slot02, *slot1;
+    int ret = ne_alloc_compressed_tex(size02, &slot02, &slot1);
+    if (ret != 0)
     {
+        NE_DebugPrint("Can't find space for compressed texture");
+        return 0;
+    }
+
+    ret = NE_AllocAddress(NE_TexAllocList, slot02, size02);
+    if (ret != 0)
+    {
+        NE_DebugPrint("Can't allocate slot 0/2");
+        return 0;
+    }
+
+    ret = NE_AllocAddress(NE_TexAllocList, slot1, size1);
+    if (ret != 0)
+    {
+        NE_Free(NE_TexAllocList, slot02);
+        NE_DebugPrint("Can't allocate slot 1");
+        return 0;
+    }
+
+    // Save information
+    int slot = tex->texindex;
+    NE_Texture[slot].sizex = sizeX;
+    NE_Texture[slot].sizey = sizeY;
+    NE_Texture[slot].address = slot02;
+    NE_Texture[slot].uses = 1; // Initially only this material uses the texture
+
+    // Unlock texture memory for writing
+    // TODO: Only unlock the banks that Nitro Engine uses.
+    u32 vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
+                                        VRAM_D_LCD);
+
+    swiCopy(texture02, slot02, (size02 >> 2) | COPY_MODE_WORD);
+    swiCopy(texture1, slot1, (size1 >> 2) | COPY_MODE_WORD);
+
+    int hardware_size_y = ne_is_valid_tex_size(sizeY);
+    ne_set_material_tex_param(tex, sizeX, hardware_size_y, slot02,
+                              NE_TEX4X4, flags);
+
+    vramRestorePrimaryBanks(vramTemp);
+
+    return 1;
+}
+
+int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
+                       int sizeX, int sizeY, NE_TextureFlags flags,
+                       void *texture)
+{
+    NE_AssertPointer(tex, "NULL material pointer");
+    NE_Assert(fmt != 0, "No texture format provided");
+
+    if (fmt == NE_TEX4X4)
+    {
+        // Split tex4x4 texture into its two parts, that have been concatenated
+
         size_t size02 = (sizeX * sizeY) >> 2;
-        size_t size1 = size02 >> 1;
-
-        void *slot02, *slot1;
-        int ret = ne_alloc_compressed_tex(size02, &slot02, &slot1);
-        if (ret != 0)
-        {
-            NE_DebugPrint("Can't find space for compressed texture");
-            return 0;
-        }
-
-        ret = NE_AllocAddress(NE_TexAllocList, slot02, size02);
-        if (ret != 0)
-        {
-            NE_DebugPrint("Can't allocate slot 0/2");
-            return 0;
-        }
-
-        ret = NE_AllocAddress(NE_TexAllocList, slot1, size1);
-        if (ret != 0)
-        {
-            NE_Free(NE_TexAllocList, slot02);
-            NE_DebugPrint("Can't allocate slot 1");
-            return 0;
-        }
-
-        // Save information
-        int slot = tex->texindex;
-        NE_Texture[slot].sizex = sizeX;
-        NE_Texture[slot].sizey = sizeY;
-        NE_Texture[slot].address = slot02;
-        NE_Texture[slot].uses = 1; // Initially only this material uses the texture
-
-        // Unlock texture memory for writing
-        // TODO: Only unlock the banks that Nitro Engine uses.
-        u32 vramTemp = vramSetPrimaryBanks(VRAM_A_LCD, VRAM_B_LCD, VRAM_C_LCD,
-                                           VRAM_D_LCD);
 
         void *texture02 = texture;
         void *texture1 = (void *)((uintptr_t)texture + size02);
-        swiCopy(texture02, slot02, (size02 >> 2) | COPY_MODE_WORD);
-        swiCopy(texture1, slot1, (size1 >> 2) | COPY_MODE_WORD);
 
-        int hardware_size_y = ne_is_valid_tex_size(sizeY);
-        ne_set_material_tex_param(tex, sizeX, hardware_size_y, slot02, fmt, flags);
+        return NE_MaterialTex4x4Load(tex, sizeX, sizeY, flags,
+                                     texture02, texture1);
+    }
 
-        vramRestorePrimaryBanks(vramTemp);
+    // The width of a texture must be a power of 2. The height doesn't need to
+    // be a power of 2, but we will have to cheat later and make the DS believe
+    // it is a power of 2.
+    if (ne_is_valid_tex_size(sizeX) != sizeX)
+    {
+        NE_DebugPrint("Width of textures must be a power of 2");
+        return 0;
+    }
 
-        return 1;
+    // Check if a texture exists
+    if (tex->texindex != NE_NO_TEXTURE)
+        ne_texture_delete(tex->texindex);
+
+    // Get free slot
+    tex->texindex = NE_NO_TEXTURE;
+    for (int i = 0; i < NE_MAX_TEXTURES; i++)
+    {
+        if (NE_Texture[i].address == NULL)
+        {
+            tex->texindex = i;
+            break;
+        }
+    }
+
+    if (tex->texindex == NE_NO_TEXTURE)
+    {
+        NE_DebugPrint("No free slots");
+        return 0;
     }
 
     // All non-compressed texture types are handled here
@@ -412,7 +478,7 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
         3, // NE_PAL4
         2, // NE_PAL16
         1, // NE_PAL256
-        0, // NE_COMPRESSED (This value isn't used)
+        0, // NE_TEX4X4 (This value isn't used)
         1, // NE_A5PAL8
         0, // NE_A1RGB5
         0, // NE_RGB5
