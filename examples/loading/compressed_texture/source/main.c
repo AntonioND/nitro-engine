@@ -9,8 +9,14 @@
 #include "a5pal8_tex_bin.h"
 #include "a5pal8_pal_bin.h"
 
-#include "texture_bin.h"
-#include "palette_bin.h"
+// This has been taken from a libnds example:
+//
+// https://github.com/devkitPro/nds-examples/tree/6afa09b2054c9f47685514c32873b3905721c9ee/Graphics/3D/Paletted_Cube/data
+//
+// When img2ds supports compressed textures it will be replaced by a PNG file.
+#include "texture10_COMP_pal_bin.h"
+#include "texture10_COMP_tex_bin.h"
+#include "texture10_COMP_texExt_bin.h"
 
 NE_Material *Material1, *Material2;
 NE_Palette *Palette1, *Palette2;
@@ -43,15 +49,17 @@ int main(void)
     Palette1 = NE_PaletteCreate();
     Palette2 = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material1, NE_COMPRESSED, 128, 128, NE_TEXGEN_TEXCOORD,
-                       (u8 *)texture_bin);
+    NE_MaterialTex4x4Load(Material1, 128, 128, NE_TEXGEN_TEXCOORD,
+                          (u8 *)texture10_COMP_tex_bin,
+                          (u8 *)texture10_COMP_texExt_bin);
+    NE_PaletteLoadSize(Palette1, (u16 *)texture10_COMP_pal_bin,
+                       texture10_COMP_pal_bin_size, NE_TEX4X4);
+    NE_MaterialSetPalette(Material1, Palette1);
+
     NE_MaterialTexLoad(Material2, NE_A5PAL8, 256, 256, NE_TEXGEN_TEXCOORD,
                        (u8 *)a5pal8_tex_bin);
-
-    NE_PaletteLoadSize(Palette1, (u16 *)palette_bin, palette_bin_size, NE_COMPRESSED);
-    NE_PaletteLoadSize(Palette2, (u16 *)a5pal8_pal_bin, a5pal8_pal_bin_size, NE_A5PAL8);
-
-    NE_MaterialSetPalette(Material1, Palette1);
+    NE_PaletteLoadSize(Palette2, (u16 *)a5pal8_pal_bin, a5pal8_pal_bin_size,
+                       NE_A5PAL8);
     NE_MaterialSetPalette(Material2, Palette2);
 
     while (1)
