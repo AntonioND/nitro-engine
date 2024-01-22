@@ -1,14 +1,16 @@
 #!/bin/sh
 
-NITRO_ENGINE=$DEVKITPRO/nitro-engine
-ASSETS=$NITRO_ENGINE/examples/assets
-TOOLS=$NITRO_ENGINE/tools
-IMG2DS=$TOOLS/img2ds/img2ds.py
-
+rm -rf data
 mkdir -p data
 
-python3 $IMG2DS \
-    --input $ASSETS/a5pal8.png \
-    --name a5pal8 \
-    --output data \
-    --format A5PAL8
+# ptexconv can be obtained here: https://github.com/Garhoogin/ptexconv/
+
+/opt/blocksds/external/ptexconv/ptexconv \
+    -gt -ob -k FF00FF -v -f tex4x4 \
+    -o data/grill \
+    assets/grill.png
+
+/opt/blocksds/external/ptexconv/ptexconv \
+    -gt -ob -k FF00FF -v -f tex4x4 \
+    -o data/landscape \
+    assets/landscape.jpg
