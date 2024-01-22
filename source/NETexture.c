@@ -177,7 +177,7 @@ void NE_MaterialColorDelete(NE_Material *tex)
 
 int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
                           int sizeX, int sizeY, NE_TextureFlags flags,
-                          char *path)
+                          const char *path)
 {
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(path, "NULL path pointer");
@@ -197,7 +197,8 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
 }
 
 int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
-                             NE_TextureFlags flags, char *path02, char *path1)
+                             NE_TextureFlags flags, const char *path02,
+                             const char *path1)
 {
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(path02, "NULL path02 pointer");
@@ -337,7 +338,8 @@ static int ne_alloc_compressed_tex(size_t size, void **slot02, void **slot1)
 }
 
 int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
-                          NE_TextureFlags flags, void *texture02, void *texture1)
+                          NE_TextureFlags flags, const void *texture02,
+                          const void *texture1)
 {
     NE_AssertPointer(tex, "NULL material pointer");
 
@@ -422,7 +424,7 @@ int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
 
 int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
                        int sizeX, int sizeY, NE_TextureFlags flags,
-                       void *texture)
+                       const void *texture)
 {
     NE_AssertPointer(tex, "NULL material pointer");
     NE_Assert(fmt != 0, "No texture format provided");
@@ -433,8 +435,8 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
 
         size_t size02 = (sizeX * sizeY) >> 2;
 
-        void *texture02 = texture;
-        void *texture1 = (void *)((uintptr_t)texture + size02);
+        const void *texture02 = texture;
+        const void *texture1 = (const void *)((uintptr_t)texture + size02);
 
         return NE_MaterialTex4x4Load(tex, sizeX, sizeY, flags,
                                      texture02, texture1);

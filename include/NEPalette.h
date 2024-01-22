@@ -38,7 +38,7 @@ NE_Palette *NE_PaletteCreate(void);
 /// @param path Path of the palette.
 /// @param format Format of the palette.
 /// @return It returns 1 on success, 0 on error.
-int NE_PaletteLoadFAT(NE_Palette *pal, char *path, NE_TextureFormat format);
+int NE_PaletteLoadFAT(NE_Palette *pal, const char *path, NE_TextureFormat format);
 
 /// Assign a palette in RAM to a palette object, given its number of colors.
 ///
@@ -47,7 +47,7 @@ int NE_PaletteLoadFAT(NE_Palette *pal, char *path, NE_TextureFormat format);
 /// @param numcolor Number of colors of the palette.
 /// @param format Format of the palette.
 /// @return It returns 1 on success, 0 on error.
-int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor,
+int NE_PaletteLoad(NE_Palette *pal, const void *pointer, u16 numcolor,
                    NE_TextureFormat format);
 
 /// Assign a palette in RAM to a palette object, given its size.
@@ -60,7 +60,7 @@ int NE_PaletteLoad(NE_Palette *pal, u16 *pointer, u16 numcolor,
 /// @param size Size of the palette in bytes.
 /// @param format Format of the palette.
 /// @return It returns 1 on success, 0 on error.
-int NE_PaletteLoadSize(NE_Palette *pal, u16 *pointer, size_t size,
+int NE_PaletteLoadSize(NE_Palette *pal, const void *pointer, size_t size,
                        NE_TextureFormat format);
 
 /// Deletes a palette object.

@@ -97,7 +97,7 @@ void NE_MaterialColorDelete(NE_Material *tex);
 /// @return It returns 1 on success, 0 on error.
 int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
                           int sizeX, int sizeY, NE_TextureFlags flags,
-                          char *path);
+                          const char *path);
 
 /// Loads a texture in Texel 4x4 format from the filesystem and assigns it to a
 /// material object.
@@ -112,7 +112,8 @@ int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
 /// @param path1 Path of the texture file (part that goes in slot 1).
 /// @return It returns 1 on success, 0 on error.
 int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
-                             NE_TextureFlags flags, char *path02, char *path1);
+                             NE_TextureFlags flags, const char *path02,
+                             const char *path1);
 
 /// Loads a texture from RAM and assigns it to a material object.
 ///
@@ -140,7 +141,7 @@ int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
 /// @return It returns 1 on success, 0 on error.
 int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
                        int sizeX, int sizeY, NE_TextureFlags flags,
-                       void *texture);
+                       const void *texture);
 
 /// Loads a texture from RAM and assigns it to a material object.
 ///
@@ -154,7 +155,8 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
 /// @param texture1 Pointer to the texture data (part that goes in slot 1).
 /// @return It returns 1 on success, 0 on error.
 int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
-                          NE_TextureFlags flags, void *texture02, void *texture1);
+                          NE_TextureFlags flags, const void *texture02,
+                          const void *texture1);
 
 /// Copies the texture of a material into another material.
 ///
