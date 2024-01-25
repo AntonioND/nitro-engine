@@ -115,6 +115,18 @@ int NE_MaterialTex4x4LoadFAT(NE_Material *tex, int sizeX, int sizeY,
                              NE_TextureFlags flags, const char *path02,
                              const char *path1);
 
+/// Loads a texture in any format from a GRF file to a material and palette.
+///
+/// The size and format are obtained from the GRF header.
+///
+/// @param tex Material.
+/// @param pal Palette. If the format is 16 bit, nothing will be loaded here.
+/// @param flags Parameters of the texture.
+/// @param path Path of the GRF file.
+/// @return It returns 1 on success, 0 on error.
+int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
+                          NE_TextureFlags flags, const char *path);
+
 /// Loads a texture from RAM and assigns it to a material object.
 ///
 /// Textures with width that isn't a power of two need to be resized manually,

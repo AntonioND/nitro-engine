@@ -175,6 +175,97 @@ void NE_MaterialColorDelete(NE_Material *tex)
     tex->color = NE_White;
 }
 
+int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
+                          NE_TextureFlags flags, const char *path)
+{
+    NE_AssertPointer(tex, "NULL material pointer");
+    NE_AssertPointer(path, "NULL path pointer");
+
+    int ret = 0;
+
+    void *gfxDst = NULL;
+    void *palDst = NULL;
+    GRFHeader header = { 0 };
+    GRFError err = grfLoadPath(path, &header, &gfxDst, NULL, &palDst, NULL, NULL);
+    if (err != GRF_NO_ERROR)
+    {
+        NE_DebugPrint("Couldn't load GRF file: %d", err);
+        goto cleanup;
+    }
+
+    if (gfxDst == NULL)
+    {
+        NE_DebugPrint("No graphics found in GRF file");
+        goto cleanup;
+    }
+
+    NE_TextureFormat fmt;
+    switch (header.gfxAttr)
+    {
+        case GRF_TEXFMT_A5I3:
+            fmt = NE_A5PAL8;
+            break;
+        case GRF_TEXFMT_A3I5:
+            fmt = NE_A3PAL32;
+            break;
+        case GRF_TEXFMT_4x4:
+            fmt = NE_TEX4X4;
+            break;
+        case 16:
+            fmt = NE_A1RGB5;
+            break;
+        case 8:
+            fmt = NE_PAL256;
+            break;
+        case 4:
+            fmt = NE_PAL16;
+            break;
+        case 2:
+            fmt = NE_PAL4;
+            break;
+        default:
+            NE_DebugPrint("Invalid format in GRF file");
+            goto cleanup;
+    }
+
+    if (NE_MaterialTexLoad(tex, fmt, header.gfxWidth, header.gfxHeight,
+                           flags, gfxDst) == 0)
+    {
+        NE_DebugPrint("Failed to load GRF texture");
+        goto cleanup;
+    }
+
+    // If there is no palette to be loaded there is nothing else to do
+    if (palDst == NULL)
+    {
+        ret = 1; // Success
+        goto cleanup;
+    }
+
+    // Okay, there is a palette to load. Make sure that the user has provided a
+    // palette object.
+    if (pal == NULL)
+    {
+        NE_DebugPrint("GRF with a palette, but no palette object provided");
+        goto cleanup;
+    }
+
+    if (NE_PaletteLoadSize(pal, palDst, header.palAttr * 2, fmt) == 0)
+    {
+        NE_DebugPrint("Failed to load GRF palette");
+        goto cleanup;
+    }
+
+    NE_MaterialSetPalette(tex, pal);
+
+    ret = 1; // Success
+
+cleanup:
+    free(gfxDst);
+    free(palDst);
+    return ret;
+}
+
 int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
                           int sizeX, int sizeY, NE_TextureFlags flags,
                           const char *path)
