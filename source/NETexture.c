@@ -178,6 +178,10 @@ void NE_MaterialColorDelete(NE_Material *tex)
 int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
                           NE_TextureFlags flags, const char *path)
 {
+#ifndef NE_BLOCKSDS
+    NE_DebugPrint("%s only supported in BlocksDS", __func__);
+    return 0;
+#else // NE_BLOCKSDS
     NE_AssertPointer(tex, "NULL material pointer");
     NE_AssertPointer(path, "NULL path pointer");
 
@@ -264,6 +268,7 @@ cleanup:
     free(gfxDst);
     free(palDst);
     return ret;
+#endif // NE_BLOCKSDS
 }
 
 int NE_MaterialTexLoadFAT(NE_Material *tex, NE_TextureFormat fmt,
