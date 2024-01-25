@@ -52,7 +52,7 @@ typedef enum {
     NE_TEX4X4     = 5, ///< 4x4 compressed format
     NE_A5PAL8     = 6, ///< 8 color palette, 5 bits of alpha
     NE_A1RGB5     = 7, ///< Direct color (5 bits per channel), 1 bit of alpha
-    NE_RGB5       = 8  ///< Don't use it. Like NE_A1RGB5, but sets alpha to 1 when loading
+    NE_RGB5       = 8  ///< @deprecated Like NE_A1RGB5, but sets alpha to 1 when loading
 } NE_TextureFormat;
 
 /// Switch off a light.
