@@ -6,8 +6,8 @@
 
 #include <NEMain.h>
 
-#include "text_tex_bin.h"
-#include "text2_tex_bin.h"
+#include "text.h"
+#include "text2.h"
 
 NE_Material *Text, *Text2;
 
@@ -61,9 +61,9 @@ int main(void)
     Text = NE_MaterialCreate();
     Text2 = NE_MaterialCreate();
     NE_MaterialTexLoad(Text, NE_A1RGB5, 256, 64, NE_TEXGEN_TEXCOORD,
-                       (void *)text_tex_bin);
+                       textBitmap);
     NE_MaterialTexLoad(Text2, NE_A1RGB5, 512, 128, NE_TEXGEN_TEXCOORD,
-                       (void *)text2_tex_bin);
+                       text2Bitmap);
 
     NE_TextInit(0,     // Font slot
                 Text,  // Image

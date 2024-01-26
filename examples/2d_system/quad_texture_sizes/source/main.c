@@ -13,14 +13,10 @@
 
 #include <NEMain.h>
 
-#include "s8_tex_bin.h"
-#include "s8_pal_bin.h"
-#include "s16_tex_bin.h"
-#include "s16_pal_bin.h"
-#include "s64_tex_bin.h"
-#include "s64_pal_bin.h"
-#include "s256_tex_bin.h"
-#include "s256_pal_bin.h"
+#include "s8.h"
+#include "s16.h"
+#include "s64.h"
+#include "s256.h"
 
 NE_Material *Material_s8, *Material_s16, *Material_s64, *Material_s256;
 NE_Palette *Palette_s8, *Palette_s16, *Palette_s64, *Palette_s256;
@@ -85,21 +81,21 @@ int main(void)
 
     NE_MaterialTexLoad(Material_s8, NE_PAL16, 8, 8,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
-                       (void *)s8_tex_bin);
+                       s8Bitmap);
     NE_MaterialTexLoad(Material_s16, NE_PAL16, 16, 16,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
-                       (void *)s16_tex_bin);
+                       s16Bitmap);
     NE_MaterialTexLoad(Material_s64, NE_PAL16, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
-                       (void *)s64_tex_bin);
+                       s64Bitmap);
     NE_MaterialTexLoad(Material_s256, NE_PAL16, 256, 256,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
-                       (void *)s256_tex_bin);
+                       s256Bitmap);
 
-    NE_PaletteLoad(Palette_s8, (u16 *)s8_pal_bin, 16, NE_PAL16);
-    NE_PaletteLoad(Palette_s16, (u16 *)s16_pal_bin, 16, NE_PAL16);
-    NE_PaletteLoad(Palette_s64, (u16 *)s64_pal_bin, 16, NE_PAL16);
-    NE_PaletteLoad(Palette_s256, (u16 *)s256_pal_bin, 16, NE_PAL16);
+    NE_PaletteLoad(Palette_s8, s8Pal, 16, NE_PAL16);
+    NE_PaletteLoad(Palette_s16, s16Pal, 16, NE_PAL16);
+    NE_PaletteLoad(Palette_s64, s64Pal, 16, NE_PAL16);
+    NE_PaletteLoad(Palette_s256, s256Pal, 16, NE_PAL16);
 
     NE_MaterialSetPalette(Material_s8, Palette_s8);
     NE_MaterialSetPalette(Material_s16, Palette_s16);

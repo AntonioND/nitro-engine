@@ -6,8 +6,7 @@
 
 #include <NEMain.h>
 
-#include "icon_tex_bin.h"
-#include "icon_pal_bin.h"
+#include "icon.h"
 
 NE_Material *Material;
 NE_Palette *Palette;
@@ -32,8 +31,8 @@ int main(void)
     Palette = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material, NE_PAL16, 128, 128, NE_TEXGEN_TEXCOORD,
-                       (void *)icon_tex_bin);
-    NE_PaletteLoad(Palette, (void *)icon_pal_bin, 32, NE_PAL16);
+                       iconBitmap);
+    NE_PaletteLoad(Palette, iconPal, 32, NE_PAL16);
     NE_MaterialSetPalette(Material, Palette);
 
 

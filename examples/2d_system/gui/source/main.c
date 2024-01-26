@@ -6,12 +6,9 @@
 
 #include <NEMain.h>
 
-#include "button_tex_bin.h"
-#include "button_pal_bin.h"
-#include "empty_tex_bin.h"
-#include "empty_pal_bin.h"
-#include "true_tex_bin.h"
-#include "true_pal_bin.h"
+#include "button.h"
+#include "empty.h"
+#include "true.h"
 
 void Draw3DScene(void)
 {
@@ -50,20 +47,20 @@ int main(void)
 
     NE_MaterialTexLoad(ButtonImg, NE_PAL256, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
-                       (void *)button_tex_bin);
-    NE_PaletteLoad(ButtonPal, (void *)button_pal_bin, 256, NE_PAL256);
+                       buttonBitmap);
+    NE_PaletteLoad(ButtonPal, buttonPal, 256, NE_PAL256);
     NE_MaterialSetPalette(ButtonImg, ButtonPal);
 
     NE_MaterialTexLoad(EmptyImg, NE_PAL256, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
-                       (void *)empty_tex_bin);
-    NE_PaletteLoad(EmptyPal, (void *)empty_pal_bin, 256, NE_PAL256);
+                       emptyBitmap);
+    NE_PaletteLoad(EmptyPal, emptyPal, 256, NE_PAL256);
     NE_MaterialSetPalette(EmptyImg, EmptyPal);
 
     NE_MaterialTexLoad(TrueImg, NE_PAL256, 64, 64,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_COLOR0_TRANSPARENT,
-                       (void *)true_tex_bin);
-    NE_PaletteLoad(TruePal, (void *)true_pal_bin, 256, NE_PAL256);
+                       trueBitmap);
+    NE_PaletteLoad(TruePal, truePal, 256, NE_PAL256);
     NE_MaterialSetPalette(TrueImg, TruePal);
 
 
