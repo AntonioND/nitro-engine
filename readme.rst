@@ -18,8 +18,8 @@ Features:
   <https://github.com/AntonioND/dsma-library>`_, which converts MD5 models (with
   skeletal animation) into a format that can be rendered with hardware
   acceleration. It can also blend two animations together (for transitions).
-- Support for all format of textures (even compressed textures, but the
-  converter included in this repository doesn't support them yet).
+- Support for all format of textures (even compressed textures, thanks to 
+  `ptexconv <https://github.com/Garhoogin/ptexconv>`_).
 - Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
 - Functions to render 2D images accelerated by 3D hardware.
 - Basic text system.
