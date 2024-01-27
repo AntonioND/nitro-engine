@@ -66,18 +66,15 @@ int main(void)
     Material2 = NE_MaterialCreate();
     Palette2 = NE_PaletteCreate();
 
-    int ret;
-    ret = NE_MaterialTexLoadGRF(Material1, NULL, NE_TEXGEN_TEXCOORD,
-                                "a1rgb5_png.grf");
-    if (ret == 0)
+    if (NE_MaterialTexLoadGRF(Material1, NULL, NE_TEXGEN_TEXCOORD,
+                              "a1rgb5_png.grf") == 0)
     {
         printf("Failed to load GRF 1\n");
         WaitLoop();
     }
 
-    ret = NE_MaterialTexLoadGRF(Material2, Palette2, NE_TEXGEN_TEXCOORD,
-                                "a3pal32_png.grf");
-    if (ret == 0)
+    if (NE_MaterialTexLoadGRF(Material2, Palette2, NE_TEXGEN_TEXCOORD,
+                              "a3pal32_png.grf") == 0)
     {
         printf("Failed to load GRF 2\n");
         WaitLoop();
