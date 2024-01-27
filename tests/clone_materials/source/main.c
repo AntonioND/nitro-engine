@@ -6,8 +6,7 @@
 
 #include <NEMain.h>
 
-#include "a3pal32_pal_bin.h"
-#include "a3pal32_tex_bin.h"
+#include "a3pal32.h"
 
 #define NUM_CLONES 5
 
@@ -39,8 +38,8 @@ int main(void)
     NE_MaterialTexLoad(Material[0],
                        NE_A3PAL32, // Texture type
                        64, 200,    // Width, height (in pixels)
-                       NE_TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
-    NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
+                       NE_TEXGEN_TEXCOORD, a3pal32Bitmap);
+    NE_PaletteLoad(Palette, a3pal32Pal, 32, NE_A3PAL32);
     NE_MaterialSetPalette(Material[0], Palette);
 
     for (int i = 1; i < NUM_CLONES; i++)
