@@ -322,6 +322,10 @@ def convert_img(in_path, out_name, out_folder, out_format):
         if height not in VALID_TEXTURE_SIZES:
             print(f"WARN: Height {height} is not a valid texture size")
 
+        if out_format != "DEPTHBMP":
+            print(f"WARN: Formats other than DEPTHBMP are deprecated in img2ds.")
+            print(f"WARN: Use grit to convert your textures instead.")
+
         if out_format == "A1RGB5":
             texture, palette = convert_a1rgb5(img)
         elif out_format == "DEPTHBMP":
@@ -351,7 +355,7 @@ if __name__ == "__main__":
     import sys
     import traceback
 
-    print("img2ds v0.1.0")
+    print("img2ds v0.1.1")
     print("Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>")
     print("All rights reserved")
     print("")
