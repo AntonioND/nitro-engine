@@ -248,7 +248,7 @@ void NE_PaletteDefragMem(void)
 
             if ((int)pointer != (int)NE_PalInfo[i].pointer)
             {
-                dmaCopy((void*)NE_PalInfo[i].pointer, pointer, size);
+                dmaCopy((void *)NE_PalInfo[i].pointer, pointer, size);
 
                 NE_PalInfo[i].pointer = (void*)pointer;
                 ok = false;

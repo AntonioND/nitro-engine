@@ -833,7 +833,7 @@ void NE_TextureDefragMem(void)
 
             if (pointer != NE_Texture[i].address)
             {
-                dmaCopy((void*) NE_Texture[i].address, pointer, size);
+                dmaCopy((void *)NE_Texture[i].address, pointer, size);
                 NE_Texture[i].address = pointer;
                 NE_Texture[i].param &= 0xFFFF0000;
                 NE_Texture[i].param |= ((uint32_t)pointer >> 3) & 0xFFFF;
