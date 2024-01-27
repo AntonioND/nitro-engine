@@ -47,10 +47,10 @@ int main(void)
         Model[i] = NE_ModelCreate(NE_Static);
         Physics[i] = NE_PhysicsCreate(NE_BoundingBox);
 
-        NE_ModelLoadStaticMesh(Model[i], (u32 *)cube_bin);
+        NE_ModelLoadStaticMesh(Model[i], cube_bin);
 
         NE_PhysicsSetModel(Physics[i], // Physics object
-                           (void *)Model[i]); // Model assigned to it
+                           Model[i]); // Model assigned to it
 
         NE_PhysicsEnable(Physics[i], false);
         NE_PhysicsSetSize(Physics[i], 1, 1, 1);

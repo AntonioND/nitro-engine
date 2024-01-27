@@ -61,7 +61,7 @@ int main(void)
                     0, 1, 0);
 
     // Load model once
-    NE_ModelLoadStaticMesh(Model[0], (u32 *)sphere_bin);
+    NE_ModelLoadStaticMesh(Model[0], sphere_bin);
 
     // Clone model to the test of the objects
     for (int i = 1; i < NUM_MODELS; i++)

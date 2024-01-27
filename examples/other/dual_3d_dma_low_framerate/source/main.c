@@ -56,8 +56,8 @@ int main(void)
                  0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Teapot, (u32 *)teapot_bin);
-    NE_ModelLoadStaticMesh(Sphere, (u32 *)sphere_bin);
+    NE_ModelLoadStaticMesh(Teapot, teapot_bin);
+    NE_ModelLoadStaticMesh(Sphere, sphere_bin);
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);

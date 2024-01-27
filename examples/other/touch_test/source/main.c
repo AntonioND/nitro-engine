@@ -79,7 +79,7 @@ int main(void)
 
     // Load model
     for (int i = 0; i < 10; i++)
-        NE_ModelLoadStaticMesh(Model[i], (u32 *)sphere_bin);
+        NE_ModelLoadStaticMesh(Model[i], sphere_bin);
 
     // Set up lights
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);

@@ -64,7 +64,7 @@ int main(void)
                  0, 1, 0);
 
     Model = NE_ModelCreate(NE_Static);
-    NE_ModelLoadStaticMesh(Model, (u32 *)cube_bin);
+    NE_ModelLoadStaticMesh(Model, cube_bin);
 
     NE_LightSet(0, NE_Yellow, -1, -1, 0);
     NE_LightSet(1, NE_Red, -1, 1, 0);

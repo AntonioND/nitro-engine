@@ -53,16 +53,14 @@ int main(void)
     Palette2 = NE_PaletteCreate();
 
     NE_MaterialTex4x4Load(Material1, 128, 128, NE_TEXGEN_TEXCOORD,
-                          (u8 *)grill_tex_bin,
-                          (u8 *)grill_idx_bin);
-    NE_PaletteLoadSize(Palette1, (u16 *)grill_pal_bin, grill_pal_bin_size,
+                          grill_tex_bin, grill_idx_bin);
+    NE_PaletteLoadSize(Palette1, grill_pal_bin, grill_pal_bin_size,
                        NE_TEX4X4);
     NE_MaterialSetPalette(Material1, Palette1);
 
     NE_MaterialTex4x4Load(Material2, 128, 128, NE_TEXGEN_TEXCOORD,
-                          (u8 *)landscape_tex_bin,
-                          (u8 *)landscape_idx_bin);
-    NE_PaletteLoadSize(Palette2, (u16 *)landscape_pal_bin,
+                          landscape_tex_bin, landscape_idx_bin);
+    NE_PaletteLoadSize(Palette2, landscape_pal_bin,
                        landscape_pal_bin_size, NE_TEX4X4);
     NE_MaterialSetPalette(Material2, Palette2);
 

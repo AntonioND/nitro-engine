@@ -49,7 +49,7 @@ int main(void)
                  0, 1, 0);  // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, (u32 *)teapot_bin);
+    NE_ModelLoadStaticMesh(Model, teapot_bin);
 
     // Load a RGB texture from RAM and assign it to "Material".
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256,

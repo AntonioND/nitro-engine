@@ -14,7 +14,7 @@
 // The name you will have to use is "binfilename_bin". For example, for loading
 // "model.bin" you will have to use:
 //
-//     NE_ModelLoadStaticMesh(Model, (u32 *)binfilename_bin);
+//     NE_ModelLoadStaticMesh(Model, binfilename_bin);
 //
 #include "robot_bin.h"
 #include "texture.h"
@@ -55,7 +55,7 @@ int main(void)
                   0, 1, 0); // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, (u32 *)robot_bin);
+    NE_ModelLoadStaticMesh(Model, robot_bin);
     // Load a RGB texture from RAM and assign it to "Material".
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        textureBitmap);

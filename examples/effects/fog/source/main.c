@@ -54,9 +54,9 @@ int main(void)
                   0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Model, (u32 *)sphere_bin);
-    NE_ModelLoadStaticMesh(Model2, (u32 *)sphere_bin);
-    NE_ModelLoadStaticMesh(Model3, (u32 *)sphere_bin);
+    NE_ModelLoadStaticMesh(Model, sphere_bin);
+    NE_ModelLoadStaticMesh(Model2, sphere_bin);
+    NE_ModelLoadStaticMesh(Model3, sphere_bin);
 
     // Load texture
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
