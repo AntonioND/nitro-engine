@@ -17,7 +17,7 @@
 
 #include <NEMain.h>
 
-#include "background_tex_bin.h"
+#include "background.h"
 #include "depth_tex_bin.h"
 #include "cube_bin.h"
 
@@ -51,7 +51,7 @@ int main(void)
 
     // Copy data into VRAM
     vramSetBankC(VRAM_C_LCD);
-    dmaCopy(background_tex_bin, VRAM_C, background_tex_bin_size);
+    dmaCopy(backgroundBitmap, VRAM_C, backgroundBitmapLen * 2);
     vramSetBankD(VRAM_D_LCD);
     dmaCopy(depth_tex_bin, VRAM_D, depth_tex_bin_size);
 

@@ -9,7 +9,7 @@
 #include <NEMain.h>
 
 #include "teapot_bin.h"
-#include "teapot_tex_bin.h"
+#include "teapot.h"
 
 // Note: There are better ways to do this, for example, using the VBL interrupt
 // to check if the second has changed.
@@ -54,7 +54,7 @@ int main(void)
     // Load a RGB texture from RAM and assign it to "Material".
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
-                       (u8 *)teapot_tex_bin);
+                       teapotBitmap);
 
     // Assign texture to model...
     NE_ModelSetMaterial(Model, Material);

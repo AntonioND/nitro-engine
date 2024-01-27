@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "texture_tex_bin.h"
+#include "texture.h"
 
 NE_Camera *Camera;
 NE_Material *Material;
@@ -59,7 +59,7 @@ int main(void)
                  0, 1, 0);
 
     NE_MaterialTexLoad(Material, NE_A1RGB5, 128, 128, NE_TEXGEN_TEXCOORD,
-                       (u8 *)texture_tex_bin);
+                       textureBitmap);
 
     while (1)
     {

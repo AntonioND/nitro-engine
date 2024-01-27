@@ -17,7 +17,7 @@
 //     NE_ModelLoadStaticMesh(Model, (u32 *)binfilename_bin);
 //
 #include "robot_bin.h"
-#include "texture_tex_bin.h"
+#include "texture.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -58,7 +58,7 @@ int main(void)
     NE_ModelLoadStaticMesh(Model, (u32 *)robot_bin);
     // Load a RGB texture from RAM and assign it to "Material".
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (u8 *)texture_tex_bin);
+                       textureBitmap);
 
     // Assign texture to model...
     NE_ModelSetMaterial(Model, Material);

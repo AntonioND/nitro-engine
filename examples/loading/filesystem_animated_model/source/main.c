@@ -81,7 +81,7 @@ int main(void)
     }
 
     if (NE_MaterialTexLoadFAT(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                              "texture_tex.bin") == 0)
+                              "texture.img.bin") == 0)
     {
         printf("Couldn't load texture...");
         WaitLoop();

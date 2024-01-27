@@ -6,8 +6,7 @@
 
 #include <NEMain.h>
 
-#include "pal256_tex_bin.h"
-#include "pal256_pal_bin.h"
+#include "pal256.h"
 
 NE_Material *Material;
 NE_Palette *Palette;
@@ -37,8 +36,8 @@ int main(void)
 
     // Load texture
     NE_MaterialTexLoad(Material, NE_PAL256, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (void *)pal256_tex_bin);
-    NE_PaletteLoad(Palette, (void *)pal256_pal_bin, 32, NE_PAL256);
+                       pal256Bitmap);
+    NE_PaletteLoad(Palette, pal256Pal, 32, NE_PAL256);
     NE_MaterialSetPalette(Material, Palette);
 
     // Modify color 254 of the palette so that we can use it to draw with a

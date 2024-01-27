@@ -4,8 +4,9 @@ NITRO_ENGINE=$DEVKITPRO/nitro-engine
 ASSETS=$NITRO_ENGINE/examples/assets
 TOOLS=$NITRO_ENGINE/tools
 MD5_TO_DSMA=$TOOLS/md5_to_dsma/md5_to_dsma.py
-IMG2DS=$TOOLS/img2ds/img2ds.py
+GRIT=grit
 
+rm -rf nitrofiles
 mkdir -p nitrofiles
 
 python3 $MD5_TO_DSMA \
@@ -17,8 +18,7 @@ python3 $MD5_TO_DSMA \
     --skip-frames 1 \
     --blender-fix
 
-python3 $IMG2DS \
-    --input $ASSETS/teapot.png \
-    --name texture \
-    --output nitrofiles \
-    --format A1RGB5
+$GRIT \
+    graphics/texture.png \
+    -ftb -fh! -W1 \
+    -onitrofiles/texture

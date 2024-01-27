@@ -23,8 +23,8 @@ TARGET   := $(shell basename $(CURDIR))
 BUILD    := build
 SOURCES  := source
 INCLUDES := include
-DATA     := data
-GRAPHICS :=
+DATA     :=
+GRAPHICS := graphics
 AUDIO    :=
 ICON     :=
 

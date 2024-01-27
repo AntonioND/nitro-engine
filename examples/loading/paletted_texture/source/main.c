@@ -6,11 +6,8 @@
 
 #include <NEMain.h>
 
-#include "a5pal8_tex_bin.h"
-#include "a5pal8_pal_bin.h"
-
-#include "a3pal32_tex_bin.h"
-#include "a3pal32_pal_bin.h"
+#include "a5pal8.h"
+#include "a3pal32.h"
 
 NE_Material *Material1, *Material2;
 NE_Palette *Palette1, *Palette2;
@@ -51,14 +48,14 @@ int main(void)
     // Load part of the texture ignoring some of its height. You can't do
     // this with width because of how textures are laid out in VRAM.
     NE_MaterialTexLoad(Material1, NE_A3PAL32, 256, 192, NE_TEXGEN_TEXCOORD,
-                       (u8 *)a3pal32_tex_bin);
+                       a3pal32Bitmap);
 
     // Load complete texture
     NE_MaterialTexLoad(Material2, NE_A5PAL8, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (u8 *)a5pal8_tex_bin);
+                       a5pal8Bitmap);
 
-    NE_PaletteLoad(Palette1, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
-    NE_PaletteLoad(Palette2, (u16 *)a5pal8_pal_bin, 32, NE_A5PAL8);
+    NE_PaletteLoad(Palette1, a3pal32Pal, 32, NE_A3PAL32);
+    NE_PaletteLoad(Palette2, a5pal8Pal, 32, NE_A5PAL8);
 
     NE_MaterialSetPalette(Material1, Palette1);
     NE_MaterialSetPalette(Material2, Palette2);

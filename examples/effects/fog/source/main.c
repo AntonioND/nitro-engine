@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "texture_tex_bin.h"
+#include "texture.h"
 #include "sphere_bin.h"
 
 NE_Camera *Camera;
@@ -60,7 +60,7 @@ int main(void)
 
     // Load texture
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (u8 *)texture_tex_bin);
+                       textureBitmap);
 
     // Assign the same material to every model object.
     NE_ModelSetMaterial(Model, Material);

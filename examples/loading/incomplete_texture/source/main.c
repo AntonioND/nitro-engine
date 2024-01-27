@@ -6,10 +6,8 @@
 
 #include <NEMain.h>
 
-#include "a3pal32_pal_bin.h"
-#include "a3pal32_tex_bin.h"
-#include "pal4_pal_bin.h"
-#include "pal4_tex_bin.h"
+#include "a3pal32.h"
+#include "pal4.h"
 
 NE_Material *Material, *Material2;
 NE_Palette *Palette, *Palette2;
@@ -59,8 +57,8 @@ int main(void)
     NE_MaterialTexLoad(Material,
                        NE_A3PAL32, // Texture type
                        64, 200,    // Width, height (in pixels)
-                       NE_TEXGEN_TEXCOORD, (u8 *)a3pal32_tex_bin);
-    NE_PaletteLoad(Palette, (u16 *)a3pal32_pal_bin, 32, NE_A3PAL32);
+                       NE_TEXGEN_TEXCOORD, a3pal32Bitmap);
+    NE_PaletteLoad(Palette, a3pal32Pal, 32, NE_A3PAL32);
     NE_MaterialSetPalette(Material, Palette);
 
     // Allocate objects for another material
@@ -68,8 +66,8 @@ int main(void)
     Palette2 = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material2, NE_PAL4, 64, 100, NE_TEXGEN_TEXCOORD,
-                       (u8 *)pal4_tex_bin);
-    NE_PaletteLoad(Palette2, (u16 *)pal4_pal_bin, 4, NE_PAL4);
+                       pal4Bitmap);
+    NE_PaletteLoad(Palette2, pal4Pal, 4, NE_PAL4);
     NE_MaterialSetPalette(Material2, Palette2);
 
     while (1)

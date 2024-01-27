@@ -1,3 +1,4 @@
 BINDIRS	:= data
+GFXDIRS	:= graphics
 
 include ../../Makefile.example.blocksds

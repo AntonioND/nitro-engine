@@ -9,7 +9,7 @@
 #include "robot_dsm_bin.h"
 #include "robot_walk_dsa_bin.h"
 #include "robot_wave_dsa_bin.h"
-#include "texture_tex_bin.h"
+#include "texture.h"
 
 NE_Camera *Camera;
 NE_Model *Model;
@@ -54,7 +54,7 @@ int main(void)
 
     Texture = NE_MaterialCreate();
     NE_MaterialTexLoad(Texture, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (void *)texture_tex_bin);
+                       textureBitmap);
 
     NE_ModelSetMaterial(Model, Texture);
 

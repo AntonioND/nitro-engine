@@ -6,8 +6,8 @@
 
 #include <NEMain.h>
 
-#include "a5pal8_tex_bin.h"
-#include "a5pal8_pal_bin.h"
+#include "a5pal8.h"
+#include "a5pal8.h"
 
 NE_Material *Material;
 NE_Palette *Palette;
@@ -40,9 +40,9 @@ int main(void)
     Palette = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material, NE_A5PAL8, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (u8 *)a5pal8_tex_bin);
+                       a5pal8Bitmap);
 
-    NE_PaletteLoad(Palette, (u16 *)a5pal8_pal_bin, 32, NE_A5PAL8);
+    NE_PaletteLoad(Palette, a5pal8Pal, 32, NE_A5PAL8);
 
     NE_MaterialSetPalette(Material, Palette);
 

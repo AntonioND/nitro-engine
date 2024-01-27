@@ -65,12 +65,12 @@ int main(void)
     NE_ModelLoadStaticMeshFAT(Model, "cube.bin");
 
     NE_MaterialTexLoadFAT(MaterialBlue, NE_A3PAL32, 64, 64, NE_TEXGEN_TEXCOORD,
-                          "spiral_blue_pal32_tex.bin");
+                          "spiral_blue_pal32.img.bin");
     NE_MaterialTexLoadFAT(MaterialRed, NE_A3PAL32, 64, 64, NE_TEXGEN_TEXCOORD,
-                          "spiral_red_pal32_tex.bin");
+                          "spiral_red_pal32.img.bin");
 
-    NE_PaletteLoadFAT(PaletteBlue, "spiral_blue_pal32_pal.bin", NE_A3PAL32);
-    NE_PaletteLoadFAT(PaletteRed, "spiral_red_pal32_pal.bin", NE_A3PAL32);
+    NE_PaletteLoadFAT(PaletteBlue, "spiral_blue_pal32.pal.bin", NE_A3PAL32);
+    NE_PaletteLoadFAT(PaletteRed, "spiral_red_pal32.pal.bin", NE_A3PAL32);
 
     NE_MaterialSetPalette(MaterialBlue, PaletteBlue);
     NE_MaterialSetPalette(MaterialRed, PaletteRed);

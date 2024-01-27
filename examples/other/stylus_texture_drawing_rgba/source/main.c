@@ -6,7 +6,7 @@
 
 #include <NEMain.h>
 
-#include "a1rgb5_tex_bin.h"
+#include "a1rgb5.h"
 
 NE_Material *Material;
 
@@ -26,8 +26,8 @@ int main(void)
     NE_MainScreenSetOnBottom();
 
     Material = NE_MaterialCreate();
-    NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                       (u8 *)a1rgb5_tex_bin);
+    NE_MaterialTexLoad(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
+                       a1rgb5Bitmap);
 
     // Wait a bit...
     scanKeys();
