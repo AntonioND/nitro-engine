@@ -1,6 +1,32 @@
 Changelog
 =========
 
+Version 0.10.0 (2024-01-28)
+---------------------------
+
+- Create variants of ``NE_Process()`` and ``NE_ProcessDual()`` that can pass an
+  argument to the screen draw callbacks.
+
+- Add function to load textures in GRF format (BlocksDS only).
+
+- Add functions to load compressed textures (Texel 4x4 format).
+
+- Add examples to load assets from the filesystem, both in binary and GRF
+  function.
+
+- Cleanup code style: Use stdint types, turn some functions ``static inline``...
+
+- Remove unneeded call to ``DC_FlushAll()``.
+
+- ``obj2dl``: Improve error message. Fix vertical coordinates being flipped.
+
+- ``img2ds``: Deprecate it except for generating ``DEPTHBMP`` binaries.
+
+- The makefile for BlocksDS now installs the tools to ``/opt/blockds/external``,
+  not only the library and headers.
+
+- Migrate all examples to using ``grit`` instead of ``img2ds``.
+
 Version 0.9.1 (2023-11-12)
 --------------------------
 
