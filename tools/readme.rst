@@ -14,7 +14,10 @@ The following tools are used to export models created on the PC to the NDS:
 
   https://github.com/AntonioND/dsma-library
 
-- **img2ds** (WIP)
+- **img2ds**
 
   Converts images in several formats to NDS textures and palettes. It is
   recommended to use PNG files with transparency.
+
+  This tool has been deprecated. You should only use it for the depth bitmap
+  (DEPTHBMP), as this conversion isn't supported by any other tool.
