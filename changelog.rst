@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.DEV (XXXX-XX-XX)
+--------------------------
+
+- Fix "properties" typo. This involves renaming some functions, but compatibilty
+  definitions have been added.
+
 Version 0.10.0 (2024-01-28)
 ---------------------------
 
@@ -196,9 +202,9 @@ Version 0.6.0 (2009-6-30)
 - The functions used to modify textures and palettes now return a pointer to the
   data so that you can modify them easily.
 
-- Each material can have different propierties (amient, diffuse...). You can set
-  the default ones, the propierties each new material will have, and then you
-  can set each material's propierties individually.
+- Each material can have different properties (amient, diffuse...). You can set
+  the default ones, the properties each new material will have, and then you
+  can set each material's properties individually.
 
 - New texture and palette allocation system, it is faster and better.
   Defragmenting functions don't work now, but I'll fix them for the next

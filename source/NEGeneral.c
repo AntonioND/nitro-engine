@@ -273,9 +273,9 @@ static void ne_init_registers(void)
     NE_ShininessTableGenerate(NE_SHININESS_CUBIC);
 
     // setup default material properties
-    NE_MaterialSetDefaultPropierties(RGB15(20, 20, 20), RGB15(16, 16, 16),
-                                     RGB15(8, 8, 8), RGB15(5, 5, 5),
-                                     false, true);
+    NE_MaterialSetDefaultProperties(RGB15(20, 20, 20), RGB15(16, 16, 16),
+                                    RGB15(8, 8, 8), RGB15(5, 5, 5),
+                                    false, true);
 
     // Turn off some things...
     for (int i = 0; i < 4; i++)

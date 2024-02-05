@@ -63,8 +63,8 @@ int main(void)
     // Assign material to the model
     NE_ModelSetMaterial(Model, Material);
 
-    // Set some propierties to the material
-    NE_MaterialSetPropierties(Material,
+    // Set some properties to the material
+    NE_MaterialSetProperties(Material,
                   RGB15(24, 24, 24), // Diffuse
                   RGB15(8, 8, 8),    // Ambient
                   RGB15(0, 0, 0),    // Specular

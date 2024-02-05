@@ -307,7 +307,7 @@ int NE_TextureGetRealSizeX(const NE_Material *tex);
 /// @return Returns the size in pixels.
 int NE_TextureGetRealSizeY(const NE_Material *tex);
 
-/// Sets lighting propierties of this material.
+/// Sets lighting properties of this material.
 ///
 /// @param tex Material to modify.
 /// @param diffuse Set diffuse color: lights that directly hits the polygon.
@@ -319,11 +319,17 @@ int NE_TextureGetRealSizeY(const NE_Material *tex);
 /// @param vtxcolor If true, diffuse reflection will work as a color command.
 /// @param useshininess If true, specular reflection will use the shininess
 ///                     table.
-void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse, u32 ambient,
-                               u32 specular, u32 emission, bool vtxcolor,
-                               bool useshininess);
+void NE_MaterialSetProperties(NE_Material *tex, u32 diffuse, u32 ambient,
+                              u32 specular, u32 emission, bool vtxcolor,
+                              bool useshininess);
 
-/// Sets default lighting propierties of materials when they are created.
+/// Alias of NE_MaterialSetProperties
+///
+/// @deprecated This definition is only present for backwards compatibility and
+/// it will be removed.
+#define NE_MaterialSetPropierties NE_MaterialSetProperties
+
+/// Sets default lighting properties of materials when they are created.
 ///
 /// @param diffuse Set diffuse color: lights that directly hits the polygon.
 /// @param ambient Set ambient color: lights that indirectly hit the polygon
@@ -334,9 +340,15 @@ void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse, u32 ambient,
 /// @param vtxcolor If true, diffuse reflection will work as a color command.
 /// @param useshininess If true, specular reflection will use the shininess
 ///                     table.
-void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient, u32 specular,
-                                      u32 emission, bool vtxcolor,
-                                      bool useshininess);
+void NE_MaterialSetDefaultProperties(u32 diffuse, u32 ambient, u32 specular,
+                                     u32 emission, bool vtxcolor,
+                                     bool useshininess);
+
+/// Alias of NE_MaterialSetDefaultProperties
+///
+/// @deprecated This definition is only present for backwards compatibility and
+/// it will be removed.
+#define NE_MaterialSetDefaultPropierties NE_MaterialSetDefaultProperties
 
 /// Enables modification of the specified texture.
 ///

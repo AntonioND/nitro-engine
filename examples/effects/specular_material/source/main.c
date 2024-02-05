@@ -76,21 +76,21 @@ int main(void)
     NE_ModelSetMaterial(ModelSpecular, MaterialSpecular);
     NE_ModelSetMaterial(ModelDiffuse, MaterialDiffuse);
 
-    // Set some propierties to the materials
+    // Set some properties to the materials
 
-    NE_MaterialSetPropierties(MaterialSpecular,
-                              RGB15(0, 0, 0),    // Diffuse
-                              RGB15(0, 0, 0),    // Ambient
-                              RGB15(31, 31, 31), // Specular
-                              RGB15(0, 0, 0),    // Emission
-                              false, true);      // Vtx color, use shininess table
+    NE_MaterialSetProperties(MaterialSpecular,
+                             RGB15(0, 0, 0),    // Diffuse
+                             RGB15(0, 0, 0),    // Ambient
+                             RGB15(31, 31, 31), // Specular
+                             RGB15(0, 0, 0),    // Emission
+                             false, true);      // Vtx color, use shininess table
 
-    NE_MaterialSetPropierties(MaterialDiffuse,
-                              RGB15(31, 31, 31), // Diffuse
-                              RGB15(0, 0, 0),    // Ambient
-                              RGB15(0, 0, 0),    // Specular
-                              RGB15(0, 0, 0),    // Emission
-                              false, false);     // Vtx color, use shininess table
+    NE_MaterialSetProperties(MaterialDiffuse,
+                             RGB15(31, 31, 31), // Diffuse
+                             RGB15(0, 0, 0),    // Ambient
+                             RGB15(0, 0, 0),    // Specular
+                             RGB15(0, 0, 0),    // Emission
+                             false, false);     // Vtx color, use shininess table
 
     // Set light color and direction
     NE_LightSet(0, NE_White, 0, 1, 0);

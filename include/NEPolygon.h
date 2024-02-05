@@ -14,7 +14,7 @@
 
 /// @defgroup other_functions Other functions
 ///
-/// Some functions to set lights and its propierties, to draw polygons, configure
+/// Some functions to set lights and its properties, to draw polygons, configure
 /// the rear plane, etc...
 ///
 /// @{
@@ -265,7 +265,7 @@ void NE_OutliningSetColor(u32 index, u32 color);
 
 /// Setup shading tables for toon shading.
 ///
-/// For the shading to look nice, change the propierties of materials affecte
+/// For the shading to look nice, change the properties of materials affecte
 /// by this to, for example:
 ///
 /// - AMBIENT = RGB15(8, 8, 8)

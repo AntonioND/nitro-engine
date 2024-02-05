@@ -28,7 +28,7 @@ static bool ne_texture_system_inited = false;
 
 static int NE_MAX_TEXTURES;
 
-// Default material propierties
+// Default material properties
 static u32 ne_default_diffuse_ambient;
 static u32 ne_default_specular_emission;
 
@@ -914,18 +914,18 @@ int NE_TextureGetSizeY(const NE_Material *tex)
     return NE_Texture[tex->texindex].sizey;
 }
 
-void NE_MaterialSetPropierties(NE_Material *tex, u32 diffuse,
-                               u32 ambient, u32 specular, u32 emission,
-                               bool vtxcolor, bool useshininess)
+void NE_MaterialSetProperties(NE_Material *tex, u32 diffuse,
+                              u32 ambient, u32 specular, u32 emission,
+                              bool vtxcolor, bool useshininess)
 {
     NE_AssertPointer(tex, "NULL pointer");
     tex->diffuse_ambient = diffuse | (ambient << 16) | (vtxcolor << 15);
     tex->specular_emission = specular | (emission << 16) | (useshininess << 15);
 }
 
-void NE_MaterialSetDefaultPropierties(u32 diffuse, u32 ambient,
-                                      u32 specular, u32 emission,
-                                      bool vtxcolor, bool useshininess)
+void NE_MaterialSetDefaultProperties(u32 diffuse, u32 ambient,
+                                     u32 specular, u32 emission,
+                                     bool vtxcolor, bool useshininess)
 {
     ne_default_diffuse_ambient = diffuse | (ambient << 16) | (vtxcolor << 15);
     ne_default_specular_emission = specular | (emission << 16)
