@@ -190,7 +190,8 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
     void *gfxDst = NULL;
     void *palDst = NULL;
     GRFHeader header = { 0 };
-    GRFError err = grfLoadPath(path, &header, &gfxDst, NULL, &palDst, NULL, NULL);
+    GRFError err = grfLoadPath(path, &header, &gfxDst, NULL, NULL, NULL,
+                               &palDst, NULL);
     if (err != GRF_NO_ERROR)
     {
         NE_DebugPrint("Couldn't load GRF file: %d", err);
