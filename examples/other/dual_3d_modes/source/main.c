@@ -84,6 +84,8 @@ int main(void)
 
     init_all();
 
+    bool console = true;
+
     while (1)
     {
         NE_WaitForVBL(0);
@@ -96,14 +98,17 @@ int main(void)
         uint32_t keys = keysHeld();
         uint32_t kdown = keysDown();
 
-        printf("\x1b[0;0H"
-               "START: Lock CPU until released\n"
-               "A: Sine effect.\n"
-               "B: Deactivate effect.\n"
-               "SELECT: Dual 3D DMA mode\n"
-               "X: Dual 3D FB mode (no console)\n"
-               "Y: Dual 3D mode\n"
-               "Pad: Rotate.\n");
+        if (console)
+        {
+            printf("\x1b[0;0H"
+                   "START: Lock CPU until released\n"
+                   "A: Sine effect.\n"
+                   "B: Deactivate effect.\n"
+                   "SELECT: Dual 3D DMA mode\n"
+                   "X: Dual 3D FB mode (no console)\n"
+                   "Y: Dual 3D mode\n"
+                   "Pad: Rotate.\n");
+        }
 
         // Lock CPU in an infinite loop to simulate a drop in framerate
         while (keys & KEY_START)
@@ -147,12 +152,14 @@ int main(void)
             NE_InitDual3D();
             NE_InitConsole();
             init_all();
+            console = true;
         }
         if (kdown & KEY_X)
         {
             NE_SpecialEffectSet(0);
             NE_InitDual3D_FB();
             init_all();
+            console = false;
         }
         if (kdown & KEY_SELECT)
         {
@@ -160,6 +167,7 @@ int main(void)
             NE_InitDual3D_DMA();
             NE_InitConsole();
             init_all();
+            console = true;
         }
     }
 
