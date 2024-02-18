@@ -27,8 +27,6 @@ static NE_ExecutionModes ne_execution_mode = NE_ModeUninitialized;
 
 NE_Input ne_input;
 
-static SpriteEntry *NE_Sprites; // 2D sprites used for Dual 3D mode
-
 static int ne_znear, ne_zfar;
 static int fov;
 
@@ -74,8 +72,6 @@ void NE_End(void)
 
             vramSetBankC(VRAM_C_LCD);
             vramSetBankD(VRAM_D_LCD);
-
-            free(NE_Sprites);
 
             if (NE_UsingConsole)
                 vramSetBankF(VRAM_F_LCD);
@@ -338,44 +334,50 @@ int NE_Init3D(void)
     return 0;
 }
 
-static void ne_setup_sprites(void)
+// Setup 2D sprites used for Dual 3D mode
+static int ne_setup_sprites(void)
 {
+    SpriteEntry *Sprites = calloc(128, sizeof(SpriteEntry));
+    if (Sprites == NULL)
+    {
+        NE_DebugPrint("Not enough memory");
+        return -1;
+    }
+
     // Reset sprites
     for (int i = 0; i < 128; i++)
-        NE_Sprites[i].attribute[0] = ATTR0_DISABLED;
+        Sprites[i].attribute[0] = ATTR0_DISABLED;
 
     int i = 0;
     for (int y = 0; y < 3; y++)
     {
         for (int x = 0; x < 4; x++)
         {
-            NE_Sprites[i].attribute[0] = ATTR0_BMP | ATTR0_SQUARE | (64 * y);
-            NE_Sprites[i].attribute[1] = ATTR1_SIZE_64 | (64 * x);
-            NE_Sprites[i].attribute[2] = ATTR2_ALPHA(1) | (8 * 32 * y)
-                                       | (8 * x);
+            Sprites[i].attribute[0] = ATTR0_BMP | ATTR0_SQUARE | (64 * y);
+            Sprites[i].attribute[1] = ATTR1_SIZE_64 | (64 * x);
+            Sprites[i].attribute[2] = ATTR2_ALPHA(1) | (8 * 32 * y) | (8 * x);
             i++;
         }
     }
+
+    DC_FlushRange(Sprites, sizeof(SpriteEntry) * 128);
+
+    dmaCopy(Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
+
+    free(Sprites);
+
+    return 0;
 }
 
 int NE_InitDual3D(void)
 {
     NE_End();
 
-    NE_Sprites = calloc(128, sizeof(SpriteEntry));
-    if (NE_Sprites == NULL)
-    {
-        NE_DebugPrint("Not enough memory");
-        return -1;
-    }
-
     if (ne_systems_reset_all(NE_VRAM_AB) != 0)
-    {
-        free(NE_Sprites);
-        return -2;
-    }
+        return -1;
 
-    ne_setup_sprites();
+    if (ne_setup_sprites() != 0)
+        return -2;
 
     NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
 
@@ -412,17 +414,11 @@ int NE_InitDual3D_FB(void)
 {
     NE_End();
 
-    NE_Sprites = calloc(128, sizeof(SpriteEntry));
-    if (NE_Sprites == NULL)
-    {
-        NE_DebugPrint("Not enough memory");
-        return -1;
-    }
-
     if (ne_systems_reset_all(NE_VRAM_AB) != 0)
-        return -2;
+        return -1;
 
-    ne_setup_sprites();
+    if (ne_setup_sprites() != 0)
+        return -2;
 
     NE_DisplayListSetDefaultFunction(NE_DL_DMA_GFX_FIFO);
 
@@ -694,8 +690,6 @@ static void ne_process_dual_3d_common_end(void)
 {
     GFX_FLUSH = GL_TRANS_MANUALSORT;
 
-    dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
-
     NE_Screen ^= 1;
 }
 
@@ -775,8 +769,6 @@ static void ne_process_dual_3d_fb_common_start(void)
 static void ne_process_dual_3d_fb_common_end(void)
 {
     GFX_FLUSH = GL_TRANS_MANUALSORT;
-
-    dmaCopy(NE_Sprites, OAM_SUB, 128 * sizeof(SpriteEntry));
 
     NE_Screen ^= 1;
 }
