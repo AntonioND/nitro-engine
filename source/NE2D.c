@@ -80,6 +80,9 @@ void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat)
     NE_AssertPointer(sprite, "NULL sprite pointer");
     NE_AssertPointer(mat, "NULL material pointer");
     sprite->mat = mat;
+
+    sprite->w = NE_TextureGetSizeX(mat);
+    sprite->h = NE_TextureGetSizeY(mat);
 }
 
 void NE_SpriteSetPriority(NE_Sprite *sprite, int priority)

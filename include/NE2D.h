@@ -85,6 +85,9 @@ void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale);
 
 /// Assign a material to a sprite.
 ///
+/// This will also set the size of the sprite to the size of the texture of that
+/// material.
+///
 /// @param sprite Sprite.
 /// @param mat Material.
 void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat);
