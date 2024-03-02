@@ -109,6 +109,7 @@ Screenshots of some of the examples included with Nitro Engine:
 .. |specular_material| image:: screenshots/specular_material.png
 .. |screen_effects| image:: screenshots/screen_effects.png
 .. |sprites| image:: screenshots/sprites.png
+.. |text| image:: screenshots/text.png
 
 +------------------+-------------------+
 | Animated model   | Box tower physics |
@@ -127,6 +128,12 @@ Screenshots of some of the examples included with Nitro Engine:
 +------------------+-------------------+
 | |screen_effects| | |sprites|         |
 +------------------+-------------------+
+
++------------------+
+| Text             |
++------------------+
+| |text|           |
++------------------+
 
 Contact
 =======
