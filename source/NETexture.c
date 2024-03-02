@@ -151,6 +151,7 @@ NE_Material *NE_MaterialCreate(void)
         NE_UserMaterials[i] = mat;
         mat->texindex = NE_NO_TEXTURE;
         mat->palette = NULL;
+        mat->palette_autodelete = false;
         mat->color = NE_White;
         mat->diffuse_ambient = ne_default_diffuse_ambient;
         mat->specular_emission = ne_default_specular_emission;
@@ -635,6 +636,13 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
     return 1;
 }
 
+void NE_MaterialAutodeletePalette(NE_Material *mat)
+{
+    NE_AssertPointer(mat, "NULL material pointer");
+
+    mat->palette_autodelete = true;
+}
+
 void NE_MaterialClone(NE_Material *source, NE_Material *dest)
 {
     NE_AssertPointer(source, "NULL source pointer");
@@ -769,6 +777,10 @@ cleanup:
 void NE_MaterialDelete(NE_Material *tex)
 {
     NE_AssertPointer(tex, "NULL pointer");
+
+    // Delete the palette if it has been flagged to be autodeleted
+    if (tex->palette_autodelete)
+        NE_PaletteDelete(tex->palette);
 
     // If there is an asigned texture
     if (tex->texindex != NE_NO_TEXTURE)

@@ -29,11 +29,12 @@
 
 /// Holds information of one material.
 typedef struct {
-    int texindex;           ///< Index to internal texture object
-    NE_Palette *palette;    ///< Palette used by this material
-    u32 color;              ///< Color of this material when lights aren't used
-    u32 diffuse_ambient;    ///< Diffuse and ambient lighting material color
-    u32 specular_emission;  ///< Specular and emission lighting material color
+    int texindex;            ///< Index to internal texture object
+    NE_Palette *palette;     ///< Palette used by this material
+    u32 color;               ///< Color of this material when lights aren't used
+    u32 diffuse_ambient;     ///< Diffuse and ambient lighting material color
+    u32 specular_emission;   ///< Specular and emission lighting material color
+    bool palette_autodelete; ///< Set to true for the palette to be deleted with the material.
 } NE_Material;
 
 /// Supported texture options
@@ -169,6 +170,16 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
 int NE_MaterialTex4x4Load(NE_Material *tex, int sizeX, int sizeY,
                           NE_TextureFlags flags, const void *texture02,
                           const void *texture1);
+
+/// Tell a material that it has to delete its palette on deletion.
+///
+/// Normally, when a material is deleted, the palette isn't deleted with it.
+/// This function will tell the material to delete its palette when
+/// NE_MaterialDelete() is called. This is helpful because it lets the developer
+/// stop caring about the palette.
+///
+/// @param mat Material.
+void NE_MaterialAutodeletePalette(NE_Material *mat);
 
 /// Copies the texture of a material into another material.
 ///
