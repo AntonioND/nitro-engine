@@ -179,6 +179,10 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
                           NE_TextureFlags flags, const char *path)
 {
 #ifndef NE_BLOCKSDS
+    (void)tex;
+    (void)pal;
+    (void)flags;
+    (void)path;
     NE_DebugPrint("%s only supported in BlocksDS", __func__);
     return 0;
 #else // NE_BLOCKSDS
