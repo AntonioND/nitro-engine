@@ -28,6 +28,10 @@
 ///
 /// You need to export fonts in binary format, and the images in PNG format.
 ///
+/// Note: If the replacement character � (`U+FFFD`) codepoint is included in the
+/// font, it will be used to print missing characters in the font, or when the
+/// UTF-8 string has encoding errors.
+///
 /// @{
 
 #define NE_MAX_RICH_TEXT_FONTS 8 ///< Default max number of rich text fonts
