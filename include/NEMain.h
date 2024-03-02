@@ -37,6 +37,7 @@ extern "C" {
 #include "NEPalette.h"
 #include "NEPhysics.h"
 #include "NEPolygon.h"
+#include "NERichText.h"
 #include "NEText.h"
 #include "NETexture.h"
 

@@ -15,9 +15,9 @@ include $(DEVKITARM)/ds_rules
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-SOURCES		:=	source source/dsma
+SOURCES		:=	source source/dsma source/libdsf
 DATA		:=	data
-INCLUDES	:=	include
+INCLUDES	:=	include source/libdsf
 
 ifeq ($(NE_DEBUG),1)
 	TARGET	:=	NE_debug

@@ -17,7 +17,7 @@
 /// for that.
 ///
 /// You need to call NE_2DViewInit() before using any of the text drawing
-/// functions..
+/// functions.
 ///
 /// @{
 
