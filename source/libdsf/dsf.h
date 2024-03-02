@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Zlib
+// SPDX-License-Identifier: Zlib OR MIT
 //
 // Copyright (c) 2024 Antonio Niño Díaz
 
