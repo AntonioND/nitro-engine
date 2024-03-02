@@ -1,5 +1,5 @@
 ####################
-Nitro Engine v0.10.0
+Nitro Engine v0.11.0
 ####################
 
 Introduction
@@ -22,7 +22,8 @@ Features:
   `ptexconv <https://github.com/Garhoogin/ptexconv>`_).
 - Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
 - Functions to render 2D images accelerated by 3D hardware.
-- Basic text system.
+- Text system based on `libDSF <https://github.com/AntonioND/libdsf>`_, which is
+  based on `BMFont <https://www.angelcode.com/products/bmfont/>`_.
 - Basic GUI elements like buttons and scrollbars.
 - Basic physic system: Axis-aligned bounding boxes (AABB) only.
 

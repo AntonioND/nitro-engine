@@ -1,11 +1,11 @@
 Changelog
 =========
 
-Version 0.DEV (XXXX-XX-XX)
---------------------------
+Version 0.11.0 (2024-03-02)
+---------------------------
 
 - Added a rich text system. This allows the user to draw non-monospaced text,
-  and it's based on [BMFont](https://www.angelcode.com/products/bmfont/). An
+  and it's based on `BMFont <https://www.angelcode.com/products/bmfont/>`_. An
   example has been added to show how to use it to render text. It can render
   text by using one quad per character, or by rendering to a texture which is
   then drawn as a single quad.
