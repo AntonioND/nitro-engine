@@ -4,8 +4,18 @@ Changelog
 Version 0.DEV (XXXX-XX-XX)
 --------------------------
 
+- Added a rich text system. This allows the user to draw non-monospaced text,
+  and it's based on [BMFont](https://www.angelcode.com/products/bmfont/). An
+  example has been added to show how to use it to render text. It can render
+  text by using one quad per character, or by rendering to a texture which is
+  then drawn as a single quad.
 - Fix "properties" typo. This involves renaming some functions, but compatibilty
   definitions have been added.
+- Update calls to GRF libnds functions after their prototypes have changed.
+- Cleanup setup of dual 3D modes that involve setting up 2D sprites to be used
+  as a framebuffer.
+- Now the size of a sprite is set to the size of the material it is assigned. It
+  can be modified later as usual.
 
 Version 0.10.0 (2024-01-28)
 ---------------------------
