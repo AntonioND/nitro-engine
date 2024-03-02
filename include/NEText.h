@@ -12,9 +12,11 @@
 
 /// @defgroup text_system Text system
 ///
-/// Text drawing functions using the 3D hardware. The functions accept '\n', but
-/// not things like '%d', '%s', etc. You'll need to use snprintf() or similar
-/// for that.
+/// Monospaced text drawing functions using the 3D hardware. Use the rich text
+/// module if you want a more useful text system.
+///
+/// The functions accept '\n', but not things like '%d', '%s', etc. You'll need
+/// to use snprintf() or similar for that.
 ///
 /// You need to call NE_2DViewInit() before using any of the text drawing
 /// functions.
