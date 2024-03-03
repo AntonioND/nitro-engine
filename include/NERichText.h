@@ -105,6 +105,13 @@ int NE_RichTextMaterialSet(u32 slot, NE_Material *mat, NE_Palette *pal);
 /// be used whenever the user uses NE_RichTextRenderMaterial() to render text to
 /// a new material.
 ///
+/// Also, note that this texture doesn't need to have a size that is a power of
+/// two. However, consider that the size of a row should at least be a multiple
+/// of a full byte (for example, for a 16 color texture, don't use a texture
+/// with width of 143 because the last byte won't be full). To be sure that you
+/// never find any issue, ensure that your textures have a width multiple of 4
+/// pixels, that will work with all texture formats.
+///
 /// This is required for NE_RichTextRenderMaterial().
 ///
 /// This isn't required for NE_RichTextRender3D() or NE_RichTextRender3DAlpha().
