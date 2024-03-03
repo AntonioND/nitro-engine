@@ -20,16 +20,16 @@
 /// Minor version of LibDSF (semver)
 #define LIBDSF_VERSION_MINOR 1
 /// Patch version of LibDSF (semver)
-#define LIBDSF_VERSION_PATCH 0
+#define LIBDSF_VERSION_PATCH 1
 
 /// Value that combines all version numbers, useful for version checks.
 #define LIBDSF_VERSION \
                 ((LIBDSF_VERSION_MAJOR << 16) | \
                  (LIBDSF_VERSION_MINOR << 8) | \
-                 (LIBDSF_VERSION_PATCH << 0))
+                 (LIBDSF_VERSION_PATCH << 1))
 
 /// Version string
-#define LIBDSF_VERSION_STRING "0.1.0"
+#define LIBDSF_VERSION_STRING "0.1.1"
 
 /// Character that is used when there are UTF-8 decoding errors.
 ///
@@ -151,6 +151,13 @@ dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
 /// This function won't load the texture to VRAM. The returned buffer needs to
 /// be loaded to texture VRAM to be used (with functions like glTexImage2D() or
 /// NE_MaterialTexLoad()).
+///
+/// Also, note that this texture doesn't need to have a size that is a power of
+/// two. However, consider that the size of a row should at least be a multiple
+/// of a full byte (for example, for a 16 color texture, don't use a texture
+/// with width of 143 because the last byte won't be full). To be sure that you
+/// never find any issue, ensure that your textures have a width multiple of 4
+/// pixels, that will work with all texture formats.
 ///
 /// @param handle       Handler of the font to use.
 /// @param str          String to print.
