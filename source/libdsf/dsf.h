@@ -20,7 +20,7 @@
 /// Minor version of LibDSF (semver)
 #define LIBDSF_VERSION_MINOR 1
 /// Patch version of LibDSF (semver)
-#define LIBDSF_VERSION_PATCH 1
+#define LIBDSF_VERSION_PATCH 2
 
 /// Value that combines all version numbers, useful for version checks.
 #define LIBDSF_VERSION \
@@ -29,7 +29,7 @@
                  (LIBDSF_VERSION_PATCH << 1))
 
 /// Version string
-#define LIBDSF_VERSION_STRING "0.1.1"
+#define LIBDSF_VERSION_STRING "0.1.2"
 
 /// Character that is used when there are UTF-8 decoding errors.
 ///

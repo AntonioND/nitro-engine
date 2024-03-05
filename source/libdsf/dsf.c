@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <nds.h>
 
@@ -84,27 +85,48 @@ typedef struct {
     int16_t       box_top;
     uint32_t      last_codepoint;
 
-    // If the font includes a replacement character glyph, its index will be
+    // If the font includes a replacement character glyph, its pointer will be
     // saved here for ease of access.
-    int32_t       replacement_character_id;
+    const block_char *replacement_character;
 } dsf_font_internal_state;
 
 // Functions
 // ---------
 
-static int DSF_CodepointFindGlyphIndex(dsf_handle handle, uint32_t codepoint)
+static int DSF_block_char_cmp(const void *a, const void *b)
+{
+    const block_char *a_ = a;
+    const block_char *b_ = b;
+    return a_->id - b_->id;
+}
+
+static int DSF_kerning_pair_cmp(const void *a, const void *b)
+{
+    const kerning_pair *a_ = a;
+    const kerning_pair *b_ = b;
+
+    // Compare the first codepoint. If it matches, compare the second codepoint.
+    if (a_->first != b_->first)
+        return a_->first - b_->first;
+
+    return a_->second - b_->second;
+}
+
+static const block_char *DSF_CodepointFindGlyph(dsf_handle handle,
+                                                uint32_t codepoint)
 {
     dsf_font_internal_state *font = (dsf_font_internal_state *)handle;
 
-    for (size_t i = 0; i < font->num_chars; i++)
-    {
-        block_char *ch = &(font->chars[i]);
+    // Codepoint to find
+    block_char key = { 0 };
+    key.id = codepoint;
 
-        if (ch->id == codepoint)
-            return i;
-    }
+    const block_char *ch = bsearch(&key, font->chars, font->num_chars,
+                                   sizeof(block_char), DSF_block_char_cmp);
+    if (ch == NULL)
+        return font->replacement_character;
 
-    return font->replacement_character_id;
+    return ch;
 }
 
 static dsf_error DSF_LoadFile(const char *path, void **data, size_t *_size)
@@ -228,6 +250,9 @@ dsf_error DSF_LoadFontMemory(dsf_handle *handle,
             }
 
             memcpy(font->chars, data, block_size);
+
+            qsort(font->chars, font->num_chars, sizeof(block_char),
+                  DSF_block_char_cmp);
         }
         else if (type == 5)
         {
@@ -255,6 +280,9 @@ dsf_error DSF_LoadFontMemory(dsf_handle *handle,
                 dst += sizeof(kerning_pair);
                 src += sizeof(bmf_block_5_kerning_pair);
             }
+
+            qsort(font->kernings, font->num_kernings, sizeof(kerning_pair),
+                  DSF_kerning_pair_cmp);
         }
 
         ptr += block_size + 1 + 4;
@@ -278,11 +306,11 @@ dsf_error DSF_LoadFontMemory(dsf_handle *handle,
 
     // Look for a replacement character glyph in the font.
 
-    // Initialize the value to -1 so that DSF_CodepointFindGlyphIndex() returns
-    // -1 if no replacement character glyph is found.
-    font->replacement_character_id = -1;
-    font->replacement_character_id =
-                    DSF_CodepointFindGlyphIndex(*handle, REPLACEMENT_CHARACTER);
+    // Initialize the value to NULL so that DSF_CodepointFindGlyph() returns
+    // NULL if no replacement character glyph is found.
+    font->replacement_character = NULL;
+    font->replacement_character =
+                    DSF_CodepointFindGlyph(*handle, REPLACEMENT_CHARACTER);
 
     return DSF_NO_ERROR;
 
@@ -406,11 +434,9 @@ dsf_error DSF_CodepointRenderDryRun(dsf_handle handle, uint32_t codepoint)
         return DSF_NO_ERROR;
     }
 
-    int index = DSF_CodepointFindGlyphIndex(handle, codepoint);
-    if (index < 0)
+    const block_char *ch = DSF_CodepointFindGlyph(handle, codepoint);
+    if (ch == NULL)
         return DSF_CODEPOINT_NOT_FOUND;
-
-    block_char *ch = &(font->chars[index]);
 
     int x1 = font->pointer_x;
     int x2 = x1 + ch->width;
@@ -424,16 +450,15 @@ dsf_error DSF_CodepointRenderDryRun(dsf_handle handle, uint32_t codepoint)
 
     font->pointer_x += ch->xadvance;
 
-    for (size_t i = 0; i < font->num_kernings; i++)
+    // Kerning pair to find
+    kerning_pair key = { 0 };
+    key.first = font->last_codepoint;
+    key.second = codepoint;
+
+    const kerning_pair *ker = bsearch(&key, font->kernings, font->num_kernings,
+                                      sizeof(kerning_pair), DSF_kerning_pair_cmp);
+    if (ker != NULL)
     {
-        kerning_pair *ker = &(font->kernings[i]);
-
-        if (ker->first != font->last_codepoint)
-            continue;
-
-        if (ker->second != codepoint)
-            continue;
-
         x1 += ker->amount;
         x2 += ker->amount;
         font->pointer_x += ker->amount;
@@ -459,11 +484,9 @@ static dsf_error DSF_CodepointRender3D(dsf_handle handle, uint32_t codepoint,
         return DSF_NO_ERROR;
     }
 
-    int index = DSF_CodepointFindGlyphIndex(handle, codepoint);
-    if (index < 0)
+    const block_char *ch = DSF_CodepointFindGlyph(handle, codepoint);
+    if (ch == NULL)
         return DSF_CODEPOINT_NOT_FOUND;
-
-    block_char *ch = &(font->chars[index]);
 
     int tx1 = ch->x;
     int tx2 = tx1 + ch->width;
@@ -482,16 +505,15 @@ static dsf_error DSF_CodepointRender3D(dsf_handle handle, uint32_t codepoint,
 
     font->pointer_x += ch->xadvance;
 
-    for (size_t i = 0; i < font->num_kernings; i++)
+    // Kerning pair to find
+    kerning_pair key = { 0 };
+    key.first = font->last_codepoint;
+    key.second = codepoint;
+
+    const kerning_pair *ker = bsearch(&key, font->kernings, font->num_kernings,
+                                      sizeof(kerning_pair), DSF_kerning_pair_cmp);
+    if (ker != NULL)
     {
-        kerning_pair *ker = &(font->kernings[i]);
-
-        if (ker->first != font->last_codepoint)
-            continue;
-
-        if (ker->second != codepoint)
-            continue;
-
         x1 += ker->amount;
         x2 += ker->amount;
         font->pointer_x += ker->amount;
@@ -657,11 +679,9 @@ static dsf_error DSF_CodepointRenderBuffer(dsf_handle handle,
         return DSF_NO_ERROR;
     }
 
-    int index = DSF_CodepointFindGlyphIndex(handle, codepoint);
-    if (index < 0)
+    const block_char *ch = DSF_CodepointFindGlyph(handle, codepoint);
+    if (ch == NULL)
         return DSF_CODEPOINT_NOT_FOUND;
-
-    block_char *ch = &(font->chars[index]);
 
     int tx1 = ch->x;
     int ty1 = ch->y;
@@ -678,16 +698,15 @@ static dsf_error DSF_CodepointRenderBuffer(dsf_handle handle,
 
     font->pointer_x += ch->xadvance;
 
-    for (size_t i = 0; i < font->num_kernings; i++)
+    // Kerning pair to find
+    kerning_pair key = { 0 };
+    key.first = font->last_codepoint;
+    key.second = codepoint;
+
+    const kerning_pair *ker = bsearch(&key, font->kernings, font->num_kernings,
+                                      sizeof(kerning_pair), DSF_kerning_pair_cmp);
+    if (ker != NULL)
     {
-        kerning_pair *ker = &(font->kernings[i]);
-
-        if (ker->first != font->last_codepoint)
-            continue;
-
-        if (ker->second != codepoint)
-            continue;
-
         x1 += ker->amount;
         x2 += ker->amount;
         font->pointer_x += ker->amount;
