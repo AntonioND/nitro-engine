@@ -162,7 +162,7 @@ void Draw3DSceneDark(void *arg)
 
     // Draw shadow volume as a yellow volume (light)
     NE_MaterialUse(NULL);
-    NE_PolyColor(NE_Yellow);
+    NE_PolyColor(RGB15(15, 15, 0));
 
     if (Scene->draw_edges)
     {
