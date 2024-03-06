@@ -55,7 +55,7 @@ int main(void)
 
     // Load mesh from RAM and assign it to a model
     NE_ModelLoadStaticMesh(Model, teapot_bin);
-    // Load teapot from RAM and assign it to a material
+    // Load teapot texture from RAM and assign it to a material
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
                        teapotBitmap);
