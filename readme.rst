@@ -108,6 +108,7 @@ Screenshots of some of the examples included with Nitro Engine:
 .. |fog| image:: screenshots/fog.png
 .. |specular_material| image:: screenshots/specular_material.png
 .. |screen_effects| image:: screenshots/screen_effects.png
+.. |shadow_volume| image:: screenshots/shadow_volume.png
 .. |sprites| image:: screenshots/sprites.png
 .. |text| image:: screenshots/text.png
 
@@ -124,16 +125,16 @@ Screenshots of some of the examples included with Nitro Engine:
 +------------------+---------------------+
 
 +------------------+-------------------+
+| Text             | Shadow volume     |
++------------------+-------------------+
+| |text|           | |shadow_volume|   |
++------------------+-------------------+
+
++------------------+-------------------+
 | Screen effects   | 2D sprites        |
 +------------------+-------------------+
 | |screen_effects| | |sprites|         |
 +------------------+-------------------+
-
-+------------------+
-| Text             |
-+------------------+
-| |text|           |
-+------------------+
 
 Contact
 =======
