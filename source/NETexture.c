@@ -252,21 +252,41 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
         goto cleanup;
     }
 
-    // Okay, there is a palette to load. Make sure that the user has provided a
-    // palette object.
+    // There is a palette to load.
+
+    // If the user has provided a palette object, use that one to store the
+    // palette. If not, create a palette object and mark it to be autodeleted
+    // when the material is deleted.
+    bool create_palette = false;
+
     if (pal == NULL)
     {
         NE_DebugPrint("GRF with a palette, but no palette object provided");
-        goto cleanup;
+        create_palette = true;
+    }
+
+    if (create_palette)
+    {
+        pal = NE_PaletteCreate();
+        if (pal == NULL)
+        {
+            NE_DebugPrint("Not enough memory for palette object");
+            goto cleanup;
+        }
     }
 
     if (NE_PaletteLoadSize(pal, palDst, header.palAttr * 2, fmt) == 0)
     {
         NE_DebugPrint("Failed to load GRF palette");
+        if (create_palette)
+            NE_PaletteDelete(pal);
         goto cleanup;
     }
 
     NE_MaterialSetPalette(tex, pal);
+
+    if (create_palette)
+        NE_MaterialAutodeletePalette(tex);
 
     ret = 1; // Success
 
