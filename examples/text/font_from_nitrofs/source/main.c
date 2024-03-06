@@ -60,13 +60,13 @@ int main(void)
         WaitLoop();
     }
 
-    // Load a 256-color font to be used for rendering text as quads
+    // Load a 16-color font to be used for rendering text as quads
 
     NE_RichTextInit(2);
     NE_RichTextMetadataLoadFAT(2, "fonts/font.fnt");
     NE_RichTextMaterialLoadGRF(2, "fonts/font_16_png.grf");
 
-    // Load a 16-color font to be used for rendering text as quads
+    // Load a 256-color font to be used for rendering text as quads
 
     NE_RichTextInit(3);
     NE_RichTextMetadataLoadFAT(3, "fonts/font.fnt");
