@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
         Scene.Teapot = NE_ModelCreate(NE_Static);
         Scene.Material = NE_MaterialCreate();
 
-        // Load meshe from RAM and assign it to a model
+        // Load mesh from RAM and assign it to a model
         NE_ModelLoadStaticMesh(Scene.Teapot, teapot_bin);
 
         // Load teapot texture from RAM and assign it to a material
