@@ -175,9 +175,7 @@ int NE_RichTextMaterialSet(u32 slot, NE_Material *mat, NE_Palette *pal)
 int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
 {
 #ifndef NE_BLOCKSDS
-    (void)tex;
-    (void)pal;
-    (void)flags;
+    (void)slot;
     (void)path;
     NE_DebugPrint("%s only supported in BlocksDS", __func__);
     return 0;
