@@ -99,7 +99,7 @@ void NE_OutliningSetColor(u32 index, u32 color)
     GFX_EDGE_TABLE[index] = color;
 }
 
-void NE_ShadingEnable(bool value)
+void NE_SetupToonShadingTables(bool value)
 {
     if (value)
     {

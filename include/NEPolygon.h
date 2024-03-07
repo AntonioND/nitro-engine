@@ -274,7 +274,9 @@ void NE_OutliningSetColor(u32 index, u32 color);
 /// - EMISSION = RGB15(0, 0, 0)
 ///
 /// @param value True sets up tables for toon shading, false clears them.
-void NE_ShadingEnable(bool value);
+void NE_SetupToonShadingTables(bool value);
+
+#define NE_ShadingEnable NE_SetupToonShadingTables
 
 /// Set highlight shading or toon shading modes.
 ///
