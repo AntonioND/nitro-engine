@@ -85,6 +85,12 @@ int NE_RichTextEnd(u32 slot)
     return 1;
 }
 
+void NE_RichTextResetSystem(void)
+{
+    for (int i = 0; i < NE_MAX_RICH_TEXT_FONTS; i++)
+        NE_RichTextEnd(i);
+}
+
 int NE_RichTextMetadataLoadFAT(u32 slot, const char *path)
 {
     NE_AssertPointer(path, "NULL path pointer");

@@ -44,6 +44,9 @@ void NE_RichTextPrioritySet(int priority);
 /// Set to 0 the priority of rich text drawn after this function call.
 void NE_RichTextPriorityReset(void);
 
+/// Clears all rich text font slots.
+void NE_RichTextResetSystem(void);
+
 /// Initialize a rich text slot.
 ///
 /// @param slot The slot to initialize (from 0 to NE_MAX_RICH_TEXT_FONTS).
