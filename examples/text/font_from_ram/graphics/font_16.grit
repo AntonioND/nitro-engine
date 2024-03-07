@@ -1,0 +1,2 @@
+# 16-color texture, set black as transparent color
+-gx -gb -gB4 -gT000000
