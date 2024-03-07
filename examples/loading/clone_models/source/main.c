@@ -73,9 +73,6 @@ int main(void)
     // Set up light
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);
 
-    // Enable shading
-    NE_ShadingEnable(true);
-
     // Set start coordinates/rotation of the models
     for (int i = 0; i < NUM_MODELS; i++)
     {

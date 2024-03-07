@@ -85,9 +85,6 @@ int main(void)
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);
     NE_LightSet(1, NE_Red, 0, -0.5, -0.5);
 
-    // Enable shading
-    NE_ShadingEnable(true);
-
     // Wait a bit
     swiWaitForVBlank();
     swiWaitForVBlank();

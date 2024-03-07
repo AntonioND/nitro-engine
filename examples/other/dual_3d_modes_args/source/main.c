@@ -52,9 +52,6 @@ void init_all(void)
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
-
-    // Enable shading
-    NE_ShadingEnable(true);
 }
 
 int main(void)

@@ -56,9 +56,6 @@ int main(void)
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
 
-    // Enable shading
-    NE_ShadingEnable(true);
-
     // Other test configurations
     //NE_SpecialEffectNoiseConfig(31);
     //NE_SpecialEffectSineConfig(3, 8);
