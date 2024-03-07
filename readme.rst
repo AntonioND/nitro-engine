@@ -158,8 +158,7 @@ The full text of the licenses can be found under the ``licenses`` folder.
 Future work
 ===========
 
-- Asynchronous loading of assets.
-- Support for compressed textures.
+- Asynchronous loading of assets (loading textures during VBL).
 
 Thanks to
 =========
