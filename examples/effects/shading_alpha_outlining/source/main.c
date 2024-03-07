@@ -75,7 +75,7 @@ int main(void)
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
 
     // This enables shading (you can choose normal or toon).
-    NE_ShadingEnable(true);
+    NE_SetupToonShadingTables(true);
     // This enables outlining in all polygons, so be careful
     NE_OutliningEnable(true);
 
