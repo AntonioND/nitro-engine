@@ -121,6 +121,39 @@ int NE_RichTextMaterialSet(u32 slot, NE_Material *mat, NE_Palette *pal);
 /// @return Returns 1 on success, 0 on failure.
 int NE_RichTextBitmapLoadGRF(u32 slot, const char *path);
 
+/// Assign a texture (and palette) to be used to render text to textures.
+///
+/// This doesn't load the texture to VRAM, it keeps it in RAM. The texture will
+/// be used whenever the user uses NE_RichTextRenderMaterial() to render text to
+/// a new material.
+///
+/// The buffers provided won't be freed when the text font is cleared with
+/// NE_RichTextEnd(), they have to be freed manually.
+///
+/// Also, note that this texture doesn't need to have a size that is a power of
+/// two. However, consider that the size of a row should at least be a multiple
+/// of a full byte (for example, for a 16 color texture, don't use a texture
+/// with width of 143 because the last byte won't be full). To be sure that you
+/// never find any issue, ensure that your textures have a width multiple of 4
+/// pixels, that will work with all texture formats.
+///
+/// This is required for NE_RichTextRenderMaterial().
+///
+/// This isn't required for NE_RichTextRender3D() or NE_RichTextRender3DAlpha().
+///
+/// @param slot The slot to use.
+/// @param texture_buffer Pointer to the texture.
+/// @param texture_width Width of the texture.h
+/// @param texture_height Height of the texture.
+/// @param texture_fmt Format of the texture.
+/// @param palette_buffer Pointer to the palette.
+/// @param palette_size Size of the palette in bytes.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
+                         size_t texture_width, size_t texture_height,
+                         NE_TextureFormat texture_fmt,
+                         const void *palette_buffer, size_t palette_size);
+
 /// Render a string by rendering one 3D quad per codepoint.
 ///
 /// This preserves the polygon format that is currently active.

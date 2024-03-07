@@ -16,6 +16,7 @@ typedef struct {
     NE_Palette *palette;
 
     // Fields used when the font texture is stored in RAM
+    bool has_to_free_buffers;
     NE_TextureFormat fmt;
     void *texture_buffer;
     size_t texture_width;
@@ -59,10 +60,13 @@ int NE_RichTextEnd(u32 slot)
     if (info->palette != NULL)
         NE_PaletteDelete(info->palette);
 
-    if (info->texture_buffer != NULL)
-        free(info->texture_buffer);
-    if (info->palette_buffer != NULL)
-        free(info->palette_buffer);
+    if (info->has_to_free_buffers)
+    {
+        if (info->texture_buffer != NULL)
+            free(info->texture_buffer);
+        if (info->palette_buffer != NULL)
+            free(info->palette_buffer);
+    }
 
     int ret = 0;
 
@@ -189,10 +193,13 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
     if (!info->active)
         return 0;
 
-    if (info->texture_buffer != NULL)
-        free(info->texture_buffer);
-    if (info->palette_buffer != NULL)
-        free(info->palette_buffer);
+    if (info->has_to_free_buffers)
+    {
+        if (info->texture_buffer != NULL)
+            free(info->texture_buffer);
+        if (info->palette_buffer != NULL)
+            free(info->palette_buffer);
+    }
 
     int ret = 0;
 
@@ -265,6 +272,8 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
         info->palette_size = 0;
     }
 
+    info->has_to_free_buffers = true;
+
     ret = 1; // Success
 
 cleanup:
@@ -272,6 +281,39 @@ cleanup:
     free(palDst);
     return ret;
 #endif // NE_BLOCKSDS
+}
+
+int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
+                         size_t texture_width, size_t texture_height,
+                         NE_TextureFormat texture_fmt,
+                         const void *palette_buffer, size_t palette_size)
+{
+    NE_AssertPointer(texture_buffer, "NULL texture pointer");
+    NE_AssertPointer(palette_buffer, "NULL palette pointer");
+
+    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+        return 0;
+
+    ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
+    if (!info->active)
+        return 0;
+
+    if (info->has_to_free_buffers)
+    {
+        if (info->texture_buffer != NULL)
+            free(info->texture_buffer);
+        if (info->palette_buffer != NULL)
+            free(info->palette_buffer);
+    }
+
+    info->texture_buffer = (void *)texture_buffer;
+    info->texture_width = texture_width;
+    info->texture_height = texture_height;
+    info->fmt = texture_fmt;
+    info->palette_buffer = (void *)palette_buffer;
+    info->palette_size = palette_size;
+
+    return 1;
 }
 
 int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
