@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2024
 //
 // This file is part of Nitro Engine
 
@@ -28,48 +28,56 @@
 #include "teapot_bin.h"
 #include "sphere_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Teapot, *Sphere;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Teapot, *Sphere;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_ClearColorSet(NE_Red, 31, 63);
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Teapot);
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Teapot);
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_ClearColorSet(NE_Green, 31, 63);
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Sphere);
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Sphere);
 }
 
-void init_all(void)
+void init_all(SceneData *Scene)
 {
     // Allocate objects...
-    Teapot = NE_ModelCreate(NE_Static);
-    Sphere = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
+    Scene->Teapot = NE_ModelCreate(NE_Static);
+    Scene->Sphere = NE_ModelCreate(NE_Static);
+    Scene->Camera = NE_CameraCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene->Camera,
                  0, 0, -2,
                  0, 0, 0,
                  0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Teapot, teapot_bin);
-    NE_ModelLoadStaticMesh(Sphere, sphere_bin);
+    NE_ModelLoadStaticMesh(Scene->Teapot, teapot_bin);
+    NE_ModelLoadStaticMesh(Scene->Sphere, sphere_bin);
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
@@ -79,7 +87,7 @@ int main(void)
     NE_InitDual3D();
     NE_InitConsole();
 
-    init_all();
+    init_all(&Scene);
 
     bool console = true;
 
@@ -88,7 +96,7 @@ int main(void)
         NE_WaitForVBL(0);
 
         // Draw 3D scenes
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene, Draw3DScene2, &Scene, &Scene);
 
         // Refresh keys
         scanKeys();
@@ -117,23 +125,23 @@ int main(void)
         // Rotate model
         if (keys & KEY_UP)
         {
-            NE_ModelRotate(Sphere, 0, 0, 2);
-            NE_ModelRotate(Teapot, 0, 0, 2);
+            NE_ModelRotate(Scene.Sphere, 0, 0, 2);
+            NE_ModelRotate(Scene.Teapot, 0, 0, 2);
         }
         if (keys & KEY_DOWN)
         {
-            NE_ModelRotate(Sphere, 0, 0, -2);
-            NE_ModelRotate(Teapot, 0, 0, -2);
+            NE_ModelRotate(Scene.Sphere, 0, 0, -2);
+            NE_ModelRotate(Scene.Teapot, 0, 0, -2);
         }
         if (keys & KEY_RIGHT)
         {
-            NE_ModelRotate(Sphere, 0, 2, 0);
-            NE_ModelRotate(Teapot, 0, 2, 0);
+            NE_ModelRotate(Scene.Sphere, 0, 2, 0);
+            NE_ModelRotate(Scene.Teapot, 0, 2, 0);
         }
         if (keys & KEY_LEFT)
         {
-            NE_ModelRotate(Sphere, 0, -2, 0);
-            NE_ModelRotate(Teapot, 0, -2, 0);
+            NE_ModelRotate(Scene.Sphere, 0, -2, 0);
+            NE_ModelRotate(Scene.Teapot, 0, -2, 0);
         }
 
         // Deactivate effect
@@ -148,14 +156,14 @@ int main(void)
             NE_SpecialEffectSet(0);
             NE_InitDual3D();
             NE_InitConsole();
-            init_all();
+            init_all(&Scene);
             console = true;
         }
         if (kdown & KEY_X)
         {
             NE_SpecialEffectSet(0);
             NE_InitDual3D_FB();
-            init_all();
+            init_all(&Scene);
             console = false;
         }
         if (kdown & KEY_SELECT)
@@ -163,7 +171,7 @@ int main(void)
             NE_SpecialEffectSet(0);
             NE_InitDual3D_DMA();
             NE_InitConsole();
-            init_all();
+            init_all(&Scene);
             console = true;
         }
     }

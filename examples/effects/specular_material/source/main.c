@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -10,19 +10,22 @@
 #include "teapot_bin.h"
 #include "teapot.h"
 
-NE_Camera *Camera;
-NE_Model *ModelSpecular, *ModelDiffuse;
-NE_Material *MaterialSpecular, *MaterialDiffuse;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *ModelSpecular, *ModelDiffuse;
 
-bool wireframe;
+    bool wireframe;
+} SceneData;
 
-void Draw3DScene1(void)
+void Draw3DScene1(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
 
-    NE_PolyFormat(wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+    NE_CameraUse(Scene->Camera);
 
-    NE_ModelDraw(ModelSpecular);
+    NE_PolyFormat(Scene->wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    NE_ModelDraw(Scene->ModelSpecular);
 
     printf("\x1b[22;0H"
            "Polygon count: %d   \n"
@@ -31,17 +34,21 @@ void Draw3DScene1(void)
            NE_GetVertexCount());
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
 
-    NE_PolyFormat(wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+    NE_CameraUse(Scene->Camera);
 
-    NE_ModelDraw(ModelDiffuse);
+    NE_PolyFormat(Scene->wireframe ? 0 : 31, 0, NE_LIGHT_ALL, NE_CULL_BACK, 0);
+
+    NE_ModelDraw(Scene->ModelDiffuse);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -50,21 +57,21 @@ int main(void)
     NE_InitConsole();
 
     // Allocate objects
-    Camera = NE_CameraCreate();
-    ModelSpecular = NE_ModelCreate(NE_Static);
-    ModelDiffuse = NE_ModelCreate(NE_Static);
-    MaterialSpecular = NE_MaterialCreate();
-    MaterialDiffuse = NE_MaterialCreate();
+    Scene.Camera = NE_CameraCreate();
+    Scene.ModelSpecular = NE_ModelCreate(NE_Static);
+    Scene.ModelDiffuse = NE_ModelCreate(NE_Static);
+    NE_Material *MaterialSpecular = NE_MaterialCreate();
+    NE_Material *MaterialDiffuse = NE_MaterialCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, 3,
                  0, 0, 0,
                  0, 1, 0);
 
     // Load model
-    NE_ModelLoadStaticMesh(ModelSpecular, (u32*)teapot_bin);
-    NE_ModelClone(ModelDiffuse, ModelSpecular);
+    NE_ModelLoadStaticMesh(Scene.ModelSpecular, teapot_bin);
+    NE_ModelClone(Scene.ModelDiffuse, Scene.ModelSpecular);
 
     // Load texture and clone it. The texture coordinates of the model are
     // outside of [0.0, 1.0], so it is needed to enable wrapping.
@@ -73,8 +80,8 @@ int main(void)
                        teapotBitmap);
     NE_MaterialClone(MaterialSpecular, MaterialDiffuse);
 
-    NE_ModelSetMaterial(ModelSpecular, MaterialSpecular);
-    NE_ModelSetMaterial(ModelDiffuse, MaterialDiffuse);
+    NE_ModelSetMaterial(Scene.ModelSpecular, MaterialSpecular);
+    NE_ModelSetMaterial(Scene.ModelDiffuse, MaterialDiffuse);
 
     // Set some properties to the materials
 
@@ -115,30 +122,30 @@ int main(void)
                "L/R: Change shininess\n");
 
         if (keys & KEY_A)
-            wireframe = true;
+            Scene.wireframe = true;
         else
-            wireframe = false;
+            Scene.wireframe = false;
 
         // Rotate model
         if (keys & KEY_UP)
         {
-            NE_ModelRotate(ModelSpecular, -2, 0, 0);
-            NE_ModelRotate(ModelDiffuse, -2, 0, 0);
+            NE_ModelRotate(Scene.ModelSpecular, -2, 0, 0);
+            NE_ModelRotate(Scene.ModelDiffuse, -2, 0, 0);
         }
         if (keys & KEY_DOWN)
         {
-            NE_ModelRotate(ModelSpecular, 2, 0, 0);
-            NE_ModelRotate(ModelDiffuse, 2, 0, 0);
+            NE_ModelRotate(Scene.ModelSpecular, 2, 0, 0);
+            NE_ModelRotate(Scene.ModelDiffuse, 2, 0, 0);
         }
         if (keys & KEY_RIGHT)
         {
-            NE_ModelRotate(ModelSpecular, 0, 2, 0);
-            NE_ModelRotate(ModelDiffuse, 0, 2, 0);
+            NE_ModelRotate(Scene.ModelSpecular, 0, 2, 0);
+            NE_ModelRotate(Scene.ModelDiffuse, 0, 2, 0);
         }
         if (keys & KEY_LEFT)
         {
-            NE_ModelRotate(ModelSpecular, 0, -2, 0);
-            NE_ModelRotate(ModelDiffuse, 0, -2, 0);
+            NE_ModelRotate(Scene.ModelSpecular, 0, -2, 0);
+            NE_ModelRotate(Scene.ModelDiffuse, 0, -2, 0);
         }
 
         // Shininess table
@@ -166,7 +173,7 @@ int main(void)
 
         NE_ShininessTableGenerate(shininess);
 
-        NE_ProcessDual(Draw3DScene1, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene1, Draw3DScene2, &Scene, &Scene);
     }
 
     return 0;

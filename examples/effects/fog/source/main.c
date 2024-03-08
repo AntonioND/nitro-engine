@@ -30,7 +30,7 @@ void Draw3DScene(void *arg)
     NE_ModelDraw(Scene->Model3);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     SceneData Scene = { 0 };
 

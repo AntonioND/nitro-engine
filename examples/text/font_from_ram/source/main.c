@@ -11,10 +11,14 @@
 #include "font_16.h"
 #include "font_256.h"
 
-NE_Sprite *TextSprite;
+typedef struct {
+    NE_Sprite *TextSprite;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    (void)arg;
+
     NE_ClearColorSet(RGB15(0, 7, 7), 31, 63);
 
     NE_2DViewInit();
@@ -25,18 +29,22 @@ void Draw3DScene(void)
                              POLY_ALPHA(20) | POLY_CULL_BACK, 30);
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_ClearColorSet(RGB15(7, 0, 7), 31, 63);
 
     NE_2DViewInit();
 
-    NE_SpriteSetPos(TextSprite, 16, 32);
-    NE_SpriteDraw(TextSprite);
+    NE_SpriteSetPos(Scene->TextSprite, 16, 32);
+    NE_SpriteDraw(Scene->TextSprite);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -61,6 +69,8 @@ int main(void)
 
         NE_MaterialSetPalette(Font16, Pal16);
 
+        // The material and palette will be deleted when the rich text font is
+        // deleted.
         NE_RichTextMaterialSet(2, Font16, Pal16);
     }
 
@@ -80,6 +90,8 @@ int main(void)
 
         NE_MaterialSetPalette(Font256, Pal256);
 
+        // The material and palette will be deleted when the rich text font is
+        // deleted.
         NE_RichTextMaterialSet(3, Font256, Pal256);
     }
 
@@ -101,21 +113,21 @@ int main(void)
 
     // Create a sprite to be used to render the texture we've rendered
 
-    TextSprite = NE_SpriteCreate();
-    NE_SpriteSetMaterial(TextSprite, Material);
+    Scene.TextSprite = NE_SpriteCreate();
+    NE_SpriteSetMaterial(Scene.TextSprite, Material);
 
     while (1)
     {
         NE_WaitForVBL(0);
 
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene, Draw3DScene2, &Scene, &Scene);
 
         scanKeys();
         if (keysHeld() & KEY_START)
             break;
     }
 
-    NE_SpriteDelete(TextSprite);
+    NE_SpriteDelete(Scene.TextSprite);
     NE_MaterialDelete(Material);
 
     NE_RichTextEnd(2);

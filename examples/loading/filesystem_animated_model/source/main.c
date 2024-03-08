@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -11,22 +11,24 @@
 
 #include <NEMain.h>
 
-NE_Camera *Camera;
-NE_Model *Model;
-NE_Animation *Animation;
-NE_Material *Material;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
 
     NE_PolyFormat(31, 0, NE_LIGHT_0, NE_CULL_NONE, 0);
-    NE_ModelDraw(Model);
+    NE_ModelDraw(Scene->Model);
 }
 
 void WaitLoop(void)
 {
-    while(1)
+    while (1)
     {
         swiWaitForVBlank();
         scanKeys();
@@ -35,8 +37,10 @@ void WaitLoop(void)
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -55,18 +59,18 @@ int main(void)
     }
 
     // Allocate space for objects...
-    Model = NE_ModelCreate(NE_Animated);
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
-    Animation = NE_AnimationCreate();
+    Scene.Model = NE_ModelCreate(NE_Animated);
+    Scene.Camera = NE_CameraCreate();
+    NE_Material *Material = NE_MaterialCreate();
+    NE_Animation *Animation = NE_AnimationCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  6, 3, -4,
                  0, 3, 0,
                  0, 1, 0);
 
-    if (NE_ModelLoadDSMFAT(Model, "robot.dsm") == 0)
+    if (NE_ModelLoadDSMFAT(Scene.Model, "robot.dsm") == 0)
     {
         printf("Couldn't load model...");
         WaitLoop();
@@ -89,10 +93,10 @@ int main(void)
     }
 
     // Assign material to the model
-    NE_ModelSetMaterial(Model, Material);
+    NE_ModelSetMaterial(Scene.Model, Material);
 
-    NE_ModelSetAnimation(Model, Animation);
-    NE_ModelAnimStart(Model, NE_ANIM_LOOP, floattof32(0.1));
+    NE_ModelSetAnimation(Scene.Model, Animation);
+    NE_ModelAnimStart(Scene.Model, NE_ANIM_LOOP, floattof32(0.1));
 
     NE_LightSet(0, NE_White, 0, -1, -1);
 
@@ -111,16 +115,15 @@ int main(void)
             break;
 
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+            NE_ModelRotate(Scene.Model, 0, 2, 0);
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+            NE_ModelRotate(Scene.Model, 0, -2, 0);
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
+            NE_ModelRotate(Scene.Model, 0, 0, 2);
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 0, 0, -2);
+            NE_ModelRotate(Scene.Model, 0, 0, -2);
 
-        // Draw scene...
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

@@ -10,10 +10,7 @@
 
 #define NUM_CLONES 5
 
-NE_Material *Material[NUM_CLONES];
-NE_Palette *Palette;
-
-int main(void)
+int main(int argc, char *argv[])
 {
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
@@ -28,9 +25,11 @@ int main(void)
     // This is needed to print text
     consoleDemoInit();
 
+    NE_Material *Material[NUM_CLONES];
     for (int i = 0; i < NUM_CLONES; i++)
         Material[i] = NE_MaterialCreate();
-    Palette = NE_PaletteCreate();
+
+    NE_Palette *Palette = NE_PaletteCreate();
 
     int total_tex_mem = NE_TextureFreeMem();
     int total_pal_mem = NE_PaletteFreeMem();

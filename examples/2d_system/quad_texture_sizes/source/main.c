@@ -67,7 +67,7 @@ void Draw3DScene2(void *arg)
                           3, Scene->Material_s256);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     SceneData Scene = { 0 };
 

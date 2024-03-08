@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -8,34 +8,38 @@
 
 #include "sphere_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Model[10];
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model[10];
 
-int distancetocamera[10];
+    int distancetocamera[10];
 
-int object_touched;
+    int object_touched;
 
-int rotz, roty;
+    int rotz, roty;
 
-uint32_t keys;
+    bool touching;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
-    NE_ViewRotate(0, roty, rotz);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
+    NE_ViewRotate(0, Scene->roty, Scene->rotz);
 
     // Draw everything
     for (int i = 0; i < 10; i++)
     {
-        if (i == object_touched)
+        if (i == Scene->object_touched)
             NE_PolyFormat(31, 0, NE_LIGHT_1, NE_CULL_BACK, 0);
         else
             NE_PolyFormat(31, 0, NE_LIGHT_0, NE_CULL_BACK, 0);
 
-        NE_ModelDraw(Model[i]);
+        NE_ModelDraw(Scene->Model[i]);
     }
 
-    if (keys & KEY_TOUCH)
+    if (Scene->touching)
     {
         // Get the information
         NE_TouchTestStart();
@@ -46,15 +50,17 @@ void Draw3DScene(void)
             // objects, with no textures, etc, in order to make it
             // easier for the GPU to handle.
             NE_TouchTestObject();
-            NE_ModelDraw(Model[i]);
-            distancetocamera[i] = NE_TouchTestResult();
+            NE_ModelDraw(Scene->Model[i]);
+            Scene->distancetocamera[i] = NE_TouchTestResult();
         }
         NE_TouchTestEnd();
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -68,40 +74,35 @@ int main(void)
     consoleDemoInit();
 
     for (int i = 0; i < 10; i++)
-        Model[i] = NE_ModelCreate(NE_Static);
+        Scene.Model[i] = NE_ModelCreate(NE_Static);
 
     // Allocate everything
-    Camera = NE_CameraCreate();
-    NE_CameraSet(Camera,
+    Scene.Camera = NE_CameraCreate();
+    NE_CameraSet(Scene.Camera,
                  -4, 0, 0,
                   0, 0, 0,
                   0, 1, 0);
 
     // Load model
     for (int i = 0; i < 10; i++)
-        NE_ModelLoadStaticMesh(Model[i], sphere_bin);
+        NE_ModelLoadStaticMesh(Scene.Model[i], sphere_bin);
 
     // Set up lights
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);
     NE_LightSet(1, NE_Red, 0, -0.5, -0.5);
 
-    // Wait a bit
-    swiWaitForVBlank();
-    swiWaitForVBlank();
-    swiWaitForVBlank();
-    swiWaitForVBlank();
     printf("Press any key to start...");
 
     int framecount = 0;
 
     while (1)
     {
-        if(framecount < 30)
+        if (framecount < 30)
             printf("\x1b[1;0H_");
         else
             printf("\x1b[1;0H ");
 
-        if(framecount == 60)
+        if (framecount == 60)
             framecount = 0;
 
         framecount++;
@@ -111,7 +112,7 @@ int main(void)
         // Set random coordinates
         for (int i = 0; i < 10; i++)
         {
-            NE_ModelSetCoordI(Model[i],
+            NE_ModelSetCoordI(Scene.Model[i],
                 (rand() & (inttof32(3) - 1)) - floattof32(1.5),
                 (rand() & (inttof32(3) - 1)) - floattof32(1.5),
                 (rand() & (inttof32(3) - 1)) - floattof32(1.5));
@@ -136,24 +137,29 @@ int main(void)
         NE_WaitForVBL(0);
 
         scanKeys();
-        keys = keysHeld();
+        uint32_t keys = keysHeld();
 
         // Rotate view
         if (keys & KEY_RIGHT)
-            roty --;
+            Scene.roty--;
         if (keys & KEY_LEFT)
-            roty ++;
+            Scene.roty++;
         if (keys & KEY_UP)
-            rotz ++;
+            Scene.rotz++;
         if (keys & KEY_DOWN)
-            rotz --;
+            Scene.rotz--;
+
+        if (keys & KEY_TOUCH)
+            Scene.touching = true;
+        else
+            Scene.touching = false;
 
         if (keysDown() & KEY_START)
         {
             // Set random coordinates
             for (int i = 0; i < 10; i++)
             {
-                NE_ModelSetCoordI(Model[i],
+                NE_ModelSetCoordI(Scene.Model[i],
                     (rand() & (inttof32(3) - 1)) - floattof32(1.5),
                     (rand() & (inttof32(3) - 1)) - floattof32(1.5) ,
                     (rand() & (inttof32(3) - 1)) - floattof32(1.5));
@@ -161,7 +167,7 @@ int main(void)
         }
 
         // Reset object being touched, let's test if we're wrong
-        object_touched = -1;
+        Scene.object_touched = -1;
 
         if (keys & KEY_TOUCH)
         {
@@ -175,14 +181,14 @@ int main(void)
                 // If the distance is greater than 0, the object has been
                 // touched. Note that this array is filled in the drawing
                 // function
-                if(distancetocamera[j] >= 0)
+                if (Scene.distancetocamera[j] >= 0)
                 {
                     // If the object is closer than any previously detected
                     // object, replace it
-                    if (distancetocamera[j] < min_distance)
+                    if (Scene.distancetocamera[j] < min_distance)
                     {
-                        object_touched = j;
-                        min_distance = distancetocamera[j];
+                        Scene.object_touched = j;
+                        min_distance = Scene.distancetocamera[j];
                     }
                 }
             }
@@ -191,10 +197,10 @@ int main(void)
         {
             // Reset distances if screen is not being touched
             for (int j = 0; j < 10; j++)
-                distancetocamera[j] = GL_MAX_DEPTH;
+                Scene.distancetocamera[j] = GL_MAX_DEPTH;
         }
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -8,29 +8,37 @@
 
 #include "teapot_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Model;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Set rear plane color
     NE_ClearColorSet(NE_Red, 31, 63);
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Model);
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Model);
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Set rear plane color
     NE_ClearColorSet(NE_Green, 31, 63);
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Model);
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Model);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
@@ -41,17 +49,17 @@ int main(void)
     NE_InitConsole();
 
     // Allocate objects...
-    Model = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
+    Scene.Model = NE_ModelCreate(NE_Static);
+    Scene.Camera = NE_CameraCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, -3,
                  0, 0, 0,
                  0, 1, 0);
 
     // Load model
-    NE_ModelLoadStaticMesh(Model, teapot_bin);
+    NE_ModelLoadStaticMesh(Scene.Model, teapot_bin);
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
@@ -75,13 +83,13 @@ int main(void)
 
         // Rotate model
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
+            NE_ModelRotate(Scene.Model, 0, 0, 2);
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 0, 0, -2);
+            NE_ModelRotate(Scene.Model, 0, 0, -2);
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+            NE_ModelRotate(Scene.Model, 0, 2, 0);
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+            NE_ModelRotate(Scene.Model, 0, -2, 0);
 
         // Activate effects
         if (kdown & KEY_B)
@@ -99,7 +107,7 @@ int main(void)
             NE_SpecialEffectPause(false);
 
         // Draw 3D scenes
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene, Draw3DScene2, &Scene, &Scene);
     }
 
     return 0;

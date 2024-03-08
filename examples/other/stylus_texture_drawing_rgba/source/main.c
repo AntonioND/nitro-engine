@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -8,16 +8,22 @@
 
 #include "a1rgb5.h"
 
-NE_Material *Material;
+typedef struct {
+    NE_Material *Material;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_2DViewInit();
-    NE_2DDrawTexturedQuad(0, 0, 256, 256, 0, Material);
+    NE_2DDrawTexturedQuad(0, 0, 256, 256, 0, Scene->Material);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -25,13 +31,9 @@ int main(void)
     NE_Init3D();
     NE_MainScreenSetOnBottom();
 
-    Material = NE_MaterialCreate();
-    NE_MaterialTexLoad(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
+    Scene.Material = NE_MaterialCreate();
+    NE_MaterialTexLoad(Scene.Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        a1rgb5Bitmap);
-
-    // Wait a bit...
-    scanKeys();
-    NE_WaitForVBL(0);
 
     while (1)
     {
@@ -44,7 +46,7 @@ int main(void)
         {
             // Update stylus coordinates when screen is pressed
             touchRead(&touch);
-            NE_TextureDrawingStart(Material);
+            NE_TextureDrawingStart(Scene.Material);
 
             // Draw blue pixels with no transparency. The function
             // NE_TexturePutPixelRGBA() makes sure to not draw outside of the
@@ -58,7 +60,7 @@ int main(void)
             NE_TextureDrawingEnd();
         }
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

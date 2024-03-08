@@ -10,25 +10,34 @@
 #include <filesystem.h>
 #include <NEMain.h>
 
-NE_Material *Material1, *Material2;
-NE_Palette *Palette2;
+typedef struct {
+    NE_Material *Material1;
+} SceneData1;
 
-void Draw3DScene(void)
+typedef struct {
+    NE_Material *Material2;
+} SceneData2;
+
+void Draw3DScene(void *arg)
 {
+    SceneData1 *Scene = arg;
+
     NE_2DViewInit();
 
     NE_2DDrawTexturedQuad(0, 0,
                           256, 192,
-                          0, Material1);
+                          0, Scene->Material1);
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
+    SceneData2 *Scene = arg;
+
     NE_2DViewInit();
 
     NE_2DDrawTexturedQuad(64, 32,
                           64 + 128, 32 + 128,
-                          0, Material2);
+                          0, Scene->Material2);
 }
 
 __attribute__((noreturn)) void WaitLoop(void)
@@ -43,8 +52,11 @@ __attribute__((noreturn)) void WaitLoop(void)
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData1 Scene1 = { 0 };
+    SceneData2 Scene2 = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -62,18 +74,20 @@ int main(void)
     NE_InitConsole();
 
     // Allocate objects
-    Material1 = NE_MaterialCreate();
-    Material2 = NE_MaterialCreate();
-    Palette2 = NE_PaletteCreate();
+    Scene1.Material1 = NE_MaterialCreate();
+    Scene2.Material2 = NE_MaterialCreate();
 
-    if (NE_MaterialTexLoadGRF(Material1, NULL, NE_TEXGEN_TEXCOORD,
+    if (NE_MaterialTexLoadGRF(Scene1.Material1, NULL, NE_TEXGEN_TEXCOORD,
                               "a1rgb5_png.grf") == 0)
     {
         printf("Failed to load GRF 1\n");
         WaitLoop();
     }
 
-    if (NE_MaterialTexLoadGRF(Material2, Palette2, NE_TEXGEN_TEXCOORD,
+    // This material has a palette, but we don't care about it. By setting the
+    // pointer to NULL it will be marked to be autoedeleted when the material is
+    // deleted.
+    if (NE_MaterialTexLoadGRF(Scene2.Material2, NULL, NE_TEXGEN_TEXCOORD,
                               "a3pal32_png.grf") == 0)
     {
         printf("Failed to load GRF 2\n");
@@ -84,7 +98,7 @@ int main(void)
     {
         NE_WaitForVBL(0);
 
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene, Draw3DScene2, &Scene1, &Scene2);
     }
 
     return 0;

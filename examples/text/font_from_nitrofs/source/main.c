@@ -8,10 +8,14 @@
 #include <nds.h>
 #include <NEMain.h>
 
-NE_Sprite *TextSprite;
+typedef struct {
+    NE_Sprite *TextSprite;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene1(void *arg)
 {
+    (void)arg;
+
     NE_ClearColorSet(RGB15(0, 7, 7), 31, 63);
 
     NE_2DViewInit();
@@ -22,14 +26,16 @@ void Draw3DScene(void)
                              POLY_ALPHA(20) | POLY_CULL_BACK, 30);
 }
 
-void Draw3DScene2(void)
+void Draw3DScene2(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_ClearColorSet(RGB15(7, 0, 7), 31, 63);
 
     NE_2DViewInit();
 
-    NE_SpriteSetPos(TextSprite, 16, 32);
-    NE_SpriteDraw(TextSprite);
+    NE_SpriteSetPos(Scene->TextSprite, 16, 32);
+    NE_SpriteDraw(Scene->TextSprite);
 }
 
 __attribute__((noreturn)) void WaitLoop(void)
@@ -44,8 +50,10 @@ __attribute__((noreturn)) void WaitLoop(void)
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -89,21 +97,21 @@ int main(void)
 
     // Create a sprite to be used to render the texture we've rendered
 
-    TextSprite = NE_SpriteCreate();
-    NE_SpriteSetMaterial(TextSprite, Material);
+    Scene.TextSprite = NE_SpriteCreate();
+    NE_SpriteSetMaterial(Scene.TextSprite, Material);
 
     while (1)
     {
         NE_WaitForVBL(0);
 
-        NE_ProcessDual(Draw3DScene, Draw3DScene2);
+        NE_ProcessDualArg(Draw3DScene1, Draw3DScene2, &Scene, &Scene);
 
         scanKeys();
         if (keysHeld() & KEY_START)
             break;
     }
 
-    NE_SpriteDelete(TextSprite);
+    NE_SpriteDelete(Scene.TextSprite);
     NE_MaterialDelete(Material);
 
     NE_RichTextEnd(2);

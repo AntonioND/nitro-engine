@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -10,15 +10,19 @@
 
 #define NUM_MODELS 16
 
-NE_Camera *Camera;
-NE_Model *Model[NUM_MODELS];
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model[NUM_MODELS];
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
 
     for (int i = 0; i < NUM_MODELS; i++)
-        NE_ModelDraw(Model[i]);
+        NE_ModelDraw(Scene->Model[i]);
 
     // Get some information after drawing but before returning from the
     // function
@@ -26,8 +30,10 @@ void Draw3DScene(void)
            NE_GetPolygonCount(), NE_GetVertexCount());
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -40,19 +46,19 @@ int main(void)
 
     // Allocate space for everything
     for (int i = 0; i < NUM_MODELS; i++)
-        Model[i] = NE_ModelCreate(NE_Static);
+        Scene.Model[i] = NE_ModelCreate(NE_Static);
 
-    Camera = NE_CameraCreate();
+    Scene.Camera = NE_CameraCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  -3.5, 1.5, 1.25,
                     0, 1.5, 1.25,
                     0, 1, 0);
 
     // Load model
     for (int i = 0; i < NUM_MODELS; i++)
-        NE_ModelLoadStaticMesh(Model[i], sphere_bin);
+        NE_ModelLoadStaticMesh(Scene.Model[i], sphere_bin);
 
     // Setup light
     NE_LightSet(0, NE_Yellow, 0, -0.5, -0.5);
@@ -60,8 +66,8 @@ int main(void)
     // Set start coordinates/rotation of models
     for (int i = 0; i < NUM_MODELS; i++)
     {
-        NE_ModelSetRot(Model[i], i, i * 30, i * 20);
-        NE_ModelSetCoord(Model[i], 0, i % 4, i / 4);
+        NE_ModelSetRot(Scene.Model[i], i, i * 30, i * 20);
+        NE_ModelSetCoord(Scene.Model[i], 0, i % 4, i / 4);
     }
 
     while (1)
@@ -70,10 +76,10 @@ int main(void)
 
         // Rotate every model
         for (int i = 0; i < NUM_MODELS; i++)
-            NE_ModelRotate(Model[i], -i, i % 5, 5 - i);
+            NE_ModelRotate(Scene.Model[i], -i, i % 5, 5 - i);
 
         // Draw scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2024
 //
 // This file is part of Nitro Engine
 
@@ -21,15 +21,19 @@
 #include "depth_tex_bin.h"
 #include "cube_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Model;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
 
     NE_PolyFormat(31, 0, NE_LIGHT_01, NE_CULL_BACK, 0);
-    NE_ModelDraw(Model);
+    NE_ModelDraw(Scene->Model);
 
     NE_2DViewInit();
     NE_2DDrawQuad(0, 0,
@@ -37,8 +41,10 @@ void Draw3DScene(void)
                   0, NE_White);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -57,14 +63,14 @@ int main(void)
 
     NE_ClearBMPEnable(true);
 
-    Camera = NE_CameraCreate();
-    NE_CameraSet(Camera,
+    Scene.Camera = NE_CameraCreate();
+    NE_CameraSet(Scene.Camera,
                  1, 1, 1,
                  0, 0, 0,
                  0, 1, 0);
 
-    Model = NE_ModelCreate(NE_Static);
-    NE_ModelLoadStaticMesh(Model, cube_bin);
+    Scene.Model = NE_ModelCreate(NE_Static);
+    NE_ModelLoadStaticMesh(Scene.Model, cube_bin);
 
     NE_LightSet(0, NE_Yellow, -1, -1, 0);
     NE_LightSet(1, NE_Red, -1, 1, 0);
@@ -81,7 +87,7 @@ int main(void)
         scanKeys();
         uint32_t keys = keysHeld();
 
-        NE_ModelRotate(Model, 0, 2, 1);
+        NE_ModelRotate(Scene.Model, 0, 2, 1);
 
         if (keys & KEY_A)
             NE_ClearBMPEnable(true);
@@ -99,7 +105,7 @@ int main(void)
         if (keys & KEY_LEFT)
             scrollx--;
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

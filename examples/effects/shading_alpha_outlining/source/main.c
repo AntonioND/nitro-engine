@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -9,26 +9,32 @@
 #include "teapot_bin.h"
 #include "teapot.h"
 
-NE_Camera *Camera;
-NE_Model *Model;
-NE_Material *Material;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
 
-int shading, alpha, id;
+    int shading, alpha, id;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Set camera
-    NE_CameraUse(Camera);
+    NE_CameraUse(Scene->Camera);
 
     // Set polygon format
-    NE_PolyFormat(alpha, id, NE_LIGHT_0, NE_CULL_BACK, shading);
+    NE_PolyFormat(Scene->alpha, Scene->id, NE_LIGHT_0, NE_CULL_BACK,
+                  Scene->shading);
 
     // Draw model
-    NE_ModelDraw(Model);
+    NE_ModelDraw(Scene->Model);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
@@ -43,25 +49,25 @@ int main(void)
     consoleDemoInit();
 
     // Allocate the objects we will use
-    Model = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
+    Scene.Model = NE_ModelCreate(NE_Static);
+    Scene.Camera = NE_CameraCreate();
+    NE_Material *Material = NE_MaterialCreate();
 
     // Set camera coordinates
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, -3,
                  0, 0, 0,
                  0, 1, 0);
 
     // Load mesh from RAM and assign it to a model
-    NE_ModelLoadStaticMesh(Model, teapot_bin);
+    NE_ModelLoadStaticMesh(Scene.Model, teapot_bin);
     // Load teapot texture from RAM and assign it to a material
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256,
                        NE_TEXGEN_TEXCOORD | NE_TEXTURE_WRAP_S | NE_TEXTURE_WRAP_T,
                        teapotBitmap);
 
     // Assign material to the model
-    NE_ModelSetMaterial(Model, Material);
+    NE_ModelSetMaterial(Scene.Model, Material);
 
     // Set some properties to the material
     NE_MaterialSetProperties(Material,
@@ -98,35 +104,35 @@ int main(void)
 
         // Rotate model using the pad
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
+            NE_ModelRotate(Scene.Model, 0, 0, 2);
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 0, 0, -2);
+            NE_ModelRotate(Scene.Model, 0, 0, -2);
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+            NE_ModelRotate(Scene.Model, 0, 2, 0);
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+            NE_ModelRotate(Scene.Model, 0, -2, 0);
 
         // Change shading type
         if (keys & KEY_A)
-            shading = NE_TOON_HIGHLIGHT_SHADING;
+            Scene.shading = NE_TOON_HIGHLIGHT_SHADING;
         else
-            shading = NE_MODULATION;
+            Scene.shading = NE_MODULATION;
 
         if (keys & KEY_B)
-            alpha = 15; // Transparent
+            Scene.alpha = 15; // Transparent
         else if (keys & KEY_Y)
-            alpha = 0;  // Wireframe
+            Scene.alpha = 0;  // Wireframe
         else
-            alpha = 31; // Opaque
+            Scene.alpha = 31; // Opaque
 
         // Change polygon ID to change outlining color
         if (keys & KEY_X)
-            id = 8;
+            Scene.id = 8;
         else
-            id = 0;
+            Scene.id = 0;
 
         // Draw scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

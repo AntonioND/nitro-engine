@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
 #include <NEMain.h>
 
-NE_Camera *Camera;
+typedef struct {
+    NE_Camera *Camera;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Use camera and draw polygon.
-    NE_CameraUse(Camera);
+    NE_CameraUse(Scene->Camera);
 
     // Begin drawing
     NE_PolyBegin(GL_QUAD);
@@ -31,17 +35,19 @@ void Draw3DScene(void)
     NE_PolyEnd();
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     NE_Init3D();
 
-    Camera = NE_CameraCreate();
+    Scene.Camera = NE_CameraCreate();
 
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, 2,
                  0, 0, 0,
                  0, 1, 0);
@@ -50,7 +56,7 @@ int main(void)
     {
         NE_WaitForVBL(0);
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -8,17 +8,22 @@
 
 #include "texture.h"
 
-NE_Camera *Camera;
-NE_Material *Material;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Material *Material;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
 
     // This set material's color to drawing color (default = white)
-    NE_MaterialUse(Material);
+    NE_MaterialUse(Scene->Material);
 
-    // In general you should avoid using the functions below
+    // In general you should avoid using the functions below for drawing models
+    // because they have a much lower performance than precompiled models.
 
     // Begin drawing
     NE_PolyBegin(GL_QUAD);
@@ -42,30 +47,32 @@ void Draw3DScene(void)
     NE_PolyEnd();
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     NE_Init3D();
 
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
+    Scene.Camera = NE_CameraCreate();
+    Scene.Material = NE_MaterialCreate();
 
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, 2,
                  0, 0, 0,
                  0, 1, 0);
 
-    NE_MaterialTexLoad(Material, NE_A1RGB5, 128, 128, NE_TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Scene.Material, NE_A1RGB5, 128, 128, NE_TEXGEN_TEXCOORD,
                        textureBitmap);
 
     while (1)
     {
         NE_WaitForVBL(0);
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

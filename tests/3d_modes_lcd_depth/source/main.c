@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2023
+// SPDX-FileContributor: Antonio Niño Díaz, 2023-2024
 //
 // This file is part of Nitro Engine
 
@@ -49,10 +49,14 @@
 #define ID_1 10
 #define ID_2 11
 
-uint32_t x = 80;
+typedef struct {
+    uint32_t x;
+} SceneData;
 
-void Draw3DSceneBands(void)
+void Draw3DSceneBands(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_ClearColorSet(NE_Black, 31, 63);
 
     NE_2DViewInit();
@@ -66,19 +70,23 @@ void Draw3DSceneBands(void)
 
     NE_PolyFormat(15, ID_2, 0, NE_CULL_NONE, 0);
 
-    NE_2DDrawQuadGradient(0 + x, 128, 256 + x, 192,
+    NE_2DDrawQuadGradient(0 + Scene->x, 128, 256 + Scene->x, 192,
                           9,
                           RGB15(16, 16, 16), RGB15(12, 12, 12),
                           RGB15(12, 12, 12), RGB15(16, 16, 16));
 }
 
-void Draw3DSceneEmpty(void)
+void Draw3DSceneEmpty(void *arg)
 {
+    (void)arg;
+
     NE_ClearColorSet(NE_Black, 31, 63);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
@@ -89,6 +97,8 @@ int main(void)
     NE_MainScreenSetOnTop();
     consoleDemoInit();
 
+    Scene.x = 80;
+
     while (1)
     {
         NE_WaitForVBL(0);
@@ -97,13 +107,13 @@ int main(void)
         switch (NE_CurrentExecutionMode())
         {
             case NE_ModeSingle3D:
-                NE_Process(Draw3DSceneBands);
+                NE_ProcessArg(Draw3DSceneBands, &Scene);
                 break;
 
             case NE_ModeDual3D:
             case NE_ModeDual3D_FB:
             case NE_ModeDual3D_DMA:
-                NE_ProcessDual(Draw3DSceneBands, Draw3DSceneEmpty);
+                NE_ProcessDualArg(Draw3DSceneBands, Draw3DSceneEmpty, &Scene, &Scene);
                 break;
 
             case NE_ModeUninitialized:
@@ -150,9 +160,9 @@ int main(void)
         }
 
         if (keys & KEY_LEFT)
-            x--;
+            Scene.x--;
         if (keys & KEY_RIGHT)
-            x++;
+            Scene.x++;
 
         if (kdown & KEY_Y)
         {

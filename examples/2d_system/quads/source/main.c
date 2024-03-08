@@ -63,7 +63,7 @@ void Draw3DScene(void)
     }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2024
 // SPDX-FileContributor: NightFox, 2009-2011
 //
 // This file is part of Nitro Engine
@@ -35,26 +35,30 @@
 #include <NEMain.h>
 #include <nf_lib.h>
 
-NE_Camera *Camera;
-NE_Model *Model;
-NE_Animation *Animation;
-NE_Material *Material;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
+    NE_Animation *Animation;
+    NE_Material *Material;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
 
     NE_PolyFormat(31, 0, NE_LIGHT_0, NE_CULL_NONE, 0);
-    NE_ModelDraw(Model);
+    NE_ModelDraw(Scene->Model);
 }
 
 void WaitLoop(void)
 {
-    while(1)
+    while (1)
         swiWaitForVBlank();
 }
 
-void LoadAndSetupGraphics3D(void)
+void LoadAndSetupGraphics3D(SceneData *Scene)
 {
     // When using nflib for the 2D sub screen engine, banks C and H are used for
     // backgrounds and banks D and I are used for sprites. Nitro Engine only
@@ -66,29 +70,29 @@ void LoadAndSetupGraphics3D(void)
 
     // Create objects
 
-    Model = NE_ModelCreate(NE_Animated);
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
-    Animation = NE_AnimationCreate();
+    Scene->Model = NE_ModelCreate(NE_Animated);
+    Scene->Camera = NE_CameraCreate();
+    Scene->Material = NE_MaterialCreate();
+    Scene->Animation = NE_AnimationCreate();
 
     // Load assets from the filesystem
 
-    if (NE_ModelLoadDSMFAT(Model, "robot.dsm") == 0)
+    if (NE_ModelLoadDSMFAT(Scene->Model, "robot.dsm") == 0)
     {
         consoleDemoInit();
         printf("Couldn't load model...");
         WaitLoop();
     }
 
-    if (NE_AnimationLoadFAT(Animation, "robot_wave.dsa") == 0)
+    if (NE_AnimationLoadFAT(Scene->Animation, "robot_wave.dsa") == 0)
     {
         consoleDemoInit();
         printf("Couldn't load animation...");
         WaitLoop();
     }
 
-    if (NE_MaterialTexLoadFAT(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
-                              "texture_tex.bin") == 0)
+    if (NE_MaterialTexLoadFAT(Scene->Material, NE_A1RGB5, 256, 256,
+                              NE_TEXGEN_TEXCOORD, "texture_tex.bin") == 0)
     {
         consoleDemoInit();
         printf("Couldn't load texture...");
@@ -96,11 +100,11 @@ void LoadAndSetupGraphics3D(void)
     }
 
     // Assign material to the model
-    NE_ModelSetMaterial(Model, Material);
+    NE_ModelSetMaterial(Scene->Model, Scene->Material);
 
     // Assign animation to the model and start it
-    NE_ModelSetAnimation(Model, Animation);
-    NE_ModelAnimStart(Model, NE_ANIM_LOOP, floattof32(0.1));
+    NE_ModelSetAnimation(Scene->Model, Scene->Animation);
+    NE_ModelAnimStart(Scene->Model, NE_ANIM_LOOP, floattof32(0.1));
 
     // Setup light
     NE_LightSet(0, NE_White, 0, -1, -1);
@@ -109,7 +113,7 @@ void LoadAndSetupGraphics3D(void)
     NE_ClearColorSet(NE_Black, 31, 63);
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene->Camera,
                  6, 3, -4,
                  0, 3, 0,
                  0, 1, 0);
@@ -156,8 +160,10 @@ void LoadAndSetupGraphics2D(void)
     NF_CreateTextLayer(1, 0, 0, "normal");
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     // Initialize nitroFS before doing anything else
     NF_Set2D(0, 0);
     NF_Set2D(1, 0);
@@ -188,7 +194,7 @@ int main(void)
     irqSet(IRQ_HBLANK, NE_HBLFunc);
 
     // Load and setup graphics
-    LoadAndSetupGraphics3D();
+    LoadAndSetupGraphics3D(&Scene);
     LoadAndSetupGraphics2D();
 
     // Initialize variables to control the sprite
@@ -230,13 +236,13 @@ int main(void)
             break;
 
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+            NE_ModelRotate(Scene.Model, 0, 2, 0);
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+            NE_ModelRotate(Scene.Model, 0, -2, 0);
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
+            NE_ModelRotate(Scene.Model, 0, 0, 2);
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 0, 0, -2);
+            NE_ModelRotate(Scene.Model, 0, 0, -2);
 
         if (keys & KEY_L)
         {
@@ -283,7 +289,7 @@ int main(void)
         NF_SpriteOamSet(1);
 
         // Draw 3D scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

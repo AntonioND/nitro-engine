@@ -996,7 +996,7 @@ void test_stress(void)
     POOL_DEINITIALIZE();
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
     // This test doesn't use Nitro Engine at all. Initialize the default console
     // of libnds to print the results of the tests.

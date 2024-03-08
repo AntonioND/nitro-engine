@@ -1,17 +1,8 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
-
-#include <NEMain.h>
-
-#include "sphere_bin.h"
-
-#define NUM_MODELS 16
-
-NE_Camera *Camera;
-NE_Model *Model[NUM_MODELS];
 
 // Cloning models will avoid loading into memory the same mesh many times. This
 // is really useful when you want to draw lots of the same model in different
@@ -21,13 +12,26 @@ NE_Model *Model[NUM_MODELS];
 // If you clone an animated model you will be able to set different animations
 // for each model.
 
-void Draw3DScene(void)
+#include <NEMain.h>
+
+#include "sphere_bin.h"
+
+#define NUM_MODELS 16
+
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model[NUM_MODELS];
+} SceneData;
+
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Setup camera and draw all objects.
-    NE_CameraUse(Camera);
+    NE_CameraUse(Scene->Camera);
 
     for (int i = 0; i < NUM_MODELS; i++)
-        NE_ModelDraw(Model[i]);
+        NE_ModelDraw(Scene->Model[i]);
 
     // Get some information AFTER drawing but BEFORE returning from the
     // function.
@@ -35,8 +39,10 @@ void Draw3DScene(void)
            NE_GetPolygonCount(), NE_GetVertexCount());
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -50,24 +56,24 @@ int main(void)
 
     // Allocate space for everything.
     for (int i = 0; i < NUM_MODELS; i++)
-        Model[i] = NE_ModelCreate(NE_Static);
+        Scene.Model[i] = NE_ModelCreate(NE_Static);
 
-    Camera = NE_CameraCreate();
+    Scene.Camera = NE_CameraCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  -3.5, 1.5, 1.25,
                     0, 1.5, 1.25,
                     0, 1, 0);
 
     // Load model once
-    NE_ModelLoadStaticMesh(Model[0], sphere_bin);
+    NE_ModelLoadStaticMesh(Scene.Model[0], sphere_bin);
 
     // Clone model to the test of the objects
     for (int i = 1; i < NUM_MODELS; i++)
     {
-        NE_ModelClone(Model[i],  // Destination
-                      Model[0]); // Source model
+        NE_ModelClone(Scene.Model[i],  // Destination
+                      Scene.Model[0]); // Source model
     }
 
     // Set up light
@@ -76,8 +82,8 @@ int main(void)
     // Set start coordinates/rotation of the models
     for (int i = 0; i < NUM_MODELS; i++)
     {
-        NE_ModelSetRot(Model[i], i, i * 30, i * 20);
-        NE_ModelSetCoord(Model[i], 0, i % 4, i / 4);
+        NE_ModelSetRot(Scene.Model[i], i, i * 30, i * 20);
+        NE_ModelSetCoord(Scene.Model[i], 0, i % 4, i / 4);
     }
 
     while (1)
@@ -86,10 +92,10 @@ int main(void)
 
         // Rotate every model
         for (int i = 0; i < NUM_MODELS; i++)
-            NE_ModelRotate(Model[i], -i, i % 5, 5 - i);
+            NE_ModelRotate(Scene.Model[i], -i, i % 5, 5 - i);
 
         // Draw scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;

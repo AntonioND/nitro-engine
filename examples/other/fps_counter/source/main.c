@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
+
+// TODO: There are better ways to do this, for example, using the VBL interrupt
+// to check if the second has changed.
 
 #include <time.h>
 
@@ -11,21 +14,23 @@
 #include "teapot_bin.h"
 #include "teapot.h"
 
-// Note: There are better ways to do this, for example, using the VBL interrupt
-// to check if the second has changed.
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model;
+} SceneData;
 
-NE_Camera *Camera;
-NE_Model *Model;
-NE_Material *Material;
-
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Model);
+    SceneData *Scene = arg;
+
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Model);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -38,18 +43,18 @@ int main(void)
     consoleDemoInit();
 
     // Allocate space for objects
-    Model = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
+    Scene.Model = NE_ModelCreate(NE_Static);
+    Scene.Camera = NE_CameraCreate();
+    NE_Material *Material = NE_MaterialCreate();
 
     // Set coordinates for the camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  0, 0, -3,  // Position
                  0, 0, 0,   // Look at
                  0, 1, 0);  // Up direction
 
     // Load mesh from RAM and assign it to the object "Model".
-    NE_ModelLoadStaticMesh(Model, teapot_bin);
+    NE_ModelLoadStaticMesh(Scene.Model, teapot_bin);
 
     // Load a RGB texture from RAM and assign it to "Material".
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256,
@@ -57,7 +62,7 @@ int main(void)
                        teapotBitmap);
 
     // Assign texture to model...
-    NE_ModelSetMaterial(Model, Material);
+    NE_ModelSetMaterial(Scene.Model, Material);
 
     // We set a light and its color
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
@@ -95,15 +100,15 @@ int main(void)
 
         // Rotate model using the pad
         if (keys & KEY_UP)
-            NE_ModelRotate(Model, 0, 0, 2);
+            NE_ModelRotate(Scene.Model, 0, 0, 2);
         if (keys & KEY_DOWN)
-            NE_ModelRotate(Model, 0, 0, -2);
+            NE_ModelRotate(Scene.Model, 0, 0, -2);
         if (keys & KEY_RIGHT)
-            NE_ModelRotate(Model, 0, 2, 0);
+            NE_ModelRotate(Scene.Model, 0, 2, 0);
         if (keys & KEY_LEFT)
-            NE_ModelRotate(Model, 0, -2, 0);
+            NE_ModelRotate(Scene.Model, 0, -2, 0);
 
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
 
         // Increase frame count
         fpscount++;

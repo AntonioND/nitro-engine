@@ -1,61 +1,81 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2023
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2024
 //
 // This file is part of Nitro Engine
 
 // This is an example of passing arguments to the functions passed to
-// NE_ProcessDualArg(). This example only passes a color to be used as clear
-// color, but the code could pass a pointer to a struct with the information to
-// render in that screen, or anything that the developer wants.
+// NE_ProcessDualArg(). This passes a pointer to a struct with the information
+// to render in that screen and anything else that the developer wants.
 
 #include <NEMain.h>
 
 #include "teapot_bin.h"
 #include "sphere_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Teapot, *Sphere;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Teapot;
+    uint16_t clear_color;
+} SceneData1;
+
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Sphere;
+    uint16_t clear_color;
+} SceneData2;
 
 void Draw3DScene(void *arg)
 {
-    NE_ClearColorSet(*(uint16_t *)arg, 31, 63);
+    SceneData1 *Scene = arg;
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Teapot);
+    NE_ClearColorSet(Scene->clear_color, 31, 63);
+
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Teapot);
 }
 
 void Draw3DScene2(void *arg)
 {
-    NE_ClearColorSet(*(uint16_t *)arg, 31, 63);
+    SceneData2 *Scene = arg;
 
-    NE_CameraUse(Camera);
-    NE_ModelDraw(Sphere);
+    NE_ClearColorSet(Scene->clear_color, 31, 63);
+
+    NE_CameraUse(Scene->Camera);
+    NE_ModelDraw(Scene->Sphere);
 }
 
-void init_all(void)
+void init_all(SceneData1 *Scene1, SceneData2 *Scene2)
 {
     // Allocate objects...
-    Teapot = NE_ModelCreate(NE_Static);
-    Sphere = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
+    Scene1->Teapot = NE_ModelCreate(NE_Static);
+    Scene2->Sphere = NE_ModelCreate(NE_Static);
+    Scene1->Camera = NE_CameraCreate();
+    Scene2->Camera = NE_CameraCreate();
 
     // Setup camera
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene1->Camera,
+                 0, 0, -2,
+                 0, 0, 0,
+                 0, 1, 0);
+    NE_CameraSet(Scene2->Camera,
                  0, 0, -2,
                  0, 0, 0,
                  0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Teapot, teapot_bin);
-    NE_ModelLoadStaticMesh(Sphere, sphere_bin);
+    NE_ModelLoadStaticMesh(Scene1->Teapot, teapot_bin);
+    NE_ModelLoadStaticMesh(Scene2->Sphere, sphere_bin);
 
     // Set light color and direction
     NE_LightSet(0, NE_White, -0.5, -0.5, -0.5);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData1 Scene1 = { 0 };
+    SceneData2 Scene2 = { 0 };
+
     // This is needed for special screen effects
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
@@ -65,10 +85,10 @@ int main(void)
     NE_InitDual3D();
     NE_InitConsole();
 
-    init_all();
+    init_all(&Scene1, &Scene2);
 
-    uint16_t red = NE_Red;
-    uint16_t green = NE_Green;
+    Scene1.clear_color = NE_Red;
+    Scene2.clear_color = NE_Green;
 
     bool console = true;
 
@@ -77,8 +97,7 @@ int main(void)
         NE_WaitForVBL(0);
 
         // Draw 3D scenes
-        NE_ProcessDualArg(Draw3DScene, Draw3DScene2,
-                          (void *)&red, (void *)&green);
+        NE_ProcessDualArg(Draw3DScene, Draw3DScene2, &Scene1, &Scene2);
 
         // Refresh keys
         scanKeys();
@@ -104,43 +123,43 @@ int main(void)
         // Rotate model
         if (keys & KEY_UP)
         {
-            NE_ModelRotate(Sphere, 0, 0, 2);
-            NE_ModelRotate(Teapot, 0, 0, 2);
+            NE_ModelRotate(Scene2.Sphere, 0, 0, 2);
+            NE_ModelRotate(Scene1.Teapot, 0, 0, 2);
         }
         if (keys & KEY_DOWN)
         {
-            NE_ModelRotate(Sphere, 0, 0, -2);
-            NE_ModelRotate(Teapot, 0, 0, -2);
+            NE_ModelRotate(Scene2.Sphere, 0, 0, -2);
+            NE_ModelRotate(Scene1.Teapot, 0, 0, -2);
         }
         if (keys & KEY_RIGHT)
         {
-            NE_ModelRotate(Sphere, 0, 2, 0);
-            NE_ModelRotate(Teapot, 0, 2, 0);
+            NE_ModelRotate(Scene2.Sphere, 0, 2, 0);
+            NE_ModelRotate(Scene1.Teapot, 0, 2, 0);
         }
         if (keys & KEY_LEFT)
         {
-            NE_ModelRotate(Sphere, 0, -2, 0);
-            NE_ModelRotate(Teapot, 0, -2, 0);
+            NE_ModelRotate(Scene2.Sphere, 0, -2, 0);
+            NE_ModelRotate(Scene1.Teapot, 0, -2, 0);
         }
 
         if (kdown & KEY_Y)
         {
             NE_InitDual3D();
             NE_InitConsole();
-            init_all();
+            init_all(&Scene1, &Scene2);
             console = true;
         }
         if (kdown & KEY_X)
         {
             NE_InitDual3D_FB();
-            init_all();
+            init_all(&Scene1, &Scene2);
             console = false;
         }
         if (kdown & KEY_A)
         {
             NE_InitDual3D_DMA();
             NE_InitConsole();
-            init_all();
+            init_all(&Scene1, &Scene2);
             console = true;
         }
     }

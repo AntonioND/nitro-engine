@@ -1,16 +1,8 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
-
-#include <NEMain.h>
-
-#include "a3pal32.h"
-#include "pal4.h"
-
-NE_Material *Material, *Material2;
-NE_Palette *Palette, *Palette2;
 
 // This is an example to show how Nitro Engine can load textures of any height.
 // Internally, the NDS thinks that the texture is bigger, but Nitro Engine only
@@ -28,21 +20,34 @@ NE_Palette *Palette, *Palette2;
 // - They save space in the final ROM, but you can achieve the same effect
 //   compressing them with LZSS compression, for example.
 
-void Draw3DScene(void)
+#include <NEMain.h>
+
+#include "a3pal32.h"
+#include "pal4.h"
+
+typedef struct {
+    NE_Material *Material, *Material2;
+} SceneData;
+
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     NE_2DViewInit();
 
     NE_2DDrawTexturedQuad(40, 10,
                           40 + 32, 10 + 100,
-                          0, Material);
+                          0, Scene->Material);
 
     NE_2DDrawTexturedQuad(128, 10,
                           128 + 64, 10 + 100,
-                          0, Material2);
+                          0, Scene->Material2);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_HBLANK, NE_HBLFunc);
@@ -51,31 +56,31 @@ int main(void)
     NE_Init3D();
 
     // Allocate objects for a material
-    Material = NE_MaterialCreate();
-    Palette = NE_PaletteCreate();
+    Scene.Material = NE_MaterialCreate();
+    NE_Palette *Palette = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material,
+    NE_MaterialTexLoad(Scene.Material,
                        NE_A3PAL32, // Texture type
                        64, 200,    // Width, height (in pixels)
                        NE_TEXGEN_TEXCOORD, a3pal32Bitmap);
     NE_PaletteLoad(Palette, a3pal32Pal, 32, NE_A3PAL32);
-    NE_MaterialSetPalette(Material, Palette);
+    NE_MaterialSetPalette(Scene.Material, Palette);
 
     // Allocate objects for another material
-    Material2 = NE_MaterialCreate();
-    Palette2 = NE_PaletteCreate();
+    Scene.Material2 = NE_MaterialCreate();
+    NE_Palette *Palette2 = NE_PaletteCreate();
 
-    NE_MaterialTexLoad(Material2, NE_PAL4, 64, 100, NE_TEXGEN_TEXCOORD,
+    NE_MaterialTexLoad(Scene.Material2, NE_PAL4, 64, 100, NE_TEXGEN_TEXCOORD,
                        pal4Bitmap);
     NE_PaletteLoad(Palette2, pal4Pal, 4, NE_PAL4);
-    NE_MaterialSetPalette(Material2, Palette2);
+    NE_MaterialSetPalette(Scene.Material2, Palette2);
 
     while (1)
     {
         NE_WaitForVBL(0);
 
         // Draw 3D scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;
