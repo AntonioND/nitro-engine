@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -17,7 +17,7 @@ typedef struct {
 
 quad_t Quad[NUM_QUADS];
 
-uint32_t kheld;
+bool enable_alpha = false;
 
 void UpdateQuads(void)
 {
@@ -55,7 +55,7 @@ void Draw3DScene(void)
         if (!Quad[i].enabled)
             continue;
 
-        if (kheld & KEY_A)
+        if (enable_alpha)
             NE_PolyFormat(Quad[i].alpha, Quad[i].id, 0, NE_CULL_NONE, 0);
 
         NE_2DDrawQuad(Quad[i].x1, Quad[i].y1, Quad[i].x2, Quad[i].y2, i,
@@ -83,7 +83,11 @@ int main(void)
         NE_WaitForVBL(0);
 
         scanKeys();
-        kheld = keysHeld();
+        uint16_t kheld = keysHeld();
+        if (kheld & KEY_A)
+            enable_alpha = true;
+        else
+            enable_alpha = false;
 
         UpdateQuads();
 
