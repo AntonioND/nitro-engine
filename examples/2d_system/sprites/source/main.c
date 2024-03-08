@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
 #include <NEMain.h>
 
 #include "icon.h"
-
-NE_Material *Material;
-NE_Palette *Palette;
-NE_Sprite *Sprite[4];
 
 void Draw3DScene(void)
 {
@@ -27,8 +23,8 @@ int main(void)
     NE_Init3D();
     NE_SwapScreens();
 
-    Material = NE_MaterialCreate();
-    Palette = NE_PaletteCreate();
+    NE_Material *Material = NE_MaterialCreate();
+    NE_Palette *Palette = NE_PaletteCreate();
 
     NE_MaterialTexLoad(Material, NE_PAL16, 128, 128, NE_TEXGEN_TEXCOORD,
                        iconBitmap);
@@ -38,6 +34,7 @@ int main(void)
 
     NE_ClearColorSet(NE_Gray, 31, 63);
 
+    NE_Sprite *Sprite[4];
     Sprite[0] = NE_SpriteCreate();
     Sprite[1] = NE_SpriteCreate();
     Sprite[2] = NE_SpriteCreate();

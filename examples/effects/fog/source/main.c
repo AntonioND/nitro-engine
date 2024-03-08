@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022, 2024
 //
 // This file is part of Nitro Engine
 
@@ -9,26 +9,31 @@
 #include "texture.h"
 #include "sphere_bin.h"
 
-NE_Camera *Camera;
-NE_Model *Model, *Model2, *Model3;
-NE_Material *Material;
+typedef struct {
+    NE_Camera *Camera;
+    NE_Model *Model, *Model2, *Model3;
+} SceneData;
 
-void Draw3DScene(void)
+void Draw3DScene(void *arg)
 {
+    SceneData *Scene = arg;
+
     // Set camera
-    NE_CameraUse(Camera);
+    NE_CameraUse(Scene->Camera);
 
     // This has to be used to use fog
     NE_PolyFormat(31, 0, NE_LIGHT_ALL, NE_CULL_BACK, NE_FOG_ENABLE);
 
     // Draw models
-    NE_ModelDraw(Model);
-    NE_ModelDraw(Model2);
-    NE_ModelDraw(Model3);
+    NE_ModelDraw(Scene->Model);
+    NE_ModelDraw(Scene->Model2);
+    NE_ModelDraw(Scene->Model3);
 }
 
 int main(void)
 {
+    SceneData Scene = { 0 };
+
     irqEnable(IRQ_HBLANK);
     irqSet(IRQ_VBLANK, NE_VBLFunc);
     irqSet(IRQ_VBLANK, NE_HBLFunc);
@@ -41,39 +46,39 @@ int main(void)
     consoleDemoInit();
 
     // Allocate objects
-    Model = NE_ModelCreate(NE_Static);
-    Model2 = NE_ModelCreate(NE_Static);
-    Model3 = NE_ModelCreate(NE_Static);
-    Camera = NE_CameraCreate();
-    Material = NE_MaterialCreate();
+    Scene.Model = NE_ModelCreate(NE_Static);
+    Scene.Model2 = NE_ModelCreate(NE_Static);
+    Scene.Model3 = NE_ModelCreate(NE_Static);
+    Scene.Camera = NE_CameraCreate();
+    NE_Material *Material = NE_MaterialCreate();
 
     // Set camera coordinates
-    NE_CameraSet(Camera,
+    NE_CameraSet(Scene.Camera,
                  -1, 2, -1,
                   1, 1, 1,
                   0, 1, 0);
 
     // Load models
-    NE_ModelLoadStaticMesh(Model, sphere_bin);
-    NE_ModelLoadStaticMesh(Model2, sphere_bin);
-    NE_ModelLoadStaticMesh(Model3, sphere_bin);
+    NE_ModelLoadStaticMesh(Scene.Model, sphere_bin);
+    NE_ModelLoadStaticMesh(Scene.Model2, sphere_bin);
+    NE_ModelLoadStaticMesh(Scene.Model3, sphere_bin);
 
     // Load texture
     NE_MaterialTexLoad(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                        textureBitmap);
 
     // Assign the same material to every model object.
-    NE_ModelSetMaterial(Model, Material);
-    NE_ModelSetMaterial(Model2, Material);
-    NE_ModelSetMaterial(Model3, Material);
+    NE_ModelSetMaterial(Scene.Model, Material);
+    NE_ModelSetMaterial(Scene.Model2, Material);
+    NE_ModelSetMaterial(Scene.Model3, Material);
 
     // Set light and vector of light 0
     NE_LightSet(0, NE_White, 0, -1, -1);
 
     // Set position of every object
-    NE_ModelSetCoord(Model, 1, 0, 1);
-    NE_ModelSetCoord(Model2, 3, 1, 3);
-    NE_ModelSetCoord(Model3, 7, 2, 7);
+    NE_ModelSetCoord(Scene.Model, 1, 0, 1);
+    NE_ModelSetCoord(Scene.Model2, 3, 1, 3);
+    NE_ModelSetCoord(Scene.Model3, 7, 2, 7);
 
     // Set initial fog color to black
     u32 color = NE_Black;
@@ -125,7 +130,7 @@ int main(void)
                shift, mass, depth);
 
         // Draw scene
-        NE_Process(Draw3DScene);
+        NE_ProcessArg(Draw3DScene, &Scene);
     }
 
     return 0;
