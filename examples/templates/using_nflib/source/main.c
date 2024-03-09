@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: CC0-1.0
 //
-// SPDX-FileContributor: Antonio Niño Díaz, 2008-2011, 2019, 2022-2024
+// SPDX-FileContributor: Antonio Niño Díaz, 2008-2024
 // SPDX-FileContributor: NightFox, 2009-2011
 //
 // This file is part of Nitro Engine
