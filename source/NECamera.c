@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2008-2022 Antonio Niño Díaz
+// Copyright (c) 2008-2024 Antonio Niño Díaz
 //
 // This file is part of Nitro Engine
 
@@ -13,7 +13,7 @@ static int NE_MAX_CAMERAS;
 static bool ne_camera_system_inited = false;
 
 // Internal use only
-static void __NE_CameraUpdateMatrix(NE_Camera * cam)
+ARM_CODE static void __NE_CameraUpdateMatrix(NE_Camera * cam)
 {
     // From libnds, modified a bit
     int32 side[3], forward[3], up[3];
@@ -118,7 +118,7 @@ void NE_CameraUse(NE_Camera *cam)
     glLoadMatrix4x4(&cam->matrix);
 }
 
-void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
+ARM_CODE void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 {
     NE_AssertPointer(cam, "NULL pointer");
 
@@ -189,7 +189,7 @@ void NE_CameraMoveI(NE_Camera *cam, int x, int y, int z)
     cam->to[2] += z;
 }
 
-void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
+ARM_CODE void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 {
     NE_AssertPointer(cam, "NULL pointer");
 
@@ -250,7 +250,8 @@ void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 }
 
 // Internal use only
-static void __NE_RotateVectorAxis(int32 *vector, int angle, int x, int y, int z)
+ARM_CODE static void __NE_RotateVectorAxis(int32 *vector, int angle,
+                                           int x, int y, int z)
 {
     // Vector must be an array of 3 ints with your vector in f32 format!
     int sin = sinLerp(angle << 6);
@@ -314,7 +315,7 @@ void NE_CameraRotateAxisI(NE_Camera *cam, int angle, int x, int y, int z)
         cam->to[i] = cam->from[i] + cam_vector[i];
 }
 
-void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz)
+ARM_CODE void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz)
 {
     NE_AssertPointer(cam, "NULL pointer");
 
