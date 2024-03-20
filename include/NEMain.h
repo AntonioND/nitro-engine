@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+#ifndef NE_BLOCKSDS
+# ifndef ARM_CODE
+#  define ARM_CODE __attribute__((target("arm")))
+# endif
+#endif
+
 #include "NE2D.h"
 #include "NEAnimation.h"
 #include "NECamera.h"
