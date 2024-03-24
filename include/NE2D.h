@@ -34,6 +34,10 @@ typedef struct {
     int priority;     ///< Priority (Z coordinate)
     u32 color;        ///< Color
     NE_Material *mat; ///< Material
+    s16 tl;           ///< Left coordinate of the texture canvas
+    s16 tr;           ///< Right coordinate of the texture canvas
+    s16 tt;           ///< Top coordinate of the texture canvas
+    s16 tb;           ///< Bottom coordinate of the texture canvas
     bool visible;     ///< true if visible, false if not
     u8 alpha;         ///< Alpha value
     u8 id;            ///< Polygon ID
@@ -91,6 +95,19 @@ void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale);
 /// @param sprite Sprite.
 /// @param mat Material.
 void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat);
+
+/// Defines the part of the texture that is used when drawing the sprite.
+///
+/// This is useful if you have a texture with multiple images and you need to
+/// define a specific part of the texture for a sprite, but other parts of the
+/// texture for others.
+///
+/// @param sprite Sprite.
+/// @param tl Texture left X coordinate.
+/// @param tt Texture top Y coordinate.
+/// @param tr Texture right X coordinate.
+/// @param tb Texture bottom Y coordinate.
+void NE_SpriteSetMaterialCanvas(NE_Sprite *sprite, int tl, int tt, int tr, int tb);
 
 /// Set priority of a sprite.
 ///
@@ -274,6 +291,24 @@ void NE_2DDrawTexturedQuadColor(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
                                    const NE_Material *mat, u32 color1,
                                    u32 color2, u32 color3, u32 color4);
+
+/// Draws a quad with a material at the given coordinates with a flat color and
+/// with the specified texture coordinates.
+///
+/// @param x1 (x1, y1) Upper - left vertex.
+/// @param y1 (x1, y1) Upper - left vertex.
+/// @param x2 (x2, y2) Lower - right vertex.
+/// @param y2 (x2, y2) Lower - right vertex.
+/// @param z Priority.
+/// @param tl Texture left X coordinate.
+/// @param tt Texture top Y coordinate.
+/// @param tr Texture right X coordinate.
+/// @param tb Texture bottom Y coordinate.
+/// @param mat Material to use.
+/// @param color Color
+void NE_2DDrawTexturedQuadColorCanvas(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
+                                      int tl, int tt, int tr, int tb,
+                                      const NE_Material *mat, u32 color);
 
 /// @}
 

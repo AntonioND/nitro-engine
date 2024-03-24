@@ -81,8 +81,27 @@ void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat)
     NE_AssertPointer(mat, "NULL material pointer");
     sprite->mat = mat;
 
-    sprite->w = NE_TextureGetSizeX(mat);
-    sprite->h = NE_TextureGetSizeY(mat);
+    int mat_w = NE_TextureGetSizeX(mat);
+    int mat_h = NE_TextureGetSizeY(mat);
+
+    sprite->w = mat_w;
+    sprite->h = mat_h;
+
+    sprite->tl = 0;
+    sprite->tr = mat_w;
+    sprite->tt = 0;
+    sprite->tb = mat_h;
+}
+
+void NE_SpriteSetMaterialCanvas(NE_Sprite *sprite, int tl, int tt, int tr, int tb)
+{
+    NE_AssertPointer(sprite, "NULL sprite pointer");
+    NE_AssertPointer(sprite->mat, "Sprite doesn't have a material");
+
+    sprite->tl = tl;
+    sprite->tr = tr;
+    sprite->tt = tt;
+    sprite->tb = tb;
 }
 
 void NE_SpriteSetPriority(NE_Sprite *sprite, int priority)
@@ -199,11 +218,15 @@ void NE_SpriteDraw(const NE_Sprite *sprite)
     }
 
     GFX_POLY_FORMAT = POLY_ALPHA(sprite->alpha) | POLY_ID(sprite->id) |
-                        NE_CULL_NONE;
+                      NE_CULL_NONE;
 
-    NE_2DDrawTexturedQuadColor(sprite->x, sprite->y,
-                               sprite->x + sprite->w, sprite->y + sprite->h,
-                               sprite->priority, sprite->mat, sprite->color);
+    NE_2DDrawTexturedQuadColorCanvas(sprite->x, sprite->y,
+                                     sprite->x + sprite->w,
+                                     sprite->y + sprite->h,
+                                     sprite->priority,
+                                     sprite->tl, sprite->tt,
+                                     sprite->tr, sprite->tb,
+                                     sprite->mat, sprite->color);
 
     if (sprite->rot_angle)
         MATRIX_POP = 1;
@@ -243,11 +266,13 @@ void NE_SpriteDrawAll(void)
         GFX_POLY_FORMAT = POLY_ALPHA(sprite->alpha) |
                           POLY_ID(sprite->id) | NE_CULL_NONE;
 
-        NE_2DDrawTexturedQuadColor(sprite->x, sprite->y,
-                                   sprite->x + sprite->w,
-                                   sprite->y + sprite->h,
-                                   sprite->priority,
-                                   sprite->mat, sprite->color);
+        NE_2DDrawTexturedQuadColorCanvas(sprite->x, sprite->y,
+                                         sprite->x + sprite->w,
+                                         sprite->y + sprite->h,
+                                         sprite->priority,
+                                         sprite->tl, sprite->tt,
+                                         sprite->tr, sprite->tb,
+                                         sprite->mat, sprite->color);
 
         if (sprite->rot_angle)
             MATRIX_POP = 1;
@@ -469,5 +494,32 @@ void NE_2DDrawTexturedQuadGradient(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
 
     GFX_COLOR = color2;
     GFX_TEX_COORD = TEXTURE_PACK(inttot16(x), 0);
+    GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF); // Up-right
+}
+
+void NE_2DDrawTexturedQuadColorCanvas(s16 x1, s16 y1, s16 x2, s16 y2, s16 z,
+                                      int tl, int tt, int tr, int tb,
+                                      const NE_Material *mat, u32 color)
+{
+    NE_AssertPointer(mat, "NULL pointer");
+    NE_Assert(mat->texindex != NE_NO_TEXTURE, "No texture");
+
+    NE_MaterialUse(mat);
+
+    GFX_COLOR = color;
+
+    GFX_BEGIN = GL_QUADS;
+
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(tl), inttot16(tt));
+    GFX_VERTEX16 = (y1 << 16) | (x1 & 0xFFFF); // Up-left
+    GFX_VERTEX16 = z;
+
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(tl), inttot16(tb));
+    GFX_VERTEX_XY = (y2 << 16) | (x1 & 0xFFFF); // Down-left
+
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(tr), inttot16(tb));
+    GFX_VERTEX_XY = (y2 << 16) | (x2 & 0xFFFF); // Down-right
+
+    GFX_TEX_COORD = TEXTURE_PACK(inttot16(tr), inttot16(tt));
     GFX_VERTEX_XY = (y1 << 16) | (x2 & 0xFFFF); // Up-right
 }
