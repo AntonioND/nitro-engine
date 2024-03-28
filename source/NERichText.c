@@ -112,7 +112,7 @@ int NE_RichTextMetadataLoadFAT(u32 slot, const char *path)
 
     info->handle = handle;
 
-    return 0;
+    return 1;
 }
 
 int NE_RichTextMetadataLoadMemory(u32 slot, const void *data, size_t data_size)
