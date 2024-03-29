@@ -36,14 +36,6 @@
 
 #define NE_MAX_RICH_TEXT_FONTS 8 ///< Default max number of rich text fonts
 
-/// Change the priority of rich text drawn after this function call.
-///
-/// @param priority New priority.
-void NE_RichTextPrioritySet(int priority);
-
-/// Set to 0 the priority of rich text drawn after this function call.
-void NE_RichTextPriorityReset(void);
-
 /// Clears all rich text font slots.
 void NE_RichTextResetSystem(void);
 
