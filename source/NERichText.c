@@ -322,6 +322,28 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
     return 1;
 }
 
+int NE_RichTextRenderDryRun(u32 slot, const char *str,
+                            size_t *size_x, size_t *size_y)
+{
+    NE_AssertPointer(str, "NULL str pointer");
+    NE_AssertPointer(size_x, "NULL size X pointer");
+    NE_AssertPointer(size_y, "NULL size Y pointer");
+
+    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+        return 0;
+
+    ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
+    if (!info->active)
+        return 0;
+
+    dsf_error err = DSF_StringRenderDryRun(info->handle, str,
+                                           size_x, size_y);
+    if (err != DSF_NO_ERROR)
+        return 0;
+
+    return 1;
+}
+
 int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
 {
     NE_AssertPointer(str, "NULL str pointer");

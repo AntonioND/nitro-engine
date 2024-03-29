@@ -149,6 +149,16 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
                          NE_TextureFormat texture_fmt,
                          const void *palette_buffer, size_t palette_size);
 
+/// Calculates the final size of rendering the provided string.
+///
+/// @param slot The slot to use.
+/// @param str The string to render.
+/// @param size_x Pointer to store the width of the resulting image.
+/// @param size_y Pointer to store the height of the resulting image.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRenderDryRun(u32 slot, const char *str,
+                            size_t *size_x, size_t *size_y);
+
 /// Render a string by rendering one 3D quad per codepoint.
 ///
 /// This preserves the polygon format that is currently active.
