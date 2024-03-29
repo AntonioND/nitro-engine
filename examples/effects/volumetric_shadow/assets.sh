@@ -13,8 +13,3 @@ python3 $OBJ2DL \
     --output data/teapot.bin \
     --texture 256 256 \
     --scale 0.1
-
-python3 $OBJ2DL \
-    --input $ASSETS/cube.obj \
-    --output data/cube.bin \
-    --texture 256 256 \
