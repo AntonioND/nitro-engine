@@ -1,6 +1,32 @@
 Changelog
 =========
 
+Version 0.12.0 (2024-03-30)
+---------------------------
+
+- Deprecate ``NE_ShadingEnable()``. The name was misleading. All examples that
+  use it have stopped calling it.
+- For sprites, add a way to specify texture coordinates inside the material to
+  use a small part of the texture instead of the whole texture:
+  ``NE_SpriteSetMaterialCanvas()``. This is now used in the sprites example.
+- Stop using global variables in most examples. Instead, the rendering functions
+  get values through the arguments of ``NE_ProcessArg()`` and
+  ``NE_ProcessDualArg()``.
+- Don't expect palette objects when loading GRF files if the file doesn't
+  contain a palette.
+- Allow loading BMFont fonts from RAM, not just nitroFS. Add an example of
+  using rich text fonts from RAM.
+- Added a function to reset the rich text font system. Also add a function to
+  return the size that a specific text string would have if drawn.
+- Add shadow volume example.
+- Build some functions that do lots of multiplications as ARM to increase
+  performance.
+- Fix compilation with devkitARM.
+- Fix linker invocation for C++ with BlocksDS.
+- Update libDSF to version 0.1.2, with some speed improvements.
+- Relicensed libDSF under "Zlib OR MIT" to simplify licensing with Nitro Engine.
+- Some minor documentation improvements.
+
 Version 0.11.0 (2024-03-02)
 ---------------------------
 
