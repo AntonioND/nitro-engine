@@ -33,6 +33,16 @@ static ne_rich_textinfo_t NE_RichTextInfo[NE_MAX_RICH_TEXT_FONTS];
 
 static int NE_RICH_TEXT_PRIORITY = 0;
 
+void NE_RichTextPrioritySet(int priority)
+{
+    NE_RICH_TEXT_PRIORITY = priority;
+}
+
+void NE_RichTextPriorityReset(void)
+{
+    NE_RICH_TEXT_PRIORITY = 0;
+}
+
 void NE_RichTextInit(u32 slot)
 {
     if (slot >= NE_MAX_RICH_TEXT_FONTS)
@@ -44,6 +54,8 @@ void NE_RichTextInit(u32 slot)
 
     memset(info, 0, sizeof(ne_rich_textinfo_t));
     info->active = true;
+
+    NE_RichTextPriorityReset();
 }
 
 int NE_RichTextEnd(u32 slot)
