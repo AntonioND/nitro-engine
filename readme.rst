@@ -18,7 +18,7 @@ Features:
   <https://github.com/AntonioND/dsma-library>`_, which converts MD5 models (with
   skeletal animation) into a format that can be rendered with hardware
   acceleration. It can also blend two animations together (for transitions).
-- Support for all format of textures (even compressed textures, thanks to 
+- Support for all format of textures (even compressed textures, thanks to
   `ptexconv <https://github.com/Garhoogin/ptexconv>`_).
 - Dual 3D (render 3D to both screens, but at 30 FPS instead of 60 FPS).
 - Functions to render 2D images accelerated by 3D hardware.
@@ -82,6 +82,16 @@ BlocksDS
 
    That should build an ``.nds`` file that you can run on an emulator or real
    hardware.
+
+Note: The build system of the examples in this repository is make. The makefiles
+aren't very flexible, and they don't support converting 3D models, or saving
+graphics or models to the filesystem (you can only inject them as data to the
+ARM9, which isn't acceptable for big games).
+
+For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`. This
+build system written in Python supports converting every format that Nitro
+Engine supports, and it lets you save everything in NitroFS so that your game
+can grow as much as you want.
 
 Common
 ------
