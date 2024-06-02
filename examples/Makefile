@@ -1,20 +1,28 @@
-SUBDIRS:= $(shell ls)
+# SPDX-License-Identifier: CC0-1.0
+#
+# SPDX-FileContributor: Antonio Niño Díaz, 2023-2024
 
-#-------------------------------------------------------------------------------
-all: examples
-#-------------------------------------------------------------------------------
-	@rm -fr build-all
+.PHONY: all clean
+
+MAKE	:= make
+
+all:
+	@for i in `ls`; do \
+		if test -e $$i/Makefile ; then \
+			cd $$i; \
+			$(MAKE) --no-print-directory || exit 1 ; \
+			cd ..; \
+		fi; \
+	done;
 	@mkdir -p build-all
 	@find . -name "*.nds" -not -path build-all -exec cp -fv {} build-all \;
 
-# TODO: The previous target tries to copy the files from build-all into
-# themselves. Exclude them correctly.
-
-examples:
-	@for i in $(SUBDIRS); do if test -e $$i/Makefile ; then $(MAKE) -C $$i || { exit 1;} fi; done;
-
-#-------------------------------------------------------------------------------
 clean:
-#-------------------------------------------------------------------------------
+	@for i in `ls`; do \
+		if test -e $$i/Makefile ; then \
+			cd $$i; \
+			$(MAKE) clean --no-print-directory || exit 1 ; \
+			cd ..; \
+		fi; \
+	done;
 	@rm -fr build-all
-	@for i in $(SUBDIRS); do if test -e $$i/Makefile ; then $(MAKE)  -C $$i clean || { exit 1;} fi; done;

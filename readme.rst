@@ -8,8 +8,9 @@ Introduction
 This is a 3D game engine, a lot of functions designed to simplify the process of
 making a 3D game. It isn't standalone, it needs libnds to work.
 
-You may use Nitro Engine with both devkitPro installations, and with `BlocksDS
-<https://github.com/blocksds/sdk>`_.
+You can use Nitro Engine with `BlocksDS <https://blocksds.github.io/docs/>`_ and
+devkitPro, but BlocksDS is preferred as some features of Nitro Engine are only
+available with BlocksDS.
 
 Features:
 
@@ -36,6 +37,40 @@ to integrate Nitro Engine and NFlib in the same project `here
 Setup
 =====
 
+BlocksDS
+--------
+
+1. Clone this repository and run:
+
+   .. code:: bash
+
+       make
+       make NE_DEBUG=1
+       make install
+
+   This should build the library in both debug and release modes and install it.
+
+2. If you want to check that everything is working as expected, open one of the
+   folders of the examples and run:
+
+   .. code:: bash
+
+       make
+
+   That should build an ``.nds`` file that you can run on an emulator or real
+   hardware.
+
+Note: The build system of the examples in this repository is make. The makefiles
+aren't very flexible, and they don't support converting 3D models, or saving
+graphics or models to the filesystem (you can only inject them as data to the
+ARM9, which isn't acceptable for big games).
+
+For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`. This
+build system written in Python supports converting every format that Nitro
+Engine supports, and it lets you save everything in NitroFS so that your game
+can grow as much as you want. ArchitectDS comes with plenty of examples of how
+to use it with Nitro Engine.
+
 devkitpro
 ---------
 
@@ -51,47 +86,18 @@ devkitpro
 
    .. code:: bash
 
-       make
-       make NE_DEBUG=1
+       make -f Makefile.dkp
+       make -f Makefile.dkp NE_DEBUG=1
 
    This should build the library in both debug and release modes.
 
 3. If you want to check that everything is working as expected, open one of the
-   folders of the examples and type ``make``. That should build an ``.nds`` file
-   that you can run on an emulator or real hardware.
+   folders of the examples and type ``make -f Makefile.dkp``. That should build
+   an ``.nds`` file that you can run on an emulator or real hardware.
 
-BlocksDS
---------
-
-1. Clone this repository and run:
-
-   .. code:: bash
-
-       make -f Makefile.blocksds
-       make -f Makefile.blocksds NE_DEBUG=1
-       make -f Makefile.blocksds install
-
-   This should build the library in both debug and release modes and install it.
-
-2. If you want to check that everything is working as expected, open one of the
-   folders of the examples and run:
-
-   .. code:: bash
-
-       make -f Makefile.blocksds
-
-   That should build an ``.nds`` file that you can run on an emulator or real
-   hardware.
-
-Note: The build system of the examples in this repository is make. The makefiles
-aren't very flexible, and they don't support converting 3D models, or saving
-graphics or models to the filesystem (you can only inject them as data to the
-ARM9, which isn't acceptable for big games).
-
-For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`. This
-build system written in Python supports converting every format that Nitro
-Engine supports, and it lets you save everything in NitroFS so that your game
-can grow as much as you want.
+Note: If you're using **melonDS**, remember that any example that uses NitroFS
+with will fail if it's built with the libraries that come with devkitPro because
+of a bug in the libraries. Other emulators like **DeSmuME** still work.
 
 Common
 ------
@@ -174,7 +180,6 @@ Thanks to
 =========
 
 - **devkitPro**: https://devkitpro.org/
-- **libnds**: https://github.com/devkitPro/libnds
 - **DLDI**: https://www.chishm.com/DLDI/
 - **DeSmuME**: http://desmume.org/
 - **melonDS**: https://melonds.kuribo64.net/
