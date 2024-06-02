@@ -13,14 +13,14 @@ MAKE := make
 .PHONY: all install clean
 
 all:
-	$(MAKE) -f Makefile.blocks
-	$(MAKE) -f Makefile.blocks NE_DEBUG=1
+	$(MAKE) -f Makefile.blocksds
+	$(MAKE) -f Makefile.blocksds NE_DEBUG=1
 
 install: all
-	$(MAKE) -f Makefile.blocks install
+	$(MAKE) -f Makefile.blocksds install
 
 clean:
-	$(MAKE) -f Makefile.blocks clean
+	$(MAKE) -f Makefile.blocksds clean
 
 .PHONY: dkp dkp-clean
 
