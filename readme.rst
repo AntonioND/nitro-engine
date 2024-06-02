@@ -44,9 +44,7 @@ BlocksDS
 
    .. code:: bash
 
-       make
-       make NE_DEBUG=1
-       make install
+       make install -j`nproc`
 
    This should build the library in both debug and release modes and install it.
 
@@ -86,8 +84,7 @@ devkitpro
 
    .. code:: bash
 
-       make -f Makefile.dkp
-       make -f Makefile.dkp NE_DEBUG=1
+       make dkp -j`nproc`
 
    This should build the library in both debug and release modes.
 
