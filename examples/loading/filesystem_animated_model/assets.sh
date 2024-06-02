@@ -1,10 +1,10 @@
 #!/bin/sh
 
-NITRO_ENGINE=$DEVKITPRO/nitro-engine
+NITRO_ENGINE=../../..
 ASSETS=$NITRO_ENGINE/examples/assets
 TOOLS=$NITRO_ENGINE/tools
 MD5_TO_DSMA=$TOOLS/md5_to_dsma/md5_to_dsma.py
-GRIT=grit
+GRIT=/opt/blocksds/core/tools/grit/grit
 
 rm -rf nitrofiles
 mkdir -p nitrofiles

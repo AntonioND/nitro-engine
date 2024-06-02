@@ -1,10 +1,10 @@
 #!/bin/sh
 
-NITRO_ENGINE=$DEVKITPRO/nitro-engine
+NITRO_ENGINE=../../..
 ASSETS=$NITRO_ENGINE/examples/assets
 TOOLS=$NITRO_ENGINE/tools
 OBJ2DL=$TOOLS/obj2dl/obj2dl.py
-GRIT=grit
+GRIT=/opt/blocksds/core/tools/grit/grit
 
 rm -rf nitrofiles
 mkdir -p nitrofiles
