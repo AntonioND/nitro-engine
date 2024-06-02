@@ -591,8 +591,8 @@ def save_animation(frames, output_file, blender_fix):
             f.write(bytearray(b))
 
 def convert_md5mesh(model_file, name, output_folder, texture_size,
-                    draw_normal_polygons, extension, blender_fix,
-                    export_base_pose):
+                    draw_normal_polygons, extension_mesh, extension_anim,
+                    blender_fix, export_base_pose):
 
     print(f"Converting model: {model_file}")
 
@@ -610,7 +610,7 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
         print("Converting base pose...")
 
         save_animation([joints],
-                       os.path.join(output_folder, f"{name}{extension}"),
+                       os.path.join(output_folder, f"{name}{extension_anim}"),
                        blender_fix)
 
     print("Converting meshes...")
@@ -751,10 +751,10 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
     dl.end_vtxs()
     dl.finalize()
 
-    dl.save_to_file(os.path.join(output_folder, f"{name}{extension}"))
+    dl.save_to_file(os.path.join(output_folder, f"{name}{extension_mesh}"))
 
 
-def convert_md5anim(name, output_folder, anim_file, skip_frames, extension,
+def convert_md5anim(name, output_folder, anim_file, skip_frames, extension_anim,
                     blender_fix):
 
     print(f"Converting animation: {anim_file}")
@@ -767,7 +767,7 @@ def convert_md5anim(name, output_folder, anim_file, skip_frames, extension,
 
     frames = frames[::skip_frames+1]
     save_animation(frames, os.path.join(output_folder,
-                   f"{name}_{anim_name}{extension}"), blender_fix)
+                   f"{name}_{anim_name}{extension_anim}"), blender_fix)
 
 
 if __name__ == "__main__":
@@ -776,8 +776,8 @@ if __name__ == "__main__":
     import sys
     import traceback
 
-    print("md5_to_dsma v0.1.0")
-    print("Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>")
+    print("md5_to_dsma v0.1.1")
+    print("Copyright (c) 2022-2024 Antonio Niño Díaz <antonio_nd@outlook.com>")
     print("All rights reserved")
     print("")
 
@@ -841,7 +841,8 @@ if __name__ == "__main__":
         if args.model is not None:
             convert_md5mesh(args.model, args.name, args.output, args.texture,
                             args.draw_normal_polygons, extension_mesh,
-                            args.blender_fix, args.export_base_pose)
+                            extension_anim, args.blender_fix,
+                            args.export_base_pose)
 
         for anim_file in args.anims:
             convert_md5anim(args.name, args.output, anim_file, args.skip_frames,
