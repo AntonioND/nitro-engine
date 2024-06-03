@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     // Load mesh from the filesystem and assign it to the object "Model".
     NE_ModelLoadStaticMeshFAT(Scene.Model, "robot.bin");
     // Load a RGB texture from RAM and assign it to "Material".
-    NE_MaterialTexLoadFAT(Material, NE_RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
+    NE_MaterialTexLoadFAT(Material, NE_A1RGB5, 256, 256, NE_TEXGEN_TEXCOORD,
                           "texture.img.bin");
 
     // Assign texture to model...
