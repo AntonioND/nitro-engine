@@ -633,13 +633,13 @@ int NE_MaterialTexLoad(NE_Material *tex, NE_TextureFormat fmt,
 
     if (fmt == NE_RGB5)
     {
-        // Treat NE_RGB5 as NE_A1RGB5, but set each alpha bit to 1 during the
+        // NE_RGB5 is NE_A1RGB5 with each alpha bit manually set to 1 during the
         // copy to VRAM.
-        u16 *src = (u16 *)texture;
-        u16 *dest = addr;
-        size >>= 1; // We are going to process two bytes each iteration
+        uint32_t *src = (uint32_t *)texture;
+        uint32_t *dest = addr;
+        size >>= 2; // We are going to process four bytes each iteration
         while (size--)
-            *dest++ = *src++ | (1 << 15);
+            *dest++ = *src++ | ((1 << 15) | (1 << 31));
 
         fmt = NE_A1RGB5;
     }
