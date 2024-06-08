@@ -1,6 +1,15 @@
 Changelog
 =========
 
+Version 0.13.0 (2024-06-08)
+---------------------------
+
+- Define BlocksDS as the main toolchain to use with Nitro Engine.
+- Simplify build and installation instructions of the library.
+- Update ``md5_2_dsma`` to correctly export the base animation of models.
+- Stop using ``NE_RGB5`` in the examples, this format is discouraged.
+- Optimize copy of ``NE_RGB5`` textures to VRAM.
+
 Version 0.12.0 (2024-03-30)
 ---------------------------
 
