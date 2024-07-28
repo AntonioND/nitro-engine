@@ -16,7 +16,7 @@ static bool ne_camera_system_inited = false;
 ARM_CODE static void __NE_CameraUpdateMatrix(NE_Camera * cam)
 {
     // From libnds, modified a bit
-    int32 side[3], forward[3], up[3];
+    int32_t side[3], forward[3], up[3];
 
     for (int i = 0; i < 3; i++)
         forward[i] = cam->from[i] - cam->to[i];
@@ -124,8 +124,8 @@ ARM_CODE void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
 
     cam->matrix_is_updated = false;
 
-    int32 vec_front[3], vec_right[3], vec_up[3];
-    int32 result[3] = { 0, 0, 0 };
+    int32_t vec_front[3], vec_right[3], vec_up[3];
+    int32_t result[3] = { 0, 0, 0 };
 
     // Temporary vector used to normalize other vectors
     int temp[3];
@@ -137,7 +137,7 @@ ARM_CODE void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
     {
         for (int i = 0; i < 3; i++)
             temp[i] = vec_front[i];
-        normalizef32((int32 *) &temp);
+        normalizef32((int32_t *) &temp);
         for (int i = 0; i < 3; i++)
             result[i] += mulf32(temp[i], front);
     }
@@ -152,7 +152,7 @@ ARM_CODE void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
         {
             for (int i = 0; i < 3; i++)
                 temp[i] = vec_right[i];
-            normalizef32((int32 *) &temp);
+            normalizef32((int32_t *) &temp);
             for (int i = 0; i < 3; i++)
                 result[i] += mulf32(temp[i], right);
         }
@@ -161,7 +161,7 @@ ARM_CODE void NE_CameraMoveFreeI(NE_Camera *cam, int front, int right, int up)
         {
             crossf32(vec_right, vec_front, vec_up);
             // Last vector, not needed to use "temp"
-            normalizef32((int32 *) &vec_up);
+            normalizef32((int32_t *) &vec_up);
             for (int i = 0; i < 3; i++)
                 result[i] += mulf32(vec_up[i], up);
         }
@@ -250,7 +250,7 @@ ARM_CODE void NE_CameraRotate(NE_Camera *cam, int rx, int ry, int rz)
 }
 
 // Internal use only
-ARM_CODE static void __NE_RotateVectorAxis(int32 *vector, int angle,
+ARM_CODE static void __NE_RotateVectorAxis(int32_t *vector, int angle,
                                            int x, int y, int z)
 {
     // Vector must be an array of 3 ints with your vector in f32 format!
@@ -304,7 +304,7 @@ void NE_CameraRotateAxisI(NE_Camera *cam, int angle, int x, int y, int z)
 
     cam->matrix_is_updated = false;
 
-    int32 cam_vector[3];
+    int32_t cam_vector[3];
 
     for (int i = 0; i < 3; i++)
         cam_vector[i] = cam->to[i] - cam->from[i];
@@ -324,7 +324,7 @@ ARM_CODE void NE_CameraRotateFree(NE_Camera *cam, int rx, int ry, int rz)
 
     cam->matrix_is_updated = false;
 
-    int32 vec_front[3], vec_right[3], vec_up[3];
+    int32_t vec_front[3], vec_right[3], vec_up[3];
 
     for (int i = 0; i < 3; i++)
         vec_front[i] = cam->to[i] - cam->from[i];

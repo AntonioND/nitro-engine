@@ -129,7 +129,7 @@ void NE_FogEnable(u32 shift, u32 color, u32 alpha, int mass, int depth)
     //    GFX_FOG_TABLE[i] = i << 2;
 
     // We need a 0 in the first fog table entry!
-    int32 density = -(mass << 1);
+    int32_t density = -(mass << 1);
 
     for (int i = 0; i < 32; i++)
     {

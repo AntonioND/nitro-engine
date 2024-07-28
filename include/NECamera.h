@@ -25,9 +25,9 @@
 /// Holds information of the camera.
 typedef struct {
     m4x4 matrix;   ///< Matrix that represents the transformation
-    int32 from[3]; ///< Coordinates of location of the camera
-    int32 to[3];   ///< Where the camera is looking at
-    int32 up[3];   ///< Vector that points "up"
+    int32_t from[3]; ///< Coordinates of location of the camera
+    int32_t to[3];   ///< Where the camera is looking at
+    int32_t up[3];   ///< Vector that points "up"
     bool matrix_is_updated; ///< Set to false when the matrix isn't up-to-date
 } NE_Camera;
 
