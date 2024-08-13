@@ -324,6 +324,8 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
             free(info->palette_buffer);
     }
 
+    info->has_to_free_buffers = false;
+
     info->texture_buffer = (void *)texture_buffer;
     info->texture_width = texture_width;
     info->texture_height = texture_height;
@@ -414,7 +416,7 @@ int NE_RichTextRenderMaterial(u32 slot, const char *str, NE_Material **mat,
     if (!info->active)
         return 0;
 
-    void *out_texture;
+    void *out_texture = NULL;
     size_t out_width, out_height;
     dsf_error err = DSF_StringRenderToTexture(info->handle,
                             str, info->fmt, info->texture_buffer,
