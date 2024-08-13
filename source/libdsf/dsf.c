@@ -931,7 +931,6 @@ dsf_error DSF_StringRenderToTexture(dsf_handle handle,
     // Allocate buffer
 
     void *tex_buffer = calloc(1, tex_size);
-    memset(tex_buffer, 0, tex_size);
     if (tex_buffer == NULL)
         return DSF_NO_MEMORY;
 

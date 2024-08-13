@@ -20,7 +20,7 @@
 /// Minor version of LibDSF (semver)
 #define LIBDSF_VERSION_MINOR 1
 /// Patch version of LibDSF (semver)
-#define LIBDSF_VERSION_PATCH 2
+#define LIBDSF_VERSION_PATCH 3
 
 /// Value that combines all version numbers, useful for version checks.
 #define LIBDSF_VERSION \
@@ -29,7 +29,7 @@
                  (LIBDSF_VERSION_PATCH << 1))
 
 /// Version string
-#define LIBDSF_VERSION_STRING "0.1.2"
+#define LIBDSF_VERSION_STRING "0.1.3"
 
 /// Character that is used when there are UTF-8 decoding errors.
 ///
@@ -154,15 +154,15 @@ dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
 ///
 /// Also, note that this texture doesn't need to have a size that is a power of
 /// two. However, consider that the size of a row should at least be a multiple
-/// of a full byte (for example, for a 16 color texture, don't use a texture
-/// with width of 143 because the last byte won't be full). To be sure that you
-/// never find any issue, ensure that your textures have a width multiple of 4
-/// pixels, that will work with all texture formats.
+/// of a full pixel (for example, for a 16 color texture, don't use a texture
+/// with width of 143 bytes because the last pixel won't be full). To be sure
+/// that you never find any issue, ensure that your textures have a width
+/// multiple of 4 pixels, that will work with all texture formats.
 ///
 /// @param handle       Handler of the font to use.
 /// @param str          String to print.
 /// @param texture_fmt  Texture format (GL_TEXTURE_TYPE_ENUM, NE_TextureFormat).
-/// @param font_texture Pointer to the font texture data that contains the.
+/// @param font_texture Pointer to the font texture.
 /// @param font_width   Width of the font texture.
 /// @param font_height  Height of the font texture.
 /// @param out_texture  The pointer to the new buffer is returned here.
