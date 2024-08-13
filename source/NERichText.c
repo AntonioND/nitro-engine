@@ -219,8 +219,6 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
             free(info->palette_buffer);
     }
 
-    int ret = 0;
-
     void *gfxDst = NULL;
     void *palDst = NULL;
     size_t palSize;
@@ -230,13 +228,13 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
     if (err != GRF_NO_ERROR)
     {
         NE_DebugPrint("Couldn't load GRF file: %d", err);
-        goto cleanup;
+        goto error;
     }
 
     if (gfxDst == NULL)
     {
         NE_DebugPrint("No graphics found in GRF file");
-        goto cleanup;
+        goto error;
     }
 
     bool palette_required = true;
@@ -266,7 +264,7 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
             break;
         default:
             NE_DebugPrint("Invalid format in GRF file");
-            goto cleanup;
+            goto error;
     }
 
     info->texture_buffer = gfxDst;
@@ -283,7 +281,7 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
         if (palette_required)
         {
             NE_DebugPrint("No palette found in GRF, but format requires it");
-            goto cleanup;
+            goto error;
         }
 
         info->palette_buffer = NULL;
@@ -292,12 +290,12 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
 
     info->has_to_free_buffers = true;
 
-    ret = 1; // Success
+    return 1; // Success
 
-cleanup:
+error:
     free(gfxDst);
     free(palDst);
-    return ret;
+    return 0;
 #endif // NE_BLOCKSDS
 }
 
