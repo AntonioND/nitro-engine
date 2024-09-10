@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 0.14.0 (2024-09-10)
+---------------------------
+
+- Use ``stdint.h`` types instead of libnds types.
+- Update BlocksDS makefiles.
+- Update libdsf to v0.1.3.
+- Fix some memory leaks/use-after-free bugs in the RichText module.
+
 Version 0.13.0 (2024-06-08)
 ---------------------------
 
