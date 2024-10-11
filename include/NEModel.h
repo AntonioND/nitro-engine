@@ -58,6 +58,7 @@ typedef struct {
     int sx;                   ///< X scale of the model (f32)
     int sy;                   ///< Y scale of the model (f32)
     int sz;                   ///< Z scale of the model (f32)
+    m4x3 *mat;                ///< Transformation matrix assigned by the user.
 } NE_Model;
 
 /// Creates a new model object.
@@ -224,6 +225,27 @@ void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz);
 /// @param ry Rotation by Y axis (0 - 511).
 /// @param rz Rotation by Z axis (0 - 511).
 void NE_ModelRotate(NE_Model *model, int rx, int ry, int rz);
+
+/// Assigns a 4x3 transformation matrix to a model.
+///
+/// When a matrix is assigned, the scale, position and rotation of the model
+/// will be ignored.
+///
+/// Note that the provided matrix is copied to the internal state of the model,
+/// so the caller of the function doesn't need to keep it in memory.
+///
+/// @param model Pointer to the model.
+/// @param mat Matrix to be used.
+/// @return Returns 1 on success, 0 on failure.
+int NE_ModelSetMatrix(NE_Model *model, m4x3 *mat);
+
+/// Clears the 4x3 transformation matrix of a model.
+///
+/// The model will start using the individual scale, translation and rotation
+/// values.
+///
+/// @param model Pointer to the model.
+void NE_ModelClearMatrix(NE_Model *model);
 
 /// Update internal state of the animation of all models.
 void NE_ModelAnimateAll(void);

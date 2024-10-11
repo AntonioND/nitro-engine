@@ -141,6 +141,8 @@ NE_Model *NE_ModelCreate(NE_ModelType type)
 
     model->sx = model->sy = model->sz = inttof32(1);
 
+    model->mat = NULL;
+
     model->modeltype = type;
     model->meshindex = NE_NO_MESH;
 
@@ -185,6 +187,9 @@ void NE_ModelDelete(NE_Model *model)
         for (int i = 0; i < 2; i++)
             free(model->animinfo[i]);
     }
+
+    if (model->mat != NULL)
+        free(model->mat);
 
     // If there is an asigned mesh
     if (model->meshindex != NE_NO_MESH)
@@ -271,20 +276,27 @@ void NE_ModelDraw(const NE_Model *model)
 
     MATRIX_PUSH = 0;
 
-    MATRIX_TRANSLATE = model->x;
-    MATRIX_TRANSLATE = model->y;
-    MATRIX_TRANSLATE = model->z;
+    if (model->mat != NULL)
+    {
+        glMultMatrix4x3(model->mat);
+    }
+    else
+    {
+        MATRIX_TRANSLATE = model->x;
+        MATRIX_TRANSLATE = model->y;
+        MATRIX_TRANSLATE = model->z;
 
-    if (model->rx != 0)
-        glRotateXi(model->rx << 6);
-    if (model->ry != 0)
-        glRotateYi(model->ry << 6);
-    if (model->rz != 0)
-        glRotateZi(model->rz << 6);
+        if (model->rx != 0)
+            glRotateXi(model->rx << 6);
+        if (model->ry != 0)
+            glRotateYi(model->ry << 6);
+        if (model->rz != 0)
+            glRotateZi(model->rz << 6);
 
-    MATRIX_SCALE = model->sx;
-    MATRIX_SCALE = model->sy;
-    MATRIX_SCALE = model->sz;
+        MATRIX_SCALE = model->sx;
+        MATRIX_SCALE = model->sy;
+        MATRIX_SCALE = model->sz;
+    }
 
     if (NE_TestTouch)
     {
@@ -402,6 +414,33 @@ void NE_ModelSetRot(NE_Model *model, int rx, int ry, int rz)
     model->rx = rx;
     model->ry = ry;
     model->rz = rz;
+}
+
+int NE_ModelSetMatrix(NE_Model *model, m4x3 *mat)
+{
+    NE_AssertPointer(model, "NULL model pointer");
+    NE_AssertPointer(mat, "NULL matrix pointer");
+
+    if (model->mat == NULL)
+    {
+        model->mat = malloc(sizeof(m4x3));
+        if (model->mat == NULL)
+            return 0;
+    }
+
+    memcpy(model->mat, mat, sizeof(m4x3));
+
+    return 1;
+}
+
+void NE_ModelClearMatrix(NE_Model *model)
+{
+    NE_AssertPointer(model, "NULL pointer");
+
+    if (model->mat == NULL)
+        return;
+
+    free(model->mat);
 }
 
 void NE_ModelAnimateAll(void)
