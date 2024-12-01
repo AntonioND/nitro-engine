@@ -147,6 +147,7 @@ install: all
 	$(V)$(CP) -r tools/img2ds/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/img2ds
 	$(V)$(CP) -r tools/md5_to_dsma/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/md5_to_dsma
 	$(V)$(CP) -r tools/obj2dl/*.py $(BLOCKSDSEXT)/$(INSTALLNAME)/tools/obj2dl
+	$(V)$(CP) -r licenses $(BLOCKSDSEXT)/$(INSTALLNAME)/
 
 clean:
 	@echo "  CLEAN"
