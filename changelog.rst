@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.15.0 (2024-12-01)
+---------------------------
+
+- Allow users to specify the transformation matrix of a model manually.
+- Fix a devkitARM Makefile in an example.
+
 Version 0.14.0 (2024-09-10)
 ---------------------------
 
