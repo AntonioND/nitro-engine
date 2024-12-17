@@ -88,8 +88,8 @@ int main(int argc, char *argv[])
 
     // Render text to a texture using the last font we've loaded
 
-    // We don't care about the palette, passing NULL will mark the palette
-    // to be autodeleted when the material is deleted.
+    // We don't care about managing the palette. Passing NULL will tell Nitro
+    // Engine to delete the palete automatically when the material is deleted.
     NE_Material *Material = NULL;
     NE_RichTextRenderMaterial(5,
                 "Sample: AWAV.\nÿ_ßðñÑü(o´Áá)|\nInvalid char: ŋ",
