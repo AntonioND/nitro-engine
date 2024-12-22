@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.15.1 (2024-12-23)
+---------------------------
+
+- Install licenses with the rest of the library.
+- Clarify some comments in examples.
+
 Version 0.15.0 (2024-12-01)
 ---------------------------
 
