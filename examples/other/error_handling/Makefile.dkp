@@ -24,7 +24,7 @@ BUILD    := build
 SOURCES  := source
 INCLUDES := include
 DATA     := data
-GRAPHICS :=
+GRAPHICS := graphics
 AUDIO    :=
 ICON     :=
 
