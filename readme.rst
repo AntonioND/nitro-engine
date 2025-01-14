@@ -40,6 +40,14 @@ Setup
 BlocksDS
 --------
 
+You can install this library with ``wf-pacman`` directly:
+
+.. code:: bash
+
+    wf-pacman -Sy blocksds-nitroengine
+
+If you want to build the library from source, follow the instructions:
+
 1. Clone this repository and run:
 
    .. code:: bash
