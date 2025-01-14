@@ -71,7 +71,7 @@ aren't very flexible, and they don't support converting 3D models, or saving
 graphics or models to the filesystem (you can only inject them as data to the
 ARM9, which isn't acceptable for big games).
 
-For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`. This
+For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`_. This
 build system written in Python supports converting every format that Nitro
 Engine supports, and it lets you save everything in NitroFS so that your game
 can grow as much as you want. ArchitectDS comes with plenty of examples of how
