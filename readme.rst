@@ -80,6 +80,9 @@ to use it with Nitro Engine.
 devkitpro
 ---------
 
+**NOTE**: This option is untested. It may not work with the last version of
+devkitARM.
+
 1. Clone this repository. Create a symbolic link to it inside the devkitPro
    folder in your system. For example, in Linux, create a symlink so that
    ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine:
@@ -99,10 +102,6 @@ devkitpro
 3. If you want to check that everything is working as expected, open one of the
    folders of the examples and type ``make -f Makefile.dkp``. That should build
    an ``.nds`` file that you can run on an emulator or real hardware.
-
-Note: If you're using **melonDS**, remember that any example that uses NitroFS
-with will fail if it's built with the libraries that come with devkitPro because
-of a bug in the libraries. Other emulators like **DeSmuME** still work.
 
 Common
 ------
