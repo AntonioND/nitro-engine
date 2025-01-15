@@ -1,6 +1,14 @@
 Changelog
 =========
 
+Version 0.15.2 (2025-01-15)
+---------------------------
+
+- Fix `ar` binary used to build the library.
+- Update documentation.
+- Fix build of examples in devkitARM.
+- Improve setup instructions.
+
 Version 0.15.1 (2024-12-23)
 ---------------------------
 
