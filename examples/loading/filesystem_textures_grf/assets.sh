@@ -1,6 +1,7 @@
 #!/bin/sh
 
-GRIT=/opt/blocksds/core/tools/grit/grit
+BLOCKSDS="${BLOCKSDS:-/opt/blocksds/core/}"
+GRIT=$BLOCKSDS/tools/grit/grit
 
 rm -rf nitrofiles
 mkdir -p nitrofiles

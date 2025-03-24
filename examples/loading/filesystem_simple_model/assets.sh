@@ -4,7 +4,8 @@ NITRO_ENGINE=../../..
 ASSETS=$NITRO_ENGINE/examples/assets
 TOOLS=$NITRO_ENGINE/tools
 OBJ2DL=$TOOLS/obj2dl/obj2dl.py
-GRIT=/opt/blocksds/core/tools/grit/grit
+BLOCKSDS="${BLOCKSDS:-/opt/blocksds/core/}"
+GRIT=$BLOCKSDS/tools/grit/grit
 
 rm -rf nitrofiles
 mkdir -p nitrofiles
