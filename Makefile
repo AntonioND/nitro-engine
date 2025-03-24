@@ -21,12 +21,3 @@ install: all
 
 clean:
 	$(MAKE) -f Makefile.blocksds clean
-
-.PHONY: dkp dkp-clean
-
-dkp:
-	$(MAKE) -f Makefile.dkp
-	$(MAKE) -f Makefile.dkp NE_DEBUG=1
-
-dkp-clean:
-	$(MAKE) -f Makefile.dkp clean

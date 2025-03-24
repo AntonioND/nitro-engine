@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Version DEV (2025-XX-XX)
+------------------------
+
+- The devkitARM makefiles have been removed as they only work with old versions
+  of devkitARM, which aren't supported by its maintainers. The code and examples
+  of Nitro Engine will probably need changes to work with current devkitARM.
+
 Version 0.15.2 (2025-01-15)
 ---------------------------
 
