@@ -29,7 +29,9 @@ typedef struct {
     bool active;
 } ne_rich_textinfo_t;
 
-static ne_rich_textinfo_t NE_RichTextInfo[NE_MAX_RICH_TEXT_FONTS];
+static u32 NE_NumRichTextSlots = 0;
+
+static ne_rich_textinfo_t *NE_RichTextInfo;
 
 static int NE_RICH_TEXT_PRIORITY = 0;
 
@@ -45,8 +47,17 @@ void NE_RichTextPriorityReset(void)
 
 void NE_RichTextInit(u32 slot)
 {
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    // Compatibility mode -- if someone tries to allocate a slot
+    // without having called start system, we allocate the old maximum
+    // number of slots for safety
+    if (NE_NumRichTextSlots == 0)
+        NE_RichTextStartSystem(NE_DEFAULT_RICH_TEXT_FONTS);
+
+    if (slot >= NE_NumRichTextSlots)
+    {
+        NE_DebugPrint("Attempted to initialize a slot greater than the number of slots allocated; skipping");
         return;
+    }
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
     if (info->active)
@@ -60,7 +71,7 @@ void NE_RichTextInit(u32 slot)
 
 int NE_RichTextEnd(u32 slot)
 {
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -97,17 +108,31 @@ int NE_RichTextEnd(u32 slot)
     return 1;
 }
 
+int NE_RichTextStartSystem(u32 numSlots)
+{
+    NE_NumRichTextSlots = numSlots;
+    NE_RichTextInfo = calloc(sizeof(ne_rich_textinfo_t), NE_NumRichTextSlots);
+    if (NE_RichTextInfo == NULL)
+    {
+        NE_DebugPrint("Failed to allocate array for NE_RichTextInfo");
+        return 0;
+    }
+    return 1;
+}
+
 void NE_RichTextResetSystem(void)
 {
-    for (int i = 0; i < NE_MAX_RICH_TEXT_FONTS; i++)
+    for (int i = 0; i < NE_NumRichTextSlots; i++)
         NE_RichTextEnd(i);
+    free(NE_RichTextInfo);
+    NE_NumRichTextSlots = 0;
 }
 
 int NE_RichTextMetadataLoadFAT(u32 slot, const char *path)
 {
     NE_AssertPointer(path, "NULL path pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -131,7 +156,7 @@ int NE_RichTextMetadataLoadMemory(u32 slot, const void *data, size_t data_size)
 {
     NE_AssertPointer(data, "NULL data pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -155,7 +180,7 @@ int NE_RichTextMaterialLoadGRF(u32 slot, const char *path)
 {
     NE_AssertPointer(path, "NULL path pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -181,7 +206,7 @@ int NE_RichTextMaterialSet(u32 slot, NE_Material *mat, NE_Palette *pal)
 {
     NE_AssertPointer(mat, "NULL material pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -204,7 +229,7 @@ int NE_RichTextBitmapLoadGRF(u32 slot, const char *path)
 #else // NE_BLOCKSDS
     NE_AssertPointer(path, "NULL path pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -307,7 +332,7 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
     NE_AssertPointer(texture_buffer, "NULL texture pointer");
     NE_AssertPointer(palette_buffer, "NULL palette pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -341,7 +366,7 @@ int NE_RichTextRenderDryRun(u32 slot, const char *str,
     NE_AssertPointer(size_x, "NULL size X pointer");
     NE_AssertPointer(size_y, "NULL size Y pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -360,7 +385,7 @@ int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
 {
     NE_AssertPointer(str, "NULL str pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -382,7 +407,7 @@ int NE_RichTextRender3DAlpha(u32 slot, const char *str, s32 x, s32 y,
 {
     NE_AssertPointer(str, "NULL str pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -407,7 +432,7 @@ int NE_RichTextRenderMaterial(u32 slot, const char *str, NE_Material **mat,
     NE_AssertPointer(mat, "NULL mat pointer");
     NE_AssertPointer(pal, "NULL pal pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
