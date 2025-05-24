@@ -34,7 +34,8 @@
 ///
 /// @{
 
-#define NE_MAX_RICH_TEXT_FONTS 8 ///< Default max number of rich text fonts
+#define NE_DEFAULT_RICH_TEXT_FONTS 8 ///< Default max number of rich text fonts
+#define NE_MAX_RICH_TEXT_FONTS NE_DEFAULT_RICH_TEXT_FONTS ///< Deprecated and unused, left for compatibility
 
 /// Change the priority of rich text drawn after this function call.
 ///
@@ -44,12 +45,20 @@ void NE_RichTextPrioritySet(int priority);
 /// Set to 0 the priority of rich text drawn after this function call.
 void NE_RichTextPriorityReset(void);
 
+/// Initializes the rich text system with the specified number of slots.
+///
+/// This must be called before initializing any rich text slots.
+///
+/// @param numSlots The number of rich text slots to allocate.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextStartSystem(u32 numSlots);
+
 /// Clears all rich text font slots.
 void NE_RichTextResetSystem(void);
 
 /// Initialize a rich text slot.
 ///
-/// @param slot The slot to initialize (from 0 to NE_MAX_RICH_TEXT_FONTS).
+/// @param slot The slot to initialize (from 0 to the number of slots specified in NE_RichTextSystemStart).
 void NE_RichTextInit(u32 slot);
 
 /// End a rich text slot and free all the resources used by it.
