@@ -537,16 +537,19 @@ static dsf_error DSF_CodepointRender3D(dsf_handle handle, uint32_t codepoint,
     return DSF_NO_ERROR;
 }
 
-dsf_error DSF_StringRenderDryRun(dsf_handle handle, const char *str,
-                                 size_t *size_x, size_t *size_y)
+dsf_error DSF_StringRenderDryRunWithCursor(dsf_handle handle, const char *str,
+                                           size_t *size_x, size_t *size_y,
+                                           size_t *final_x, size_t *final_y)
 {
-    if ((handle == 0) || (str == NULL) || (size_x == NULL) || (size_y == NULL))
+    if ((handle == 0) || (str == NULL) || (size_x == NULL) || (size_y == NULL) || (final_x == NULL) || (final_y == NULL))
         return DSF_INVALID_ARGUMENT;
 
     if (strlen(str) == 0)
     {
         *size_x = 0;
         *size_y = 0;
+        *final_x = font->pointer_x;
+        *final_y = font->pointer_y;
         return DSF_NO_ERROR;
     }
 
@@ -587,8 +590,16 @@ dsf_error DSF_StringRenderDryRun(dsf_handle handle, const char *str,
     return ret;
 }
 
-dsf_error DSF_StringRender3D(dsf_handle handle, const char *str,
-                             int32_t x, int32_t y, int32_t z)
+dsf_error DSF_StringRenderDryRun(dsf_handle handle, const char *str,
+                                 size_t *size_x, size_t *size_y)
+{
+    size_t final_x, final_y;
+    return DSF_StringRenderDryRunWithCursor(handle, str, size_x, size_y, &final_x, &final_y);
+}
+
+dsf_error DSF_StringRender3DWithIndent(dsf_handle handle, const char *str,
+                             int32_t x, int32_t y, int32_t z,
+                             int32_t xStart)
 {
     if ((handle == 0) || (str == NULL))
         return DSF_INVALID_ARGUMENT;
@@ -597,7 +608,7 @@ dsf_error DSF_StringRender3D(dsf_handle handle, const char *str,
 
     dsf_font_internal_state *font = (dsf_font_internal_state *)handle;
 
-    font->pointer_x = x;
+    font->pointer_x = x + xStart;
     font->pointer_y = y;
     font->box_left = x;
     font->box_top = y;
@@ -623,9 +634,16 @@ dsf_error DSF_StringRender3D(dsf_handle handle, const char *str,
     return ret;
 }
 
-dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
-                                  int32_t x, int32_t y, int32_t z,
-                                  uint32_t poly_fmt, int poly_id_base)
+dsf_error DSF_StringRender3D(dsf_handle handle, const char *str,
+                             int32_t x, int32_t y, int32_t z)
+{
+    return DSF_StringRender3DWithIndent(handle, str, x, y, z, 0);
+}
+
+dsf_error DSF_StringRender3DAlphaWithIndent(dsf_handle handle, const char *str,
+                                            int32_t x, int32_t y, int32_t z,
+                                            uint32_t poly_fmt, int poly_id_base,
+                                            int32_t xStart)
 {
     if ((handle == 0) || (str == NULL))
         return DSF_INVALID_ARGUMENT;
@@ -634,7 +652,7 @@ dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
 
     dsf_font_internal_state *font = (dsf_font_internal_state *)handle;
 
-    font->pointer_x = x;
+    font->pointer_x = x + xStart;
     font->pointer_y = y;
     font->box_left = x;
     font->box_top = y;
@@ -661,6 +679,13 @@ dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
     }
 
     return ret;
+}
+
+dsf_error DSF_StringRender3DAlpha(dsf_handle handle, const char *str,
+                                  int32_t x, int32_t y, int32_t z,
+                                  uint32_t poly_fmt, int poly_id_base)
+{
+    return DSF_StringRender3DAlphaWithIndent(handle, str, x, y, z, poly_fmt, poly_id_base, 0);
 }
 
 static dsf_error DSF_CodepointRenderBuffer(dsf_handle handle,

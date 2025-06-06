@@ -20,9 +20,9 @@ void Draw3DScene1(void *arg)
 
     NE_2DViewInit();
 
-    NE_RichTextRender3D(3, "VAWATa\ntajl", 0, 0);
+    NE_RichTextRender3D(1, "VAWATa\ntajl", 0, 0);
 
-    NE_RichTextRender3DAlpha(2, "Text with alpha", 10, 80,
+    NE_RichTextRender3DAlpha(0, "Text with alpha", 10, 80,
                              POLY_ALPHA(20) | POLY_CULL_BACK, 30);
 }
 
@@ -70,28 +70,28 @@ int main(int argc, char *argv[])
 
     // Load a 16-color font to be used for rendering text as quads
 
-    NE_RichTextInit(2);
-    NE_RichTextMetadataLoadFAT(2, "fonts/font.fnt");
-    NE_RichTextMaterialLoadGRF(2, "fonts/font_16_png.grf");
+    NE_RichTextInit(0);
+    NE_RichTextMetadataLoadFAT(0, "fonts/font.fnt");
+    NE_RichTextMaterialLoadGRF(0, "fonts/font_16_png.grf");
 
     // Load a 256-color font to be used for rendering text as quads
 
-    NE_RichTextInit(3);
-    NE_RichTextMetadataLoadFAT(3, "fonts/font.fnt");
-    NE_RichTextMaterialLoadGRF(3, "fonts/font_256_png.grf");
+    NE_RichTextInit(1);
+    NE_RichTextMetadataLoadFAT(1, "fonts/font.fnt");
+    NE_RichTextMaterialLoadGRF(1, "fonts/font_256_png.grf");
 
     // Load a 16-color font to be used for rendering text to textures.
 
-    NE_RichTextInit(5);
-    NE_RichTextMetadataLoadFAT(5, "fonts/font.fnt");
-    NE_RichTextBitmapLoadGRF(5, "fonts/font_16_png.grf");
+    NE_RichTextInit(2);
+    NE_RichTextMetadataLoadFAT(2, "fonts/font.fnt");
+    NE_RichTextBitmapLoadGRF(2, "fonts/font_16_png.grf");
 
     // Render text to a texture using the last font we've loaded
 
     // We don't care about managing the palette. Passing NULL will tell Nitro
     // Engine to delete the palete automatically when the material is deleted.
     NE_Material *Material = NULL;
-    NE_RichTextRenderMaterial(5,
+    NE_RichTextRenderMaterial(2,
                 "Sample: AWAV.\nÿ_ßðñÑü(o´Áá)|\nInvalid char: ŋ",
                 &Material, NULL);
 
@@ -114,9 +114,7 @@ int main(int argc, char *argv[])
     NE_SpriteDelete(Scene.TextSprite);
     NE_MaterialDelete(Material);
 
-    NE_RichTextEnd(2);
-    NE_RichTextEnd(3);
-    NE_RichTextEnd(5);
+    NE_RichTextResetSystem();
 
     return 0;
 }

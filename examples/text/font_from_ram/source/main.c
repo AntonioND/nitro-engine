@@ -23,9 +23,9 @@ void Draw3DScene(void *arg)
 
     NE_2DViewInit();
 
-    NE_RichTextRender3D(3, "VAWATa\ntajl", 0, 0);
+    NE_RichTextRender3D(1, "VAWATa\ntajl", 0, 0);
 
-    NE_RichTextRender3DAlpha(2, "Text with alpha", 10, 80,
+    NE_RichTextRender3DAlpha(0, "Text with alpha", 10, 80,
                              POLY_ALPHA(20) | POLY_CULL_BACK, 30);
 }
 
@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 
     // Load a 16-color font to be used for rendering text as quads
 
-    NE_RichTextInit(2);
-    NE_RichTextMetadataLoadMemory(2, font_fnt_bin, font_fnt_bin_size);
+    NE_RichTextInit(0);
+    NE_RichTextMetadataLoadMemory(0, font_fnt_bin, font_fnt_bin_size);
 
     {
         NE_Material *Font16 = NE_MaterialCreate();
@@ -71,13 +71,13 @@ int main(int argc, char *argv[])
 
         // The material and palette will be deleted when the rich text font is
         // deleted.
-        NE_RichTextMaterialSet(2, Font16, Pal16);
+        NE_RichTextMaterialSet(0, Font16, Pal16);
     }
 
     // Load a 256-color font to be used for rendering text as quads
 
-    NE_RichTextInit(3);
-    NE_RichTextMetadataLoadMemory(3, font_fnt_bin, font_fnt_bin_size);
+    NE_RichTextInit(1);
+    NE_RichTextMetadataLoadMemory(1, font_fnt_bin, font_fnt_bin_size);
 
     {
         NE_Material *Font256 = NE_MaterialCreate();
@@ -92,14 +92,14 @@ int main(int argc, char *argv[])
 
         // The material and palette will be deleted when the rich text font is
         // deleted.
-        NE_RichTextMaterialSet(3, Font256, Pal256);
+        NE_RichTextMaterialSet(1, Font256, Pal256);
     }
 
     // Load a 16-color font to be used for rendering text to textures.
 
-    NE_RichTextInit(5);
-    NE_RichTextMetadataLoadMemory(5, font_fnt_bin, font_fnt_bin_size);
-    NE_RichTextBitmapSet(5, font_16Bitmap, 256, 256, NE_PAL16,
+    NE_RichTextInit(2);
+    NE_RichTextMetadataLoadMemory(2, font_fnt_bin, font_fnt_bin_size);
+    NE_RichTextBitmapSet(2, font_16Bitmap, 256, 256, NE_PAL16,
                          font_16Pal, font_16PalLen);
 
     // Render text to a texture using the last font we've loaded
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     // We don't care about managing the palette. Passing NULL will tell Nitro
     // Engine to delete the palete automatically when the material is deleted.
     NE_Material *Material = NULL;
-    NE_RichTextRenderMaterial(5,
+    NE_RichTextRenderMaterial(2,
                 "Sample: AWAV.\nÿ_ßðñÑü(o´Áá)|\nInvalid char: ŋ",
                 &Material, NULL);
 
@@ -130,9 +130,7 @@ int main(int argc, char *argv[])
     NE_SpriteDelete(Scene.TextSprite);
     NE_MaterialDelete(Material);
 
-    NE_RichTextEnd(2);
-    NE_RichTextEnd(3);
-    NE_RichTextEnd(5);
+    NE_RichTextResetSystem();
 
     return 0;
 }

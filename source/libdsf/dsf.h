@@ -93,16 +93,42 @@ dsf_error DSF_FreeFont(dsf_handle *handle);
 /// @defgroup libdsf_render Functions to draw text strings.
 /// @{
 
+/// @param handle  Handler of the font to use.
+/// @param str     String to print.
+/// @param size_x  Pointer to a variable to store the size.
+/// @param size_y  Pointer to a variable to store the size.
+/// @param final_x Pointer to a variable to store the final X cursor position.
+/// @param final_y Pointer to a variable to store the final Y cursor position.
+///
+/// @return An error code or DSF_NO_ERROR on success.
+dsf_error DSF_StringRenderDryRunWithCursor(dsf_handle handle, const char *str,
+                                 size_t *size_x, size_t *size_y,
+                                 size_t *final_x, size_t *final_y);
+
 /// Pretend to render a string to calculate its final size once rendered.
 ///
-/// @param handle Handler of the font to use.
-/// @param str    String to print.
-/// @param size_x Pointer to a variable to store the size.
-/// @param size_y Pointer to a variable to store the size.
+/// @param handle  Handler of the font to use.
+/// @param str     String to print.
+/// @param size_x  Pointer to a variable to store the size.
+/// @param size_y  Pointer to a variable to store the size.
 ///
 /// @return An error code or DSF_NO_ERROR on success.
 dsf_error DSF_StringRenderDryRun(dsf_handle handle, const char *str,
                                  size_t *size_x, size_t *size_y);
+                                 
+/// Render a string by rendering one 3D quad per codepoint.
+///
+/// @param handle Handler of the font to use.
+/// @param str    String to print.
+/// @param x      Top x coordinate (0 to 255, but you can go outside of that).
+/// @param y      Left y coordinate (0 to 191, but you can go outside of that).
+/// @param z      Z coordinate (depth).
+/// @param xStart The horizontal component of the cursor's starting offset (reset to x on line break)
+///
+/// @return An error code or DSF_NO_ERROR on success.
+dsf_error DSF_StringRender3DWithIndent(dsf_handle handle, const char *str,
+                                       int32_t x, int32_t y, int32_t z,
+                                       int32_t xStart);
 
 /// Render a string by rendering one 3D quad per codepoint.
 ///
@@ -115,6 +141,32 @@ dsf_error DSF_StringRenderDryRun(dsf_handle handle, const char *str,
 /// @return An error code or DSF_NO_ERROR on success.
 dsf_error DSF_StringRender3D(dsf_handle handle, const char *str,
                              int32_t x, int32_t y, int32_t z);
+
+/// Render a string by rendering one 3D quad per codepoint with alternating
+/// polygon IDs.
+///
+/// This function will alternate between polygon IDs so that alpha blending
+/// works between multiple polygons when they overlap. This is a requirement of
+/// the NDS 3D hardware.
+///
+/// It is required to pass the base polygon format as a parameter because the
+/// polygon format data is write-only. Whenever the polygon ID needs to be
+/// changed, the rest of the polygon format flags need to be set as well.
+///
+/// @param handle       Handler of the font to use.
+/// @param str          String to print.
+/// @param x            Top x coordinate (0 to 255, but you can go outside of that).
+/// @param y            Left y coordinate (0 to 191, but you can go outside of that).
+/// @param z            Z coordinate (depth).
+/// @param poly_fmt     Polygon formats to apply to the characters.
+/// @param poly_id_base poly_id_base and poly_id_base + 1 will be used.
+/// @param xStart       The horizontal component of the cursor's starting offset (reset to x on line break)
+///
+/// @return An error code or DSF_NO_ERROR on success.
+dsf_error DSF_StringRender3DAlphaWithIndent(dsf_handle handle, const char *str,
+                                            int32_t x, int32_t y, int32_t z,
+                                            uint32_t poly_fmt, int poly_id_base,
+                                            int32_t xStart);
 
 /// Render a string by rendering one 3D quad per codepoint with alternating
 /// polygon IDs.
