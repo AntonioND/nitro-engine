@@ -359,12 +359,15 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
     return 1;
 }
 
-int NE_RichTextRenderDryRun(u32 slot, const char *str,
-                            size_t *size_x, size_t *size_y)
+int NE_RichTextRenderDryRunWithPos(u32 slot, const char *str,
+                            size_t *size_x, size_t *size_y,
+                            size_t *final_x, size_t *final_y)
 {
     NE_AssertPointer(str, "NULL str pointer");
     NE_AssertPointer(size_x, "NULL size X pointer");
     NE_AssertPointer(size_y, "NULL size Y pointer");
+    NE_AssertPointer(final_x, "NULL final X pointer");
+    NE_AssertPointer(final_y, "NULL final Y pointer");
 
     if (slot >= NE_NumRichTextSlots)
         return 0;
@@ -373,15 +376,24 @@ int NE_RichTextRenderDryRun(u32 slot, const char *str,
     if (!info->active)
         return 0;
 
-    dsf_error err = DSF_StringRenderDryRun(info->handle, str,
-                                           size_x, size_y);
+    dsf_error err = DSF_StringRenderDryRunWithCursor(info->handle, str,
+                                                     size_x, size_y,
+                                                     final_x, final_y);
     if (err != DSF_NO_ERROR)
         return 0;
 
     return 1;
 }
 
-int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
+int NE_RichTextRenderDryRun(u32 slot, const char *str,
+                            size_t *size_x, size_t *size_y)
+{
+    size_t final_x, final_y;
+    return NE_RichTextRenderDryRunWithPos(slot, str, size_x, size_y, &final_x, &final_y);
+}
+
+int NE_RichTextRender3DWithIndent(u32 slot, const char *str, s32 x, s32 y,
+                                  s32 xIndent)
 {
     NE_AssertPointer(str, "NULL str pointer");
 
@@ -394,8 +406,37 @@ int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
 
     NE_MaterialUse(info->material);
 
-    dsf_error err = DSF_StringRender3D(info->handle, str, x, y,
-                                       NE_RICH_TEXT_PRIORITY);
+    dsf_error err = DSF_StringRender3DWithIndent(info->handle, str, x, y,
+                                               NE_RICH_TEXT_PRIORITY, xIndent);
+    if (err != DSF_NO_ERROR)
+        return 0;
+
+    return 1;
+}
+
+int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
+{
+    return NE_RichTextRender3DWithIndent(slot, str, x, y, 0);
+}
+
+int NE_RichTextRender3DAlphaWithIndent(u32 slot, const char *str, s32 x, s32 y,
+                                       uint32_t poly_fmt, int poly_id_base,
+                                       s32 xIndent)
+{
+    NE_AssertPointer(str, "NULL str pointer");
+
+    if (slot >= NE_NumRichTextSlots)
+        return 0;
+
+    ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
+    if (!info->active)
+        return 0;
+
+    NE_MaterialUse(info->material);
+
+    dsf_error err = DSF_StringRender3DAlphaWithIndent(info->handle, str, x, y,
+                                                      NE_RICH_TEXT_PRIORITY,
+                                                      poly_fmt, poly_id_base, xIndent);
     if (err != DSF_NO_ERROR)
         return 0;
 
@@ -405,24 +446,7 @@ int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y)
 int NE_RichTextRender3DAlpha(u32 slot, const char *str, s32 x, s32 y,
                              uint32_t poly_fmt, int poly_id_base)
 {
-    NE_AssertPointer(str, "NULL str pointer");
-
-    if (slot >= NE_NumRichTextSlots)
-        return 0;
-
-    ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
-    if (!info->active)
-        return 0;
-
-    NE_MaterialUse(info->material);
-
-    dsf_error err = DSF_StringRender3DAlpha(info->handle, str, x, y,
-                                            NE_RICH_TEXT_PRIORITY,
-                                            poly_fmt, poly_id_base);
-    if (err != DSF_NO_ERROR)
-        return 0;
-
-    return 1;
+    return NE_RichTextRender3DAlphaWithIndent(slot, str, x, y, poly_fmt, poly_id_base, 0);
 }
 
 int NE_RichTextRenderMaterial(u32 slot, const char *str, NE_Material **mat,

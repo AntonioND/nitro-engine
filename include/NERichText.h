@@ -166,6 +166,19 @@ int NE_RichTextBitmapSet(u32 slot, const void *texture_buffer,
                          NE_TextureFormat texture_fmt,
                          const void *palette_buffer, size_t palette_size);
 
+/// Calculates the final size and cursor position of rendering the provided string.
+///More actions
+/// @param slot The slot to use.
+/// @param str The string to render.
+/// @param size_x Pointer to store the width of the resulting image.
+/// @param size_y Pointer to store the height of the resulting image.
+/// @param final_x Pointer to store the final X position of the cursor.
+/// @param final_y Pointer to store the final Y position of the cursor.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRenderDryRunWithPos(u32 slot, const char *str,
+                            size_t *size_x, size_t *size_y,
+                            size_t *final_x, size_t *final_y);
+
 /// Calculates the final size of rendering the provided string.
 ///
 /// @param slot The slot to use.
@@ -184,8 +197,63 @@ int NE_RichTextRenderDryRun(u32 slot, const char *str,
 /// @param str The string to render.
 /// @param x The left coordinate of the text.
 /// @param y The top coordinate of the text.
+/// @param xIndent The horizontal indentation to apply to the first line of text.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRender3DWithIndent(u32 slot, const char *str, s32 x, s32 y,
+                                  s32 xIndent);
+
+/// Render a string by rendering one 3D quad per codepoint.
+///
+/// This preserves the polygon format that is currently active.
+///
+/// @param slot The slot to use.
+/// @param str The string to render.
+/// @param x The left coordinate of the text.
+/// @param y The top coordinate of the text.
 /// @return Returns 1 on success, 0 on failure.
 int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y);
+
+/// Render a string by rendering one 3D quad per codepoint.More actions
+///
+/// This preserves the polygon format that is currently active.
+///
+/// @param slot The slot to use.
+/// @param str The string to render.
+/// @param x The left coordinate of the text.
+/// @param y The top coordinate of the text.
+/// @param xIndent The horizontal indentation to apply to the first line of text.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRender3DWithIndent(u32 slot, const char *str, s32 x, s32 y,
+                                  s32 xIndent);
+
+/// Render a string by rendering one 3D quad per codepoint.
+///
+/// This preserves the polygon format that is currently active.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRender3D(u32 slot, const char *str, s32 x, s32 y);
+
+/// Render a string by rendering one 3D quad per codepoint with alternating
+/// polygon IDs.
+///
+/// This function will alternate between polygon IDs so that alpha blending
+/// works between multiple polygons when they overlap. This is a requirement of
+/// the NDS 3D hardware.
+///
+/// It is required to pass the base polygon format as a parameter because the
+/// polygon format data is write-only. Whenever the polygon ID needs to be
+/// changed, the rest of the polygon format flags need to be set as well.
+///
+/// @param slot The slot to use.
+/// @param str The string to render.
+/// @param x The left coordinate of the text.
+/// @param y The top coordinate of the text.
+/// @param poly_fmt The polygon format values to be used for the quads.
+/// @param poly_id_base The base polygon ID to use for the quads.
+/// @param xIndent The horizontal indentation to apply to the first line of text.
+/// @return Returns 1 on success, 0 on failure.
+int NE_RichTextRender3DAlphaWithIndent(u32 slot, const char *str, s32 x, s32 y,
+                                       uint32_t poly_fmt, int poly_id_base,
+                                       s32 xIndent);
 
 /// Render a string by rendering one 3D quad per codepoint with alternating
 /// polygon IDs.
