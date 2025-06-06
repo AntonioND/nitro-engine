@@ -8,9 +8,7 @@ Introduction
 This is a 3D game engine, a lot of functions designed to simplify the process of
 making a 3D game. It isn't standalone, it needs libnds to work.
 
-You can use Nitro Engine with `BlocksDS <https://blocksds.github.io/docs/>`_ and
-devkitPro, but BlocksDS is preferred as some features of Nitro Engine are only
-available with BlocksDS.
+You can use Nitro Engine with `BlocksDS <https://blocksds.github.io/docs/>`_.
 
 Features:
 
@@ -71,40 +69,22 @@ aren't very flexible, and they don't support converting 3D models, or saving
 graphics or models to the filesystem (you can only inject them as data to the
 ARM9, which isn't acceptable for big games).
 
-For BlocksDS, try `ArchitectDS <https://github.com/AntonioND/architectds>`_. This
+You can also try `ArchitectDS <https://github.com/AntonioND/architectds>`_. This
 build system written in Python supports converting every format that Nitro
 Engine supports, and it lets you save everything in NitroFS so that your game
 can grow as much as you want. ArchitectDS comes with plenty of examples of how
 to use it with Nitro Engine.
 
-devkitpro
+devkitPro
 ---------
 
-**NOTE**: This option is untested. It may not work with the last version of
-devkitARM.
+**NOTE**: This option has been temporarily removed. The Makefiles that were
+present in the repository were only valid in old versions of devkitARM,
+unsupported by their maintainers. The code and examples will also need changes
+to work with the new version of their libraries.
 
-1. Clone this repository. Create a symbolic link to it inside the devkitPro
-   folder in your system. For example, in Linux, create a symlink so that
-   ``/opt/devkitpro/nitro-engine`` points to the folder with Nitro Engine:
-
-   .. code:: bash
-
-       ln -sT /path/to/nitro-engine /opt/devkitpro/nitro-engine
-
-2. Go to the ``nitro-engine`` folder and type this on the terminal:
-
-   .. code:: bash
-
-       make dkp -j`nproc`
-
-   This should build the library in both debug and release modes.
-
-3. If you want to check that everything is working as expected, open one of the
-   folders of the examples and type ``make -f Makefile.dkp``. That should build
-   an ``.nds`` file that you can run on an emulator or real hardware.
-
-Common
-------
+Usage notes
+-----------
 
 Note that some features of the 3D hardware aren't emulated by most emulators, so
 you may need to use an actual NDS to test some things. **melonDS** seems to

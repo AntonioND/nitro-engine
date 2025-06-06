@@ -425,7 +425,7 @@ int NE_RichTextRender3DAlphaWithIndent(u32 slot, const char *str, s32 x, s32 y,
 {
     NE_AssertPointer(str, "NULL str pointer");
 
-    if (slot >= NE_MAX_RICH_TEXT_FONTS)
+    if (slot >= NE_NumRichTextSlots)
         return 0;
 
     ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
@@ -446,7 +446,28 @@ int NE_RichTextRender3DAlphaWithIndent(u32 slot, const char *str, s32 x, s32 y,
 int NE_RichTextRender3DAlpha(u32 slot, const char *str, s32 x, s32 y,
                              uint32_t poly_fmt, int poly_id_base)
 {
+<<<<<<< HEAD
     return NE_RichTextRender3DAlphaWithIndent(slot, str, x, y, poly_fmt, poly_id_base, 0);
+=======
+    NE_AssertPointer(str, "NULL str pointer");
+
+    if (slot >= NE_NumRichTextSlots)
+        return 0;
+
+    ne_rich_textinfo_t *info = &NE_RichTextInfo[slot];
+    if (!info->active)
+        return 0;
+
+    NE_MaterialUse(info->material);
+
+    dsf_error err = DSF_StringRender3DAlpha(info->handle, str, x, y,
+                                            NE_RICH_TEXT_PRIORITY,
+                                            poly_fmt, poly_id_base);
+    if (err != DSF_NO_ERROR)
+        return 0;
+
+    return 1;
+>>>>>>> master
 }
 
 int NE_RichTextRenderMaterial(u32 slot, const char *str, NE_Material **mat,

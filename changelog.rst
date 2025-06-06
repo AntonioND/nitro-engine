@@ -1,6 +1,18 @@
 Changelog
 =========
 
+Version 0.15.3 (2025-03-26)
+---------------------------
+
+- The devkitARM makefiles have been removed as they only work with old versions
+  of devkitARM, which aren't supported by its maintainers. The code and examples
+  of Nitro Engine will probably need changes to work with current devkitARM.
+- The GRF files used in an example have been updated, they were built before the
+  format was changed.
+- The build scripts for assets have been modified to use the value of the
+  environment variables ``BLOCKSDS`` and ``BLOCKSDSEXT`` if they are found.
+- Build library with debug symbols to help debug applications that use it.
+
 Version 0.15.2 (2025-01-15)
 ---------------------------
 
