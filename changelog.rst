@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.15.4 (2025-07-16)
+---------------------------
+
+- Allow the number of rich text fonts to be specified dynamically.
+- Optionally return cursor position from dry run & allow indenting rich text.
+
 Version 0.15.3 (2025-03-26)
 ---------------------------
 
