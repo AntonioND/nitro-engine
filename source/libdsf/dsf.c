@@ -587,6 +587,8 @@ dsf_error DSF_StringRenderDryRunWithCursor(dsf_handle handle, const char *str,
 
     *size_x = max_x;
     *size_y = max_y + font->line_height;
+    *final_x = font->pointer_x;
+    *final_y = font->pointer_y;
 
     return ret;
 }
