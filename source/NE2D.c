@@ -35,7 +35,8 @@ NE_Sprite *NE_SpriteCreate(void)
         }
 
         sprite->visible = true;
-        sprite->scale = inttof32(1);
+        sprite->xscale = inttof32(1);
+        sprite->yscale = inttof32(1);
         sprite->color = NE_White;
         sprite->mat = NULL;
         sprite->alpha = 31;
@@ -72,7 +73,20 @@ void NE_SpriteSetRot(NE_Sprite *sprite, int angle)
 void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale)
 {
     NE_AssertPointer(sprite, "NULL pointer");
-    sprite->scale = scale;
+    sprite->xscale = scale;
+    sprite->yscale = scale;
+}
+
+void NE_SpriteSetXScaleI(NE_Sprite *sprite, int scale)
+{
+    NE_AssertPointer(sprite, "NULL pointer");
+    sprite->xscale = scale;
+}
+
+void NE_SpriteSetYScaleI(NE_Sprite *sprite, int scale)
+{
+    NE_AssertPointer(sprite, "NULL pointer");
+    sprite->yscale = scale;
 }
 
 void NE_SpriteSetMaterial(NE_Sprite *sprite, NE_Material *mat)
@@ -208,13 +222,13 @@ void NE_SpriteDraw(const NE_Sprite *sprite)
         NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
                                         sprite->y + (sprite->h >> 1),
                                         sprite->rot_angle,
-                                        sprite->scale);
+                                        sprite->xscale, sprite->yscale);
     }
     else
     {
         NE_2DViewScaleByPositionI(sprite->x + (sprite->w >> 1),
                                   sprite->y + (sprite->h >> 1),
-                                  sprite->scale);
+                                  sprite->xscale, sprite->yscale);
     }
 
     GFX_POLY_FORMAT = POLY_ALPHA(sprite->alpha) | POLY_ID(sprite->id) |
@@ -254,13 +268,13 @@ void NE_SpriteDrawAll(void)
             NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
                                             sprite->y + (sprite->h >> 1),
                                             sprite->rot_angle,
-                                            sprite->scale);
+                                            sprite->xscale, sprite->yscale);
         }
         else
         {
             NE_2DViewScaleByPositionI(sprite->x + (sprite->w >> 1),
                                       sprite->y + (sprite->h >> 1),
-                                      sprite->scale);
+                                      sprite->xscale, sprite->yscale);
         }
 
         GFX_POLY_FORMAT = POLY_ALPHA(sprite->alpha) |
@@ -340,12 +354,12 @@ void NE_2DViewInit(void)
     NE_PolyFormat(31, 0, 0, NE_CULL_NONE, 0);
 }
 
-void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale)
+void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int xscale, int yscale)
 {
     NE_ViewMoveI(x, y, 0);
 
-    MATRIX_SCALE = scale;
-    MATRIX_SCALE = scale;
+    MATRIX_SCALE = xscale;
+    MATRIX_SCALE = yscale;
     MATRIX_SCALE = inttof32(1);
 
     glRotateZi(rotz << 6);
@@ -362,12 +376,12 @@ void NE_2DViewRotateByPosition(int x, int y, int rotz)
     NE_ViewMoveI(-x, -y, 0);
 }
 
-void NE_2DViewScaleByPositionI(int x, int y, int scale)
+void NE_2DViewScaleByPositionI(int x, int y, int xscale, int yscale)
 {
     NE_ViewMoveI(x, y, 0);
 
-    MATRIX_SCALE = scale;
-    MATRIX_SCALE = scale;
+    MATRIX_SCALE = xscale;
+    MATRIX_SCALE = yscale;
     MATRIX_SCALE = inttof32(1);
 
     NE_ViewMoveI(-x, -y, 0);
