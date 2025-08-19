@@ -219,14 +219,14 @@ void NE_SpriteDraw(const NE_Sprite *sprite)
     {
         MATRIX_PUSH = 0;
 
-        NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
+        NE_2DViewRotateScaleByPositionXYI(sprite->x + (sprite->w >> 1),
                                         sprite->y + (sprite->h >> 1),
                                         sprite->rot_angle,
                                         sprite->xscale, sprite->yscale);
     }
     else
     {
-        NE_2DViewScaleByPositionI(sprite->x + (sprite->w >> 1),
+        NE_2DViewScaleByPositionXYI(sprite->x + (sprite->w >> 1),
                                   sprite->y + (sprite->h >> 1),
                                   sprite->xscale, sprite->yscale);
     }
@@ -265,14 +265,14 @@ void NE_SpriteDrawAll(void)
         {
             MATRIX_PUSH = 0;
 
-            NE_2DViewRotateScaleByPositionI(sprite->x + (sprite->w >> 1),
+            NE_2DViewRotateScaleByPositionXYI(sprite->x + (sprite->w >> 1),
                                             sprite->y + (sprite->h >> 1),
                                             sprite->rot_angle,
                                             sprite->xscale, sprite->yscale);
         }
         else
         {
-            NE_2DViewScaleByPositionI(sprite->x + (sprite->w >> 1),
+            NE_2DViewScaleByPositionXYI(sprite->x + (sprite->w >> 1),
                                       sprite->y + (sprite->h >> 1),
                                       sprite->xscale, sprite->yscale);
         }
@@ -354,7 +354,7 @@ void NE_2DViewInit(void)
     NE_PolyFormat(31, 0, 0, NE_CULL_NONE, 0);
 }
 
-void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int xscale, int yscale)
+void NE_2DViewRotateScaleByPositionXYI(int x, int y, int rotz, int xscale, int yscale)
 {
     NE_ViewMoveI(x, y, 0);
 
@@ -365,6 +365,10 @@ void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int xscale, int ysc
     glRotateZi(rotz << 6);
 
     NE_ViewMoveI(-x, -y, 0);
+}
+
+void NE_2DViewScaleByPositionI(int x, int y, int scale) {
+    NE_2DViewScaleByPositionXYI(x, y, scale, scale);
 }
 
 void NE_2DViewRotateByPosition(int x, int y, int rotz)
@@ -376,7 +380,7 @@ void NE_2DViewRotateByPosition(int x, int y, int rotz)
     NE_ViewMoveI(-x, -y, 0);
 }
 
-void NE_2DViewScaleByPositionI(int x, int y, int xscale, int yscale)
+void NE_2DViewScaleByPositionXYI(int x, int y, int xscale, int yscale)
 {
     NE_ViewMoveI(x, y, 0);
 
@@ -385,6 +389,10 @@ void NE_2DViewScaleByPositionI(int x, int y, int xscale, int yscale)
     MATRIX_SCALE = inttof32(1);
 
     NE_ViewMoveI(-x, -y, 0);
+}
+
+void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale) {
+    NE_2DViewRotateScaleByPositionXYI(x, y, rotz, scale, scale);
 }
 
 void NE_2DDrawQuad(s16 x1, s16 y1, s16 x2, s16 y2, s16 z, u32 color)

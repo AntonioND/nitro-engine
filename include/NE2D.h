@@ -228,27 +228,41 @@ void NE_2DViewRotateByPosition(int x, int y, int rotz);
 //
 /// @param x (x, y) Coordinates.
 /// @param y (x, y) Coordinates.
-/// @param xscale x axis scale factor (f32).
-/// @param yscale y axis scale factor (f32).
-void NE_2DViewScaleByPositionI(int x, int y, int xscale, int yscale);
+/// @param scale Scale factor (f32).
+void NE_2DViewScaleByPositionI(int x, int y, int scale);
 
 /// Scales the current 2D view from the specified point.
 //
 /// @param x (x, y) Coordinates.
 /// @param y (x, y) Coordinates.
-/// @param sx x axis scale factor (float).
-/// @param sy y axis scale factor (float).
-#define NE_2DViewScaleByPosition(x, y, sx, sy) \
-    NE_2DViewScaleByPositionI(x, y, floattof32(sx), floattof32(sy))
+/// @param s Scale factor (float).
+#define NE_2DViewScaleByPosition(x, y, s) \
+    NE_2DViewScaleByPositionI(x, y, floattof32(s))
+
+/// Scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param xscale X axis scale factor (f32).
+/// @param yscale Y axis scale factor (f32).
+void NE_2DViewScaleByPositionXYI(int x, int y, int xscale, int yscale);
+
+/// Scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param xs x axis scale factor (float).
+/// @param ys y axis scale factor (float).
+#define NE_2DViewScaleByPositionXY(x, y, xs, xy) \
+    NE_2DViewScaleByPositionXYI(x, y, floattof32(xs), floattof32(xy))
 
 /// Rotates and scales the current 2D view from the specified point.
 ///
 /// @param x (x, y) Coordinates.
 /// @param y (x, y) Coordinates.
 /// @param rotz Angle (0-512) to rotate on the Z axis.
-/// @param xscale x axis scale factor (f32).
-/// @param yscale y axis scale factor (f32).
-void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int xscale, int yscale);
+/// @param scale Scale factor (f32).
+void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale);
 
 /// Rotates and scales the current 2D view from the specified point.
 //
@@ -258,6 +272,25 @@ void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int xscale, int ysc
 /// @param s Scale factor (float).
 #define NE_2DViewRotateScaleByPosition(x, y, r, s) \
     NE_2DViewRotateScaleByPositionI(x, y, r, floattof32(s))
+
+/// Rotates and scales the current 2D view from the specified point.
+///
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param rotz Angle (0-512) to rotate on the Z axis.
+/// @param xscale X axis scale factor (f32).
+/// @param yscale Y axis scale factor (f32).
+void NE_2DViewRotateScaleByPositionXYI(int x, int y, int rotz, int xscale, int yscale);
+
+/// Rotates and scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param r Angle (0-512) to rotate on the Z axis.
+/// @param xs x axis scale factor (float).
+/// @param ys y axis scale factor (float).
+#define NE_2DViewRotateScaleByPositionXY(x, y, r, xs, ys) \
+    NE_2DViewRotateScaleByPositionXYI(x, y, r, floattof32(xs), floattof32(ys))
 
 /// Draws a quad at the given coordinates with a flat color.
 ///
