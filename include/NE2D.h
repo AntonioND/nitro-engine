@@ -30,7 +30,8 @@ typedef struct {
     s16 w;            ///< Width in pixels
     s16 h;            ///< Height in pixels
     int rot_angle;    ///< Rotation
-    int scale;        ///< Scale (f32)
+    int xscale;       ///< Scale X (f32)
+    int yscale;       ///< Scale Y (f32)
     int priority;     ///< Priority (Z coordinate)
     u32 color;        ///< Color
     NE_Material *mat; ///< Material
@@ -86,6 +87,32 @@ void NE_SpriteSetScaleI(NE_Sprite *sprite, int scale);
 /// @param scale Scale factor (float).
 #define NE_SpriteSetScale(sprite, scale) \
     NE_SpriteSetScaleI(sprite, floattof32(scale))
+
+/// Scales a sprite from its center.
+///
+/// @param sprite Sprite to be scaled.
+/// @param scale Scale factor (f32).
+void NE_SpriteSetXScaleI(NE_Sprite *sprite, int scale);
+
+/// Scales a sprite from its center.
+///
+/// @param sprite Sprite to be scaled.
+/// @param scale Scale factor (float).
+#define NE_SpriteSetXScale(sprite, scale) \
+    NE_SpriteSetXScaleI(sprite, floattof32(scale))
+
+/// Scales a sprite from its center.
+///
+/// @param sprite Sprite to be scaled.
+/// @param scale Scale factor (f32).
+void NE_SpriteSetYScaleI(NE_Sprite *sprite, int scale);
+
+/// Scales a sprite from its center.
+///
+/// @param sprite Sprite to be scaled.
+/// @param scale Scale factor (float).
+#define NE_SpriteSetYScale(sprite, scale) \
+    NE_SpriteSetYScaleI(sprite, floattof32(scale))
 
 /// Assign a material to a sprite.
 ///
@@ -212,6 +239,23 @@ void NE_2DViewScaleByPositionI(int x, int y, int scale);
 #define NE_2DViewScaleByPosition(x, y, s) \
     NE_2DViewScaleByPositionI(x, y, floattof32(s))
 
+/// Scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param xscale X axis scale factor (f32).
+/// @param yscale Y axis scale factor (f32).
+void NE_2DViewScaleByPositionXYI(int x, int y, int xscale, int yscale);
+
+/// Scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param xs x axis scale factor (float).
+/// @param ys y axis scale factor (float).
+#define NE_2DViewScaleByPositionXY(x, y, xs, xy) \
+    NE_2DViewScaleByPositionXYI(x, y, floattof32(xs), floattof32(xy))
+
 /// Rotates and scales the current 2D view from the specified point.
 ///
 /// @param x (x, y) Coordinates.
@@ -228,6 +272,25 @@ void NE_2DViewRotateScaleByPositionI(int x, int y, int rotz, int scale);
 /// @param s Scale factor (float).
 #define NE_2DViewRotateScaleByPosition(x, y, r, s) \
     NE_2DViewRotateScaleByPositionI(x, y, r, floattof32(s))
+
+/// Rotates and scales the current 2D view from the specified point.
+///
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param rotz Angle (0-512) to rotate on the Z axis.
+/// @param xscale X axis scale factor (f32).
+/// @param yscale Y axis scale factor (f32).
+void NE_2DViewRotateScaleByPositionXYI(int x, int y, int rotz, int xscale, int yscale);
+
+/// Rotates and scales the current 2D view from the specified point.
+//
+/// @param x (x, y) Coordinates.
+/// @param y (x, y) Coordinates.
+/// @param r Angle (0-512) to rotate on the Z axis.
+/// @param xs x axis scale factor (float).
+/// @param ys y axis scale factor (float).
+#define NE_2DViewRotateScaleByPositionXY(x, y, r, xs, ys) \
+    NE_2DViewRotateScaleByPositionXYI(x, y, r, floattof32(xs), floattof32(ys))
 
 /// Draws a quad at the given coordinates with a flat color.
 ///
