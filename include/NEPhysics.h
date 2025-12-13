@@ -51,9 +51,9 @@ typedef struct {
     NE_PhysicsTypes type; ///< Type of physics object (AABB, sphere, dot).
     bool enabled;         ///< True if this object is enabled
 
-    int xspeed;           ///< X speed of model.
-    int yspeed;           ///< Y speed of model.
-    int zspeed;           ///< Z speed of model.
+    int xspeed;           ///< X speed of model times timestep.
+    int yspeed;           ///< Y speed of model times timestep.
+    int zspeed;           ///< Z speed of model times timestep.
 
     int radius;           ///< Radius of a spheres
 
@@ -61,8 +61,8 @@ typedef struct {
     int ysize;            ///< Y size of an AABB
     int zsize;            ///< Z size of an AABB
 
-    int gravity;          ///< Intensity of gravity
-    int friction;         ///< Intensity of friction
+    int gravity;          ///< Intensity of gravity multiplied by timestep
+    int friction;         ///< Intensity of friction multipled by (timestep*timestep)
 
     int keptpercent;  ///< Percentage of energy remaining after a bounce.
     NE_OnCollision oncollision; ///< Action to do if there is a collision.
@@ -110,9 +110,9 @@ void NE_PhysicsSetRadiusI(NE_Physics *pointer, int radius);
 /// Set speed of a physics object.
 ///
 /// @param pointer Pointer to the object.
-/// @param x (x, y, z) Speed vector (f32).
-/// @param y (x, y, z) Speed vector (f32).
-/// @param z (x, y, z) Speed vector (f32).
+/// @param x (x, y, z) Product of Speed vector and timestep (f32).
+/// @param y (x, y, z) Product of Speed vector and timestep (f32).
+/// @param z (x, y, z) Product of Speed vector and timestep (f32).
 void NE_PhysicsSetSpeedI(NE_Physics *pointer, int x, int y, int z);
 
 /// Set speed of a physics object.
@@ -157,7 +157,7 @@ void NE_PhysicsSetGravityI(NE_Physics *pointer, int gravity);
 /// Set friction of a physics object.
 ///
 /// @param pointer Pointer to the physics object.
-/// @param friction Friction (f32).
+/// @param friction Friction coefficient multiplied by (timestep*timestep) (f32).
 void NE_PhysicsSetFrictionI(NE_Physics *pointer, int friction);
 
 /// Set friction of a physics object.

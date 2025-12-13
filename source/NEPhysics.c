@@ -236,26 +236,89 @@ ARM_CODE void NE_PhysicsUpdate(NE_Physics *pointer)
         return;
 
     pointer->iscolliding = false;
-
+    int32_t spd[3] = { pointer->xspeed, pointer->yspeed, pointer->zspeed };
+    //above value should be chosen based on timestep
+    int32_t nspd[3]={spd[0],spd[1],spd[2]};
     // We change Y speed depending on gravity.
-    pointer->yspeed -= pointer->gravity;
+    // doing it before applying friction makes it possible to have something stick to a wall
+    nspd[1]-= pointer->gravity;
+    //above update depends on timestep
+    if (pointer->friction != 0)
+    {
+        // Now, we get the module of speed in order to apply friction.
+        int64_t modsqrd = (int64_t)nspd[0] * nspd[0] + (int64_t)nspd[1] * nspd[1]
+                        + (int64_t)nspd[2] * nspd[2];
 
-    // Now, let's move the object
+        // This value should be chosen based on time since last update.
+        int32_t friction = pointer->friction;
+        int64_t diff = modsqrd + (int64_t)-friction * friction;
 
-    // Used in collision checking to simplify the code
-    int posx = 0, posy = 0, posz = 0;
-    // Position before movement
-    int bposx = 0, bposy = 0, bposz = 0;
+        // Computing the above is faster than waiting on hw
 
+        // Check if module is very small -> speed = 0
+        if (__builtin_expect(diff <= 0, 0))
+        {
+            nspd[0]=0;
+            nspd[1]=0;
+            nspd[2]=0;
+        }
+        else
+        {
+            uint32_t mod = sqrt64(modsqrd);
+            div64_asynch((int64_t)(mod-friction) << 32, mod);
+            // f < m therefore ((m - f) / m) < 1, therefore ((m - f) << 32 ) / m < (2^32)
+            // i.e. the result fits in 32-bit
+            uint32_t correction_factor = div64_result();
+            #pragma GCC unroll 3
+            for (int i = 0; i < 3; i++)
+            {
+                int32_t t = nspd[i];
+                int32_t st = t;
+                if (t < 0)
+                    st = -st;
+                st = ((uint64_t)(uint32_t)st * correction_factor) >> 32;
+                if (t < 0)
+                    st = -st;
+                nspd[i] = st;
+            }
+
+        }
+    }
+    //here we could check if nspd=0 and then perform
+    //a correction with a custom timestep dt=abs(velocity)/abs(acceleration)
+    //but this is complex and slow so let's not do that
+
+    //Now, let's move the object
+    //below method for updating position is exact for constant acceleration
+    //equivalent to s(t+dt)=s(t)+v(t)*dt+1/2*a*dt*dt
+    //and probably good enough for 99 % of cases
+    //can add 1 ulp of accuracy with round to nearest, not sure if worth it
+    int posx, posy, posz;
     NE_Model *model = pointer->model;
+    posx = model->x + ((spd[0]+nspd[0])>>1);
+    posy = model->y + ((spd[1]+nspd[1])>>1);
+    posz = model->z + ((spd[2]+nspd[2])>>1);
+    // save position before movement
+    int bposx,bposy,bposz;
     bposx = model->x;
     bposy = model->y;
     bposz = model->z;
-    posx = model->x = model->x + pointer->xspeed;
-    posy = model->y = model->y + pointer->yspeed;
-    posz = model->z = model->z + pointer->zspeed;
+    //write back updates
+    //should be write back the updated position?
+    //or only the speed?
+    model->x =posx;
+    model->y =posy;
+    model->z =posz;
+    pointer->xspeed=nspd[0];
+    pointer->yspeed=nspd[1];
+    pointer->zspeed=nspd[2];
 
     // Gravity and movement have been applied, time to check collisions...
+
+    //below code should update the friction coefficient depending on
+    //whether we're in contact with a surface
+    //right now it doesnt
+    //probably should be tested with a sloped surface
     bool xenabled = true, yenabled = true, zenabled = true;
     if (bposx == posx)
         xenabled = false;
@@ -384,51 +447,6 @@ ARM_CODE void NE_PhysicsUpdate(NE_Physics *pointer)
                 }
                 pointer->xspeed = pointer->yspeed = pointer->zspeed = 0;
             }
-        }
-    }
-
-    // Now, we get the module of speed in order to apply friction.
-    if (pointer->friction != 0)
-    {
-        int32_t spd[3] = { pointer->xspeed, pointer->yspeed, pointer->zspeed };
-        int64_t modsqrd = (int64_t)spd[0] * spd[0] + (int64_t)spd[1] * spd[1]
-                        + (int64_t)spd[2] * spd[2];
-
-        // This value should be chosen based on time since last update.
-        int32_t friction = pointer->friction;
-        int64_t diff = modsqrd + (int64_t)-friction * friction;
-
-        // Computing the above is faster than waiting on hw
-
-        // Check if module is very small -> speed = 0
-        if (__builtin_expect(diff <= 0, 0))
-        {
-            pointer->xspeed = pointer->yspeed = pointer->zspeed = 0;
-        }
-        else
-        {
-            uint32_t mod = sqrt64(modsqrd);
-            div64_asynch((int64_t)(mod-friction) << 32, mod);
-            // f < m therefore ((m - f) / m) < 1, therefore ((m - f) << 32 ) / m < (2^32)
-            // i.e. the result fits in 32-bit
-            uint32_t correction_factor = div64_result();
-            int32_t nspd[3];
-            #pragma GCC unroll 3
-            for (int i = 0; i < 3; i++)
-            {
-                int32_t t = spd[i];
-                int32_t st = t;
-                if (t < 0)
-                    st = -st;
-                st = ((uint64_t)(uint32_t)st * correction_factor) >> 32;
-                if (t < 0)
-                    st = -st;
-                nspd[i] = st;
-            }
-
-            pointer->xspeed = nspd[0];
-            pointer->yspeed = nspd[1];
-            pointer->zspeed = nspd[2];
         }
     }
 }
