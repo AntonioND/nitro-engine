@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Version 0.15.6 (2026-02-22)
+---------------------------
+
+- Support the "color 0 transparent" flag of the GRF format.
+
 Version 0.15.5 (2026-01-23)
 ---------------------------
 
