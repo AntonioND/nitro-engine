@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>
+// Copyright (c) 2022-2026 Antonio Niño Díaz
 
-// DS Model Animation Library v0.2.0
+// DS Model Animation Library v0.2.1
 
 #include <nds.h>
 
 #include "dsma.h"
 
-// Because of Nitro Engine's safe dual 3D mode, it is required to use Nitro
-// Engine's functions to draw display lists instead of relying on libnds.
-#include "NEMain.h"
+#ifndef ARM_CODE
+# define ARM_CODE __attribute__((target("arm")))
+#endif
 
 // Format of a joint in a DSA file.
 typedef struct {
@@ -214,7 +214,7 @@ int DSMA_DrawModel(const void *dsm_file, const void *dsa_file, uint32_t frame_in
     // Draw model
     // ----------
 
-    NE_DisplayListDrawDefault(dsm_file);
+    glCallList((uint32_t *)dsm_file);
 
     MATRIX_POP = 1;
 
@@ -332,7 +332,7 @@ int DSMA_DrawModelBlendAnimation(const void *dsm_file,
     // Draw model
     // ----------
 
-    NE_DisplayListDrawDefault(dsm_file);
+    glCallList((uint32_t *)dsm_file);
 
     MATRIX_POP = 1;
 

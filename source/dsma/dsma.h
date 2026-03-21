@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 //
-// Copyright (c) 2022 Antonio Niño Díaz <antonio_nd@outlook.com>
+// Copyright (c) 2022-2026 Antonio Niño Díaz
 
-// DS Model Animation Library v0.2.0
+// DS Model Animation Library v0.2.1
 
 #ifndef DSMA_H__
 #define DSMA_H__
@@ -11,10 +11,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef ARM_CODE
-# define ARM_CODE __attribute__((target("arm")))
 #endif
 
 // Returns the number of frames stored in the specified DSA file.
@@ -29,9 +25,7 @@ uint32_t DSMA_GetNumFrames(const void *dsa_file);
 // when going over the max frame, it interpolates with frame 0.
 //
 // It returns a DSMA_* code (0 for success).
-ITCM_CODE ARM_CODE
 int DSMA_DrawModel(const void *dsm_file, const void *dsa_file, uint32_t frame_interp);
-
 
 // Draws the model in the DSM file animated with the data in the specified DSA
 // files, at the requested frame, with the requested blending factor between the
@@ -44,7 +38,6 @@ int DSMA_DrawModel(const void *dsm_file, const void *dsa_file, uint32_t frame_in
 // 0.0 to display DSA file 1 to 1.0 to display DSA file 2.
 //
 // It returns a DSMA_* code (0 for success).
-ITCM_CODE ARM_CODE
 int DSMA_DrawModelBlendAnimation(const void *dsm_file,
         const void *dsa_file_1, uint32_t frame_interp_1,
         const void *dsa_file_2, uint32_t frame_interp_2,
