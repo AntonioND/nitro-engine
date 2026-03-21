@@ -494,7 +494,7 @@ void NE_ModelAnimStart(NE_Model *model, NE_AnimationType type, int32_t speed)
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
     model->animinfo[0]->type = type;
     model->animinfo[0]->speed = speed;
-    model->animinfo[0]->currframe = 0;
+    model->animinfo[0]->currframe = speed >= 0 ? 0 : inttof32(model->animinfo[0]->numframes - 1);
 }
 
 void NE_ModelAnimSecondaryStart(NE_Model *model, NE_AnimationType type,
@@ -504,7 +504,7 @@ void NE_ModelAnimSecondaryStart(NE_Model *model, NE_AnimationType type,
     NE_Assert(model->modeltype == NE_Animated, "Not an animated model");
     model->animinfo[1]->type = type;
     model->animinfo[1]->speed = speed;
-    model->animinfo[1]->currframe = 0;
+    model->animinfo[1]->currframe = speed >= 0 ? 0 : inttof32(model->animinfo[1]->numframes - 1);
     model->anim_blend = 0;
 }
 
