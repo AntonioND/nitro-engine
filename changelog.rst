@@ -1,6 +1,12 @@
 Changelog
 =========
 
+Version 0.15.7 (2026-03-23)
+---------------------------
+
+- Fix animations with negative speed so they actually play in reverse. @Jonko
+- Update DSMA library to version 0.2.1 to fix some compiler warnings.
+
 Version 0.15.6 (2026-02-22)
 ---------------------------
 
