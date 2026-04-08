@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Clone project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: 'master'
           fetch-depth: 0
@@ -55,7 +55,7 @@ jobs:
           tar -cvf ../../repo.tar ./*
 
       - name: Upload repo artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: github-pages
           path: repo.tar
@@ -72,8 +72,8 @@ jobs:
 
     steps:
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
