@@ -193,10 +193,13 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
     int ret = 0;
 
     void *gfxDst = NULL;
+    void *pidxDst = NULL;
     void *palDst = NULL;
+    size_t palSize = 0;
+
     GRFHeader header = { 0 };
-    GRFError err = grfLoadPath(path, &header, &gfxDst, NULL, NULL, NULL,
-                               &palDst, NULL);
+    GRFError err = grfLoadPath(path, &header, &gfxDst, NULL, &pidxDst, NULL,
+                               &palDst, &palSize);
     if (err != GRF_NO_ERROR)
     {
         NE_DebugPrint("Couldn't load GRF file: %d", err);
@@ -241,12 +244,25 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
             goto cleanup;
     }
 
-    if (NE_MaterialTexLoad(tex, fmt, header.gfxWidth, header.gfxHeight,
-                           flags, gfxDst) == 0)
+    if (header.gfxAttr == GRF_TEXFMT_4x4)
     {
-        NE_DebugPrint("Failed to load GRF texture");
-        goto cleanup;
+        if (NE_MaterialTex4x4Load(tex, header.gfxWidth, header.gfxHeight,
+                           flags, gfxDst, pidxDst) == 0)
+        {
+            NE_DebugPrint("Failed to load GRF texture");
+            goto cleanup;
+        }
     }
+    else
+    {
+        if (NE_MaterialTexLoad(tex, fmt, header.gfxWidth, header.gfxHeight,
+                            flags, gfxDst) == 0)
+        {
+            NE_DebugPrint("Failed to load GRF texture");
+            goto cleanup;
+        }
+    }
+
 
     // If there is no palette to be loaded there is nothing else to do
     if (palDst == NULL)
@@ -278,7 +294,7 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
         }
     }
 
-    if (NE_PaletteLoadSize(pal, palDst, header.palAttr * 2, fmt) == 0)
+    if (NE_PaletteLoadSize(pal, palDst, palSize, fmt) == 0)
     {
         NE_DebugPrint("Failed to load GRF palette");
         if (create_palette)
@@ -295,6 +311,7 @@ int NE_MaterialTexLoadGRF(NE_Material *tex, NE_Palette *pal,
 
 cleanup:
     free(gfxDst);
+    free(pidxDst);
     free(palDst);
     return ret;
 #endif // NE_BLOCKSDS
