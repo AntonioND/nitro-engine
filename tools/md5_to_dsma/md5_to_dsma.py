@@ -810,7 +810,7 @@ if __name__ == "__main__":
                         help="export base pose of a md5mesh as a DSA file")
     parser.add_argument("--skip-frames", required=False,
                         default=0, type=int,
-                        help="number of frames to skip in an animation (0 = export all, 1 = export half, 2 = export 33%, etc)")
+                        help="number of frames to skip in an animation (0 = export all, 1 = export half, 2 = export 33%%, etc)")
     parser.add_argument("--draw-normal-polygons", required=False,
                         action='store_true',
                         help="draw polygons with the shape of normals for debugging")
