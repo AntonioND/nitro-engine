@@ -115,6 +115,11 @@ void NE_PaletteSystemEnd(void);
 /// @return Returns a pointer to the base address of the palette in VRAM.
 void *NE_PaletteModificationStart(const NE_Palette *pal);
 
+/// Gets the number of colors in the palette under active modification.
+///
+/// @return Returns the number of colors of the palette being modified. 
+u16 NE_PaletteModificationGetNumColors();
+
 /// Set the desired entry of a palette to a new color.
 ///
 /// Use this during VBL.
