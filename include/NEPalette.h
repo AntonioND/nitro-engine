@@ -117,8 +117,8 @@ void *NE_PaletteModificationStart(const NE_Palette *pal);
 
 /// Gets the number of colors in the palette under active modification.
 ///
-/// @return Returns the number of colors of the palette being modified. 
-u16 NE_PaletteModificationGetNumColors();
+/// @return Returns the number of colors of the palette being modified.
+u16 NE_PaletteModificationGetNumColors(void);
 
 /// Set the desired entry of a palette to a new color.
 ///

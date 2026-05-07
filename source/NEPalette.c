@@ -301,7 +301,7 @@ void *NE_PaletteModificationStart(const NE_Palette *pal)
     return palette_address;
 }
 
-u16 NE_PaletteModificationGetNumColors()
+u16 NE_PaletteModificationGetNumColors(void)
 {
     return palette_num_colors;
 }
