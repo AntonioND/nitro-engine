@@ -6,10 +6,10 @@
 
 import os
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from math import sqrt
 
-from display_list import DisplayList, float_to_f32
+from display_list import DisplayList, float_to_f32, float_to_n10
 
 class MD5FormatError(Exception):
     pass
@@ -590,9 +590,100 @@ def save_animation(frames, output_file, blender_fix):
                 (u32 >> 24) & 0xFF]
             f.write(bytearray(b))
 
+# ---------------------------------------------------------------------------
+# Triangle strip helpers
+# ---------------------------------------------------------------------------
+
+def _tri_directed_edge_third(tri, p, q):
+    """If triangle (a,b,c) CCW has directed edge p->q, return third vertex."""
+    a, b, c = tri
+    if a == p and b == q: return c
+    if b == p and c == q: return a
+    if c == p and a == q: return b
+    return None
+
+def stripify_triangles(resolved_tris):
+    """Greedy triangle stripification.
+    resolved_tris: list of (vk0, vk1, vk2) in CCW order.
+    Returns (strips, singles) where:
+      strips = list of (strip_vertex_keys, strip_face_indices)
+      singles = list of face indices not in any strip
+    """
+    if not resolved_tris:
+        return [], []
+
+    edge_to_faces = defaultdict(list)
+    for fi, tri in enumerate(resolved_tris):
+        for i in range(3):
+            edge = frozenset([tri[i], tri[(i + 1) % 3]])
+            edge_to_faces[edge].append(fi)
+
+    used = set()
+    strips = []
+    singles = []
+
+    for start_fi in range(len(resolved_tris)):
+        if start_fi in used:
+            continue
+
+        best_strip = None
+        best_faces = None
+
+        face = resolved_tris[start_fi]
+        for rot in range(3):
+            a = face[rot]
+            b = face[(rot + 1) % 3]
+            c = face[(rot + 2) % 3]
+
+            strip = [a, b, c]
+            faces = [start_fi]
+            local_used = set(used)
+            local_used.add(start_fi)
+
+            while True:
+                n = len(faces)
+                p, q = strip[-2], strip[-1]
+                edge_key = frozenset([p, q])
+
+                found = False
+                for cfi in edge_to_faces[edge_key]:
+                    if cfi in local_used:
+                        continue
+                    tri = resolved_tris[cfi]
+                    if n % 2 == 0:
+                        new_v = _tri_directed_edge_third(tri, p, q)
+                    else:
+                        new_v = _tri_directed_edge_third(tri, q, p)
+
+                    if new_v is not None:
+                        strip.append(new_v)
+                        faces.append(cfi)
+                        local_used.add(cfi)
+                        found = True
+                        break
+
+                if not found:
+                    break
+
+            if best_faces is None or len(faces) > len(best_faces):
+                best_strip = strip
+                best_faces = faces
+
+        for fi in best_faces:
+            used.add(fi)
+
+        if len(best_faces) >= 2:
+            strips.append((best_strip, best_faces))
+        else:
+            singles.append(start_fi)
+
+    return strips, singles
+
+# ---------------------------------------------------------------------------
+
 def convert_md5mesh(model_file, name, output_folder, texture_size,
                     draw_normal_polygons, extension_mesh, extension_anim,
-                    blender_fix, export_base_pose):
+                    blender_fix, export_base_pose, no_strip=False):
 
     print(f"Converting model: {model_file}")
 
@@ -617,7 +708,6 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
 
     # Display list shared between all meshes
     dl = DisplayList()
-    dl.switch_vtxs("triangles")
 
     base_matrix = 30 - len(joints) + 1
     last_joint_index = None
@@ -652,103 +742,158 @@ def convert_md5mesh(model_file, name, output_folder, texture_size,
             else:
                 tri_normal.append(Vector(0, 0, 0))
 
-        print("  Generating display list...")
+        # Pre-compute per-vertex data for all triangles
+        # Each entry: (texcoord, joint_index, normal_joint_space, pos, final_or_None)
+        all_tri_verts = []  # list of list of per-vertex tuples (one list per tri)
 
         for tri, norm in zip(mesh.tris, tri_normal):
             verts = [mesh.verts[i] for i in tri]
             weights = [mesh.weights[v.startWeight] for v in verts]
 
-            finals = []
-
+            tri_vdata = []
             for vert, weight in zip(verts, weights):
-
-                # Texture
-                # -------
-
                 st = vert.st
-                # In the MD5 format (0, 0) is the top-left corner, same as what
-                # the GPU of the DS expects.
                 u = st[0] * texture_size[0]
                 v = st[1] * texture_size[1]
-                dl.texcoord(u, v)
-
-                # Vertex and normal
-                # -----------------
-
-                # Load joint matrix. When drawing normal polygons it has to be
-                # loaded every time, because drawing the normal restores the
-                # original matrix.
 
                 joint_index = weight.joint
-                if draw_normal_polygons or joint_index != last_joint_index:
-                    dl.mtx_restore(base_matrix + joint_index)
-                    last_joint_index = joint_index
-
-                # Calculate normal in joint space
-
                 joint = joints[joint_index]
 
                 q = joint.orient
                 qt = q.complement()
-                n = norm.to_q()
-
-                # Transform by the inverted quaternion
-                n = qt.mul(n).mul(q).to_v3()
+                n = qt.mul(norm.to_q()).mul(q).to_v3()
                 if n.length() > 0:
                     n = n.normalize()
-                dl.normal(n.x, n.y, n.z)
 
-                # The vertex is already in joint space
+                final = None
+                if draw_normal_polygons:
+                    q2 = joint.orient
+                    qt2 = q2.complement()
+                    vq = weight.pos.to_q()
+                    delta = q2.mul(vq).mul(qt2).to_v3()
+                    final = joint.pos.add(delta)
 
-                dl.vtx(weight.pos.x, weight.pos.y, weight.pos.z)
+                tri_vdata.append({
+                    'u': u, 'v': v,
+                    'joint_index': joint_index,
+                    'nx': n.x, 'ny': n.y, 'nz': n.z,
+                    'px': weight.pos.x, 'py': weight.pos.y, 'pz': weight.pos.z,
+                    'final': final,
+                })
+            all_tri_verts.append(tri_vdata)
+
+        # Build vertex keys for stripification.
+        # A vertex key = (mesh_vert_index, quantized_normal) so that
+        # only coplanar triangles at the same vertex can share strip edges.
+        resolved_tris = []
+        for ti, tri in enumerate(mesh.tris):
+            vdata = all_tri_verts[ti]
+            vkeys = []
+            for vi in range(3):
+                d = vdata[vi]
+                vk = (tri[vi],
+                      float_to_n10(d['nx']),
+                      float_to_n10(d['ny']),
+                      float_to_n10(d['nz']))
+                vkeys.append(vk)
+            resolved_tris.append(tuple(vkeys))
+
+        # Stripify (skip when drawing debug normals or when disabled)
+        if draw_normal_polygons or no_strip:
+            tri_strips, tri_singles = [], list(range(len(resolved_tris)))
+        else:
+            tri_strips, tri_singles = stripify_triangles(resolved_tris)
+
+        # Statistics
+        separate_vtx = len(resolved_tris) * 3
+        strip_vtx = (sum(len(s) for s, _ in tri_strips)
+                     + len(tri_singles) * 3)
+        stripped_count = len(resolved_tris) - len(tri_singles)
+        print(f"  Triangle strips: {len(tri_strips)} ({stripped_count} faces stripped, "
+              f"{len(tri_singles)} separate)")
+        print(f"  GPU vertices:    {separate_vtx} -> {strip_vtx} "
+              f"(saved {separate_vtx - strip_vtx})")
+
+        # Helper: build lookup from vertex key -> (tri_index, vert_index_in_tri)
+        vk_to_src = {}
+        for ti, tri in enumerate(mesh.tris):
+            vdata = all_tri_verts[ti]
+            for vi in range(3):
+                d = vdata[vi]
+                vk = (tri[vi],
+                      float_to_n10(d['nx']),
+                      float_to_n10(d['ny']),
+                      float_to_n10(d['nz']))
+                vk_to_src[vk] = (ti, vi)
+
+        def emit_md5_vertex(vk):
+            nonlocal last_joint_index
+            ti, vi = vk_to_src[vk]
+            d = all_tri_verts[ti][vi]
+
+            dl.texcoord(d['u'], d['v'])
+
+            joint_index = d['joint_index']
+            if draw_normal_polygons or joint_index != last_joint_index:
+                dl.mtx_restore(base_matrix + joint_index)
+                last_joint_index = joint_index
+
+            dl.normal(d['nx'], d['ny'], d['nz'])
+            dl.vtx(d['px'], d['py'], d['pz'])
+
+        print("  Generating display list...")
+
+        # Emit triangle strips
+        for strip_verts, strip_faces in tri_strips:
+            dl.begin_vtxs("triangle_strip")
+            for vk in strip_verts:
+                emit_md5_vertex(vk)
+            dl.end_vtxs()
+
+        # Emit separate triangles
+        if tri_singles:
+            dl.begin_vtxs("triangles")
+            for fi in tri_singles:
+                for vk in resolved_tris[fi]:
+                    emit_md5_vertex(vk)
 
                 if draw_normal_polygons:
-                    # Calculate actual location of the vertex so that the
-                    # vertices of the triangle can be averaged as origin of the
-                    # normal polygon.
-                    q = joint.orient
-                    qt = q.complement()
-                    v = weight.pos.to_q()
+                    vdata = all_tri_verts[fi]
+                    norm = tri_normal[fi]
+                    finals = [vdata[vi]['final'] for vi in range(3)]
 
-                    delta = q.mul(v).mul(qt).to_v3()
+                    dl.mtx_restore(1)
+                    last_joint_index = None
 
-                    final = joint.pos.add(delta)
-                    finals.append(final)
+                    vert_avg = Vector(
+                        (finals[0].x + finals[1].x + finals[2].x) / 3,
+                        (finals[0].y + finals[1].y + finals[2].y) / 3,
+                        (finals[0].z + finals[1].z + finals[2].z) / 3
+                    )
 
-            if draw_normal_polygons:
+                    vert_avg_end = vert_avg.add(norm)
 
-                # Don't use any of the joint transformation matrices
-                dl.mtx_restore(1)
+                    dl.texcoord(0, 0)
 
-                vert_avg = Vector(
-                    (finals[0].x + finals[1].x + finals[2].x) / 3,
-                    (finals[0].y + finals[1].y + finals[2].y) / 3,
-                    (finals[0].z + finals[1].z + finals[2].z) / 3
-                )
+                    dl.color(1, 0, 0)
+                    dl.vtx(vert_avg.x + 0.1, vert_avg.y, vert_avg.z)
+                    dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
+                    dl.color(0, 1, 0)
+                    dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
 
-                vert_avg_end = vert_avg.add(norm)
+                    dl.color(1, 0, 0)
+                    dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
+                    dl.vtx(vert_avg.x, vert_avg.y + 0.1, vert_avg.z)
+                    dl.color(0, 1, 0)
+                    dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
 
-                dl.texcoord(0, 0)
+                    dl.color(1, 0, 0)
+                    dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
+                    dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z + 0.1)
+                    dl.color(0, 1, 0)
+                    dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
 
-                dl.color(1, 0, 0)
-                dl.vtx(vert_avg.x + 0.1, vert_avg.y, vert_avg.z)
-                dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
-                dl.color(0, 1, 0)
-                dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
-
-                dl.color(1, 0, 0)
-                dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
-                dl.vtx(vert_avg.x, vert_avg.y + 0.1, vert_avg.z)
-                dl.color(0, 1, 0)
-                dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
-
-                dl.color(1, 0, 0)
-                dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z)
-                dl.vtx(vert_avg.x, vert_avg.y, vert_avg.z + 0.1)
-                dl.color(0, 1, 0)
-                dl.vtx(vert_avg_end.x, vert_avg_end.y, vert_avg_end.z)
-
-    dl.end_vtxs()
+            dl.end_vtxs()
     dl.finalize()
 
     dl.save_to_file(os.path.join(output_folder, f"{name}{extension_mesh}"))
@@ -814,6 +959,9 @@ if __name__ == "__main__":
     parser.add_argument("--draw-normal-polygons", required=False,
                         action='store_true',
                         help="draw polygons with the shape of normals for debugging")
+    parser.add_argument("--no-strip", required=False,
+                        action='store_true',
+                        help="disable strip generation (original behavior)")
 
     args = parser.parse_args()
 
@@ -842,7 +990,7 @@ if __name__ == "__main__":
             convert_md5mesh(args.model, args.name, args.output, args.texture,
                             args.draw_normal_polygons, extension_mesh,
                             extension_anim, args.blender_fix,
-                            args.export_base_pose)
+                            args.export_base_pose, args.no_strip)
 
         for anim_file in args.anims:
             convert_md5anim(args.name, args.output, anim_file, args.skip_frames,
