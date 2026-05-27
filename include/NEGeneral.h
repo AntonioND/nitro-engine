@@ -227,6 +227,21 @@ void NE_ClippingPlanesSetI(int znear, int zfar);
 /// @param value true enables antialiasing, false disables it.
 void NE_AntialiasEnable(bool value);
 
+/// Depth buffering configuration for the 3D engine.
+typedef enum{
+    NE_ZBUFFERING = 0,
+    NE_WBUFFERING = (1 << 1)
+} NE_BufferingMode;
+
+/// Set the active depth buffering mode for 3D render.
+/// Z-buffering is default.
+///
+/// @param mode NE_ZBUFFERING or NE_WBUFFERING.
+void NE_SetDepthBufferingMode(NE_BufferingMode mode);
+
+/// Return the active depth buffering mode for 3D render.
+NE_BufferingMode NE_GetDepthBufferingMode(void)
+
 /// Returns the number of polygons drawn since the last glFlush().
 ///
 /// @return Returns the number of polygons (0 - 2048).
