@@ -228,10 +228,12 @@ void NE_ClippingPlanesSetI(int znear, int zfar);
 void NE_AntialiasEnable(bool value);
 
 /// Depth buffering configuration for the 3D engine.
-typedef enum{
-    NE_ZBUFFERING = 0,
+typedef enum
+{
+    NE_ZBUFFERING = (0 << 1),
     NE_WBUFFERING = (1 << 1)
-} NE_BufferingMode;
+}
+NE_BufferingMode;
 
 /// Set the active depth buffering mode for 3D render.
 /// Z-buffering is default.
